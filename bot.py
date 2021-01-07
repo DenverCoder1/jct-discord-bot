@@ -1,41 +1,39 @@
 import os
 from dotenv import load_dotenv
-from discord.ext.commands import Bot
+import discord
 from discord.ext import commands
 
-load_dotenv()
+if __name__ == "__main__":
 
-# Discord setup
-TOKEN = os.getenv('DISCORD_TOKEN')
-DISCORD_GUILD = int(os.getenv('DISCORD_GUILD'))
-client = Bot('~')  # bot command prefix
+	load_dotenv()
 
+	# Discord setup
+	TOKEN = os.getenv('DISCORD_TOKEN')
+	DISCORD_GUILD = int(os.getenv('DISCORD_GUILD'))
+	client = commands.Bot('~')  # bot command prefix
 
-@client.event
-async def on_ready():
-    '''When discord is connected'''
-    print(f'{client.user.name} has connected to Discord!')
+	# Get the base file names of all the files in the modules folder
+	_, _, modules = next(os.walk('./modules'))
+	modules = [os.path.splitext(os.path.basename(module))[0] for module in modules]
 
-
-@client.event
-async def on_error(event, *args, **kwargs):
-    '''When an exception is raised, log it in err.log'''
-    with open('err.log', 'a') as f:
-        if event == 'on_message':
-            f.write(f'Unhandled message: {args[0]}\n')
-        else:
-            f.write(f'Event: {event}\nMessage: {args}\n')
+	for module in modules:
+		client.load_extension('modules.' + module)
 
 
-@client.command(pass_context=True)
-@commands.has_permissions(administrator=True)
-async def ping(ctx):
-    '''Command to receive a response from the bot.
-       Invoked with !ping'''
-    # log command in console
-    print("Received ping!")
-    # respond to command
-    await ctx.send("Received ping!")
+	@client.event
+	async def on_ready():
+		'''When discord is connected'''
+		print(f'{client.user.name} has connected to Discord!')
 
-# Run Discord bot
-client.run(TOKEN)
+
+	@client.event
+	async def on_error(event, *args, **kwargs):
+		'''When an exception is raised, log it in err.log'''
+		with open('err.log', 'a') as f:
+			if event == 'on_message':
+				f.write(f'Unhandled message: {args[0]}\n')
+			else:
+				f.write(f'Event: {event}\nMessage: {args}\n')
+
+	# Run Discord bot
+	client.run(TOKEN)
