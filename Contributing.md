@@ -10,9 +10,9 @@ The first time you contribute to this project, feel free to add your name under 
 
 ### 1 - Creating an Issue
 
-When making a contribution, whether to fix a bug, or to add a new feature, first create an issue, if it doesn't already exist, outlining briefly what needs to be accomplished.
+When making a contribution, whether to fix a bug, or to add a new feature, first **create an issue** if it doesn't already exist, outlining briefly what needs to be accomplished. (Note each issue has an issue number by which we will reference it later on.)
 
-Once the issue exists, add any appropriate labels, then add it to the project **JCT Discord Bot**. (This can be accomplished on the issue's page on GitHub, on the right hand side on desktop, or at the bottom on mobile.) Then you can assign yourself to the issue.
+Once the issue exists, **add any appropriate labels**, then add it to the project **JCT Discord Bot**. (This can be accomplished on the issue's page on GitHub, on the right hand side on desktop, or at the bottom on mobile.) Then you can **assign yourself** to the issue.
 
 ### 2 - Creating a Branch
 
@@ -30,6 +30,10 @@ Always use tabs. Spaces suck.
 
 [//]: # "TODO: Explain how to test the bot locally."
 
-### 5 - Merging to Main
+### 5 - Creating a Pull Request
 
-Once you have tested your feature and you think it is ready to be deployed, you can go ahead and create a pull request on GitHub to merge your branch to the Main branch.
+Once you have tested your feature and you think it is ready to be deployed, you can go ahead and **create a pull request** on GitHub to merge your branch to the Main branch.
+
+Start the description of the pull request with the line `Close #N` (where `N` is the number of the issue) in order to link the pull request with the corresponding issue. (This can also be done manually after the PR is created, but it's preferable if you do it this way.)
+
+Once the pull request is made, or while creating it, **add a reviewer** to your pull request. They will review your changes and additions, and if they approve, they will merge your pull request.
