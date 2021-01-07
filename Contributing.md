@@ -24,11 +24,48 @@ Now you can write your code to implement your feature. You can commit and push t
 
 Always use tabs. Spaces suck.
 
-[//]: # "TODO: Explain how to organise each new feature in a separate file."
+Create a file for whatever you feature you want to add in the folder `/modules`. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
+
+```py
+class Ping(commands.Cog):
+	def __init__(self, bot):
+		self.bot = bot
+```
+
+Then as methods to that class, add any functions you need for the bot. For example:
+
+```py
+	@commands.command(name='ping')
+	async def ping(self, ctx):
+		"""A simple command which acknowledges the user's ping."""
+
+		# log in console that a ping was received
+		print('Received ping')
+
+		await ctx.send('Leave me alone, I\'m trying to sleep.')
+```
+
+Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
+
+```py
+def setup(bot):
+	bot.add_cog(Ping(bot))
+```
 
 ### 4 - Testing your Code
 
-[//]: # "TODO: Explain how to test the bot locally."
+To run the bot locally, you may want to first disable the hosted version of the bot, otherwise the bot will react to everything twice. Ask [Jonah Lawrence](https://github.com/DenverCoder1) for permission to manage the hosting service if necessary.
+
+You will also need the `.env` file in the project's root directory. Again, ask [Jonah Lawrence](https://github.com/DenverCoder1) for this file, or check the pinned messages in the `#jct-bot-development` Discord channel.
+
+You will need to make sure you have the `discord` and `python-dotenv` libraries installed. You can install them by typing the following commands in your terminal.
+
+```
+pip install discord
+pip install python-dotenv
+```
+
+Now you should be able to run the bot locally. Well done!
 
 ### 5 - Creating a Pull Request
 
