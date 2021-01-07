@@ -86,6 +86,8 @@ with open('modules/myfeature/biz.txt') as biz:
 
 ### 4 - Testing your Code
 
+You may want to add the bot to your own server to test stuff yourself first. To do so, [invite the bot to your server](https://discord.com/api/oauth2/authorize?client_id=796039233789100053&permissions=8&scope=bot). You would also have to change `DISCORD_GUILD` in the `.env` file.
+
 To run the bot locally, you may want to first disable the hosted version of the bot, otherwise the bot will react to everything twice. Ask [Jonah Lawrence](https://github.com/DenverCoder1) for permission to manage the hosting service if necessary.
 
 You will also need the `.env` file in the project's root directory. Again, ask [Jonah Lawrence](https://github.com/DenverCoder1) for this file, or check the pinned messages in the `#jct-bot-development` Discord channel.
