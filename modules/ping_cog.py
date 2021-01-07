@@ -13,16 +13,8 @@ class Ping(commands.Cog):
 		# log in console that a ping was received
 		print('Received ping')
 
-		responses = [
-			'Leave me alone, I\'m trying to sleep',
-			'Waaaazzzzzzzzaaaaaaaaaappppppp',
-			'Who do you think you are, puny human, to be pinging me?',
-			'Pong',
-			'Hey',
-			'This is *not* the droid you are looking for :hand_splayed:'
-		]
-
-		await ctx.send(random.choice(responses))
+		with open('modules/ping/responses.txt') as responses:
+			await ctx.send(random.choice(responses.readlines()))
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

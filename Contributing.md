@@ -18,16 +18,20 @@ Once the issue exists, **add any appropriate labels**, then add it to the projec
 
 Create a branch for the contribution you are making. If it is a new command you want to add, simply name the branch the same as the command (without the command prefix). If it is a bug you want to fix or something else, come up with some descriptive yet concise name for the branch.
 
+This name will be referred to as _myfeature_ throughout this guide.
+
 ### 3 - Writing the Code
 
 Now you can write your code to implement your feature. You can commit and push to the dedicated branch as often and whenever you like.
 
 Always use tabs. Spaces suck.
 
-Create a file for whatever you feature you want to add in the folder `/modules`. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
+#### 3.1 - Creating the Cog
+
+Create a file `myfeature_cog.py` (where _myfeature_ is the name of your command or feature) for whatever you feature you want to add in the folder `/modules`. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
 
 ```py
-class Ping(commands.Cog):
+class Myfeature(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 ```
@@ -35,24 +39,54 @@ class Ping(commands.Cog):
 Then as methods to that class, add any functions you need for the bot. For example:
 
 ```py
-	@commands.command(name='ping')
+	@commands.command(name='myfeature')
 	async def ping(self, ctx):
-		"""A simple command which acknowledges the user's ping."""
+		"""A simple command which replies to '~myfeature'."""
 
 		# log in console that a ping was received
-		print('Received ping')
+		print('Executing command "myfeature".')
 
-		await ctx.send('Leave me alone, I\'m trying to sleep.')
+		# reply with a message
+		await ctx.send('Command received.')
 ```
 
 Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
 
 ```py
 def setup(bot):
-	bot.add_cog(Ping(bot))
+	bot.add_cog(Myfeature(bot))
+```
+
+#### 3.2 - Additional files
+
+If you need additional files, be it python modules (`.py` files with functions and/or classes) or other files such as `.txt`, `.json`, etc. this is how you add them.
+
+First, you can create a folder `/modules/myfeature`. All your files aside from you cog will go in here.
+
+##### 3.2.1 - Using Additional Python Files
+
+Add an empty file `/modules/myfeature/__init__.py`. Then add any python files you need with whatever names you want. (Suppose your file is `/modules/myfeature/foo.py` and it contains a class or function `bar`).
+
+You can import the file from anywhere with any one of the following.
+
+```py
+import modules.myfeature.foo			# access bar with: modules.myfeature.foo.bar
+import modules.myfeature.foo as foo		# access bar with: foo.bar
+from modules.myfeature.foo import bar	# access bar with: bar
+```
+
+##### 3.2.2 - Using Additional Data Files
+
+You can add any data files you want to read from your python code in the `/modules/myfeature` folder. (Let's call one such file `biz.txt`.) To read them from your code, you can access them with the path relative to the repository root. For example:
+
+```py
+with open('modules/myfeature/biz.txt') as biz:
+	pass
 ```
 
 ### 4 - Testing your Code
+
+You may want to add the bot to your own server to test stuff yourself first. To do so, [invite the bot to your server](https://discord.com/api/oauth2/authorize?client_id=796039233789100053&permissions=8&scope=bot).
 
 To run the bot locally, you may want to first disable the hosted version of the bot, otherwise the bot will react to everything twice. Ask [Jonah Lawrence](https://github.com/DenverCoder1) for permission to manage the hosting service if necessary.
 
