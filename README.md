@@ -1,6 +1,6 @@
 # JCT Discord Bot
 
-Bot for [JCT ESP Compsci](https://discord.gg/rBsJ48Zz7q) Discord server
+Bot for JCT ESP CompSci Discord server
 
 ## Contributors
 
