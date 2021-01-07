@@ -31,6 +31,8 @@ Always use tabs. Spaces suck.
 Create a file `myfeature_cog.py` (where _myfeature_ is the name of your command or feature) for whatever you feature you want to add in the folder `/modules`. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
 
 ```py
+from discord.ext import commands
+
 class Myfeature(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -40,7 +42,7 @@ Then as methods to that class, add any functions you need for the bot. For examp
 
 ```py
 	@commands.command(name='myfeature')
-	async def ping(self, ctx):
+	async def myfeature(self, ctx):
 		"""A simple command which replies to '~myfeature'."""
 
 		# log in console that a ping was received
