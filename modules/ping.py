@@ -17,4 +17,4 @@ class Ping(commands.Cog):
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
 def setup(bot):
-    bot.add_cog(Ping(bot))
+	bot.add_cog(Ping(bot))

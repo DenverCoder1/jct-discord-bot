@@ -49,7 +49,7 @@ Finally, (this part is important,) add a function (outside the class) to add an 
 
 ```py
 def setup(bot):
-    bot.add_cog(Ping(bot))
+	bot.add_cog(Ping(bot))
 ```
 
 ### 4 - Testing your Code
