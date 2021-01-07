@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-import discord
 from discord.ext import commands
 
 if __name__ == "__main__":
@@ -13,8 +12,8 @@ if __name__ == "__main__":
 	client = commands.Bot('~')  # bot command prefix
 
 	# Get the base file names of all the files in the modules folder
-	_, _, modules = next(os.walk('./modules'))
-	modules = [os.path.splitext(os.path.basename(module))[0] for module in modules]
+	files = [f for f in os.listdir('modules') if os.path.isfile('modules/' + f)]
+	modules = [os.path.splitext(os.path.basename(file))[0] for file in files]
 
 	for module in modules:
 		client.load_extension('modules.' + module)
