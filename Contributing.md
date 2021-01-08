@@ -97,7 +97,7 @@ You will also need the `.env` file in the project's root directory. Again, ask [
 You will need to make sure you have the `discord` and `python-dotenv` libraries installed. You can install them by typing the following commands in your terminal.
 
 ```
-pip install discord
+pip install discord.py
 pip install python-dotenv
 ```
 
