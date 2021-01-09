@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan  7 09:53:09 2021
 
-@author: pinny
-"""
+import os
 from discord import utils
 from discord.ext import commands
 from modules.new_user.new_user import *
@@ -20,7 +16,7 @@ class NewUser(commands.Cog):
         #user who wrote the command
         member = ctx.author
         
-        if is_new(member) != True:
+        if not is_new(member):
             return
     
         await add_role(ctx, machon, year)
@@ -33,7 +29,10 @@ class NewUser(commands.Cog):
         '''catch missing required argument error'''
         
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("One or multiple required arguments are missing, please try again.")
+            if not is_new(ctx.message.author):
+                return
+            
+            await ctx.send("The format is: ~join <first name> <last name> <Lev or Tal> <year in college (1, 2, or 3)>\n For example: ~join Moshe Rabbeinu lev 1")
     
     
     @commands.Cog.listener()
@@ -42,8 +41,9 @@ class NewUser(commands.Cog):
         print(f"{member.name} joined the guild.")
         
         #Sets the channel to the welcome channel and sends a message to it
-        channel = utils.get(member.guild.channels, name = ":wave:welcome")#I'm not positive this is what the channel is called
-        await channel.send(f"Welcome, {member.name}, please use the join command to continue. ~join <firstname> <lastname> <machon Lev/Tal> <year of graduation>")
+        channel = utils.get(member.guild.channels, id = int(os.getenv("WELCOME_CHANNEL_ID")))#I'm not positive this is what the channel is called
+        await channel.send(f"Welcome, {member.name}, please use the join command to continue. ~join <firstname> <lastname> <Lev or Tal> <year in college (1, 2, or 3)>")
+
 
 
 #setup functions for bot
