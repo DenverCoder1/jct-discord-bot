@@ -9,7 +9,7 @@ Please follow the guidelines stated here when contributing to this repository.
 - Avoid trailing empty lines at the end of files.
 - Surround operators with a single space (except for when using `=` in parameter lists).
 - Leave two empty lines between functions.
-- Optionally leave one empty line between logical blocks of code in the same function.
+- Leave one empty line between logical blocks of code in the same function.
 
 ## Naming
 
