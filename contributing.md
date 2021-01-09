@@ -24,7 +24,7 @@ This name will be referred to as _myfeature_ throughout this guide.
 
 Now you can write your code to implement your feature. You can commit and push to the dedicated branch as often and whenever you like.
 
-Please check out the [style guide](style-guide.md).
+Please check out the [style guide](style_guide.md).
 
 #### 3.1 - Creating the Cog
 
