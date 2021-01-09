@@ -4,7 +4,7 @@ Please follow the instructions on this guide when making contributions to the JC
 
 ## First Time Contributor
 
-The first time you contribute to this project, feel free to add your name under the list of contributors in the [README.md](https://github.com/DenverCoder1/jct-discord-bot/blob/main/README.md) file. You can include this change along with the pull request you make.
+The first time you contribute to this project, feel free to add your name under the list of contributors in the [README.md](README.md) file. You can include this change along with the pull request you make.
 
 ## Contributing
 
@@ -24,7 +24,7 @@ This name will be referred to as _myfeature_ throughout this guide.
 
 Now you can write your code to implement your feature. You can commit and push to the dedicated branch as often and whenever you like.
 
-Always use tabs. Spaces suck.
+Please check out the [style guide](style_guide.md).
 
 #### 3.1 - Creating the Cog
 
