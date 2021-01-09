@@ -1,7 +1,7 @@
 from modules.piglatin.translate import translate
 from discord.ext import commands
 
-class PigLatin(commands.Cog):
+class PigLatinCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -18,4 +18,4 @@ class PigLatin(commands.Cog):
 
 
 def setup(bot):
-	bot.add_cog(PigLatin(bot))
+	bot.add_cog(PigLatinCog(bot))
