@@ -2,7 +2,7 @@ from discord.ext import commands
 import random
 
 
-class Ping(commands.Cog):
+class PingCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -19,4 +19,4 @@ class Ping(commands.Cog):
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
 def setup(bot):
-	bot.add_cog(Ping(bot))
+	bot.add_cog(PingCog(bot))

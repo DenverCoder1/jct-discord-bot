@@ -12,11 +12,13 @@ if __name__ == "__main__":
 	client = commands.Bot("~")  # bot command prefix
 
 	# Get the base file names of all the files in the modules folder
-	files = [f for f in os.listdir("modules") if os.path.isfile("modules/" + f)]
-	modules = [os.path.splitext(os.path.basename(file))[0] for file in files]
+	folders = filter(
+		lambda folder: os.path.exists("modules/" + folder + "/cog.py"),
+		os.listdir("modules"),
+	)
 
-	for module in modules:
-		client.load_extension("modules." + module)
+	for folder in folders:
+		client.load_extension("modules." + folder + ".cog")
 
 	@client.event
 	async def on_ready():
