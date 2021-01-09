@@ -24,7 +24,7 @@ This name will be referred to as _myfeature_ throughout this guide.
 
 Now you can write your code to implement your feature. You can commit and push to the dedicated branch as often and whenever you like.
 
-Always use tabs. Spaces suck.
+Please check out the [style guide](https://github.com/DenverCoder1/jct-discord-bot/blob/main/Contributing.md).
 
 #### 3.1 - Creating the Cog
 

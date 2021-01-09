@@ -4,7 +4,7 @@ Bot for JCT ESP CompSci Discord server
 
 ## Contributors
 
-This bot was created by the contribution of the following members. If you would like to contribute, please be in touch with one of the current contributors and then take a look at [the contributing guide](https://github.com/DenverCoder1/jct-discord-bot/blob/main/Contibuting.md)
+This bot was created by the contribution of the following members. If you would like to contribute, please be in touch with one of the current contributors and then take a look at [the contributing guide](https://github.com/DenverCoder1/jct-discord-bot/blob/main/contibuting.md)
 
 - [Jonah Lawrence](https://github.com/DenverCoder1)
 - [Abraham Murciano](https://github.com/abrahammurciano)
