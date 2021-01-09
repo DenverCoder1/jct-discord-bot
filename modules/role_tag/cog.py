@@ -1,5 +1,6 @@
-from modules.admin_symbol.admin_symbol import is_admin, add_symbol, remove_symbol
+from modules.role_tag.admin_symbol import is_admin, add_symbol, remove_symbol
 from discord.ext import commands
+
 
 class AdminSymbol(commands.Cog):
 	def __init__(self, bot):
@@ -7,7 +8,7 @@ class AdminSymbol(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
-		print('member updated')
+		print("member updated")
 		print(before.nick)
 		print(after.nick)
 
