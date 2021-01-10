@@ -1,5 +1,6 @@
 import os
 import discord
+from discord.ext.commands.core import command
 import config
 from discord.ext import commands
 
@@ -22,7 +23,15 @@ def main():
 	# TODO: remove this code by February (or whenever people get used to the new prefix)
 	@client.event
 	async def on_message(message: discord.Message):
-		if message.content.startswith("~"):
+		print(message.content)
+		if message.content.startswith(
+			tuple(
+				f"~{command}"
+				for command in os.listdir("modules")
+				if os.path.exists(os.path.join("modules", command, "cog.py"))
+			)
+			+ ("~help",)
+		):
 			channel = message.channel
 			await channel.send(
 				f"The prefix `~` has been changed to `{config.prefix}`. Please use that"
