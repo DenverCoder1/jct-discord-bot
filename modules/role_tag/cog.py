@@ -20,8 +20,9 @@ class RoleTagsCog(commands.Cog):
 		before = Role(before)
 		after = Role(after)
 		if before.tag != after.tag:
+			print(before.inner_role.name, "changed to", after.inner_role.name)
 			for member in after.inner_role.members:
-				Member(member).apply_tags()
+				await Member(member).apply_tags()
 
 
 def setup(bot):
