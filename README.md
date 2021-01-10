@@ -19,12 +19,18 @@ If you'd like a new feature added to the bot, or you have discovered some misbeh
 
 Here is a list of the available commands the bot responds to and how it does so.
 
-#### ~ping
+#### ++ping
 
-This command does just what you'd think it does. When a user types `~ping` into a channel which the bot is in, the bot will respond with a message to acknowledge your ping.
+This command does just what you'd think it does. When a user types `++ping` into a channel which the bot is in, the bot will respond with a message to acknowledge your ping.
+
+#### ++piglatin _lots of words_
+
+This command will reply with your message _lots of words_ but in pig latin.
 
 ### Automated Tasks
 
 This is a list of the tasks that the bot performs automatically based on some event.
 
-> Wow, such empty
+#### Role Tags
+
+A role can be given a tag by naming it something of the form **_Name_ | _tag_**. All members of the role will now have _tag_ in their server nickname. Users can have multiple tags.

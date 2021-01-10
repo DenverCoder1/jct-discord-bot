@@ -18,7 +18,7 @@ Once the issue exists, **add any appropriate labels**, then add it to the projec
 
 Create a branch for the contribution you are making. If it is a new command you want to add, simply name the branch the same as the command (without the command prefix). If it is a bug you want to fix or something else, come up with some descriptive yet concise name for the branch.
 
-This name will be referred to as _myfeature_ throughout this guide.
+This name will be referred to as _my_feature_ throughout this guide.
 
 ### 3 - Writing the Code
 
@@ -28,7 +28,7 @@ Please check out the [style guide](style_guide.md).
 
 #### 3.1 - Creating the Cog
 
-Create a file `/modules/my_feature/cog.py` (where _myfeature_ is the name of your command or feature) for whatever you feature you want to add. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
+Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of your command or feature) for whatever you feature you want to add. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
 
 ```py
 from discord.ext import commands
@@ -41,12 +41,12 @@ class MyFeatureCog(commands.Cog):
 Then as methods to that class, add any functions you need for the bot. For example:
 
 ```py
-	@commands.command(name='myfeature')
-	async def myfeature(self, ctx):
-		"""A simple command which replies to '~myfeature'."""
+	@commands.command(name='my_feature')
+	async def my_feature(self, ctx):
+		"""A simple command which replies to '++my_feature'."""
 
 		# log in console that a ping was received
-		print('Executing command "myfeature".')
+		print('Executing command "my_feature".')
 
 		# reply with a message
 		await ctx.send('Command received.')

@@ -1,32 +1,43 @@
 import os
 import discord
-from dotenv import load_dotenv
+from discord.ext.commands.core import command
+import config
 from discord.ext import commands
-from discord import Intents
 
-if __name__ == "__main__":
 
-	load_dotenv()
-
-	# Discord setup
-	TOKEN = os.getenv("DISCORD_TOKEN")
-	DISCORD_GUILD = int(os.getenv("DISCORD_GUILD"))
+def main():
+	config.init()
 
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
 	intents = discord.Intents.default()
 	intents.guilds = True
 	intents.members = True
 
-	client = commands.Bot("~", intents=intents)  # bot command prefix
+	client = commands.Bot(config.prefix, intents=intents)  # bot command prefix
 
-	# Get the base file names of all the files in the modules folder
-	folders = filter(
-		lambda folder: os.path.exists("modules/" + folder + "/cog.py"),
-		os.listdir("modules"),
-	)
+	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
+	for folder in os.listdir("modules"):
+		if os.path.exists(os.path.join("modules", folder, "cog.py")):
+			client.load_extension(f"modules.{folder}.cog")
 
-	for folder in folders:
-		client.load_extension("modules." + folder + ".cog")
+	# TODO: remove this code by February (or whenever people get used to the new prefix)
+	@client.event
+	async def on_message(message: discord.Message):
+		print(message.content)
+		if message.content.startswith(
+			tuple(
+				f"~{command}"
+				for command in os.listdir("modules")
+				if os.path.exists(os.path.join("modules", command, "cog.py"))
+			)
+			+ ("~help",)
+		):
+			channel = message.channel
+			await channel.send(
+				f"The prefix `~` has been changed to `{config.prefix}`. Please use that"
+				" instead."
+			)
+		await client.process_commands(message)
 
 	@client.event
 	async def on_ready():
@@ -43,4 +54,8 @@ if __name__ == "__main__":
 				f.write(f"Event: {event}\nMessage: {args}\n")
 
 	# Run Discord bot
-	client.run(TOKEN)
+	client.run(config.token)
+
+
+if __name__ == "__main__":
+	main()
