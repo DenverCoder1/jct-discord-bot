@@ -2,6 +2,7 @@ import os
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
+from discord import Intents
 
 if __name__ == "__main__":
 
