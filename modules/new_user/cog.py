@@ -1,8 +1,6 @@
-
-import os
 from discord.utils import get
 from discord.ext import commands
-from modules.new_user.new_user import is_unassigned, add_role, remove_unassigned, change_nick, get_id
+from modules.new_user.new_user import is_unassigned, add_role, switch_unassigned, change_nick, get_id
 
 class new_user(commands.Cog):
 	def __init__ (self, bot, attempts = {}):
@@ -16,14 +14,12 @@ class new_user(commands.Cog):
 		#user who wrote the command
 		member = ctx.author
 
-
-
 		if not is_unassigned(member):
 			return
 
 		await change_nick(member, first_name, last_name)
 		await add_role(ctx, machon, year)
-		await remove_unassigned(member)
+		await switch_unassigned(member)
 		del self.attempts[member.name]
 
 
