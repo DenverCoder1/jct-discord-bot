@@ -17,16 +17,14 @@ if __name__ == "__main__":
 	intents.guilds = True
 	intents.members = True
 
-	client = commands.Bot("~", intents=intents)  # bot command prefix
+	global PREFIX
+	PREFIX = "++"
+	client = commands.Bot(PREFIX, intents=intents)  # bot command prefix
 
-	# Get the base file names of all the files in the modules folder
-	folders = filter(
-		lambda folder: os.path.exists("modules/" + folder + "/cog.py"),
-		os.listdir("modules"),
-	)
-
-	for folder in folders:
-		client.load_extension("modules." + folder + ".cog")
+	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
+	for folder in os.listdir("modules"):
+		if os.path.exists(os.path.join("modules", folder, "cog.py")):
+			client.load_extension("modules." + folder + ".cog")
 
 	@client.event
 	async def on_ready():
