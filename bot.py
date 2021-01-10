@@ -26,6 +26,16 @@ if __name__ == "__main__":
 		if os.path.exists(os.path.join("modules", folder, "cog.py")):
 			client.load_extension("modules." + folder + ".cog")
 
+	# TODO: remove this code by February (or whenever people get used to the new prefix)
+	@client.event
+	async def on_message(message: discord.Message):
+		if message.content.startswith("~"):
+			channel = message.channel
+			await channel.send(
+				"The prefix `~` has been changed to `++`. Please use that instead."
+			)
+			await channel.send("++" + message.content[1:])
+
 	@client.event
 	async def on_ready():
 		"""When discord is connected"""
