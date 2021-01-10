@@ -1,3 +1,4 @@
+import config
 from discord.utils import get
 from discord.ext import commands
 from modules.new_user.new_user import (
@@ -51,10 +52,10 @@ class new_user(commands.Cog):
 				self.attempts[member.name] += 1
 
 			await ctx.send(
-				"""
+				f"""
 Please check the syntax of the command:
 
-++join **first-name**, **last-name**, **campus**, **year**
+{config.prefix}join **first-name**, **last-name**, **campus**, **year**
 
   - **campus** is Lev or Tal (case insensitive),
   - **year** is 1, 2, 3, or 4
@@ -69,11 +70,11 @@ Please check the syntax of the command:
 		# Sets the channel to the welcome channel and sends a message to it
 		channel = get(member.guild.channels, id=get_id("WELCOME_CHANNEL_ID"))
 		await channel.send(
-			"""
+			f"""
 Welcome to the server!
 Please type the following command so we know who you are:
 
-++join **first-name**, **last-name**, **campus**, **year**
+{config.prefix}join **first-name**, **last-name**, **campus**, **year**
 
 Where:
   - **first-name** is your first name,

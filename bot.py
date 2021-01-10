@@ -1,30 +1,23 @@
 import os
 import discord
-from dotenv import load_dotenv
+import config
 from discord.ext import commands
-from discord import Intents
 
-if __name__ == "__main__":
 
-	load_dotenv()
-
-	# Discord setup
-	TOKEN = os.getenv("DISCORD_TOKEN")
-	DISCORD_GUILD = int(os.getenv("DISCORD_GUILD"))
+def main():
+	config.init()
 
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
 	intents = discord.Intents.default()
 	intents.guilds = True
 	intents.members = True
 
-	global PREFIX
-	PREFIX = "++"
-	client = commands.Bot(PREFIX, intents=intents)  # bot command prefix
+	client = commands.Bot(config.prefix, intents=intents)  # bot command prefix
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
 	for folder in os.listdir("modules"):
 		if os.path.exists(os.path.join("modules", folder, "cog.py")):
-			client.load_extension("modules." + folder + ".cog")
+			client.load_extension(f"modules.{folder}.cog")
 
 	# TODO: remove this code by February (or whenever people get used to the new prefix)
 	@client.event
@@ -32,9 +25,10 @@ if __name__ == "__main__":
 		if message.content.startswith("~"):
 			channel = message.channel
 			await channel.send(
-				"The prefix `~` has been changed to `++`. Please use that instead."
+				f"The prefix `~` has been changed to `{config.prefix}`. Please use that"
+				" instead."
 			)
-			await channel.send("++" + message.content[1:])
+		await client.process_commands(message)
 
 	@client.event
 	async def on_ready():
@@ -51,4 +45,8 @@ if __name__ == "__main__":
 				f.write(f"Event: {event}\nMessage: {args}\n")
 
 	# Run Discord bot
-	client.run(TOKEN)
+	client.run(config.token)
+
+
+if __name__ == "__main__":
+	main()
