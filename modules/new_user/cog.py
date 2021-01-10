@@ -1,16 +1,10 @@
 import config
-from discord.utils import get
+import discord
 from discord.ext import commands
-from modules.new_user.new_user import (
-	is_unassigned,
-	add_role,
-	switch_unassigned,
-	change_nick,
-	get_id,
-)
+import modules.new_user.new_user as new_user
 
 
-class new_user(commands.Cog):
+class NewUserCog(commands.Cog):
 	def __init__(self, bot, attempts=None):
 		self.bot = bot
 		self.attempts = attempts if attempts is not None else {}
@@ -21,12 +15,12 @@ class new_user(commands.Cog):
 		# user who wrote the command
 		member = ctx.author
 
-		if not is_unassigned(member):
+		if not new_user.is_unassigned(member):
 			return
 
-		await change_nick(member, first_name, last_name)
-		await add_role(ctx, machon, year)
-		await switch_unassigned(member)
+		await new_user.change_nick(member, first_name, last_name)
+		await new_user.add_role(ctx, machon, year)
+		await new_user.switch_unassigned(member)
 		del self.attempts[member.name]
 
 	@commands.Cog.listener()
@@ -35,7 +29,7 @@ class new_user(commands.Cog):
 		member = ctx.message.author
 
 		if isinstance(error, commands.MissingRequiredArgument):
-			if not is_unassigned(member):
+			if not new_user.is_unassigned(member):
 				return
 
 			# check is this user needs extra help
@@ -43,7 +37,9 @@ class new_user(commands.Cog):
 				self.attempts[member.name] = 0
 
 			elif self.attempts[member.name] >= 2:
-				admin = get(ctx.guild.roles, id=get_id("ADMIN_ROLE_ID"))
+				admin = discord.utils.get(
+					ctx.guild.roles, id=new_user.get_id("ADMIN_ROLE_ID")
+				)
 				await ctx.send(
 					f"{admin.mention} Help! Someone doesn't know how to read!"
 				)
@@ -63,12 +59,23 @@ Please check the syntax of the command:
 			)
 
 	@commands.Cog.listener()
-	async def on_member_join(self, member):
+	async def on_member_join(self, member: discord.Member):
 		"""Welcome members who join."""
 		print(f"{member.name} joined the guild.")
 
+		# If new member is a bot, give them the bot role and don't welcome them
+		if member.bot:
+			await member.add_roles(
+				discord.utils.get(member.guild.roles, id=new_user.get_id("BOT_ROLE_ID"))
+			)
+			return
+
+		# TODO: Give user unassigned role
+
 		# Sets the channel to the welcome channel and sends a message to it
-		channel = get(member.guild.channels, id=get_id("WELCOME_CHANNEL_ID"))
+		channel = discord.utils.get(
+			member.guild.channels, id=new_user.get_id("WELCOME_CHANNEL_ID")
+		)
 		await channel.send(
 			f"""
 Welcome to the server!
@@ -89,4 +96,4 @@ If you have any trouble feel free to ask an admin for assistance by typing @Admi
 
 # setup functions for bot
 def setup(bot):
-	bot.add_cog(new_user(bot))
+	bot.add_cog(NewUserCog(bot))
