@@ -11,8 +11,9 @@ if __name__ == "__main__":
 	TOKEN = os.getenv("DISCORD_TOKEN")
 	DISCORD_GUILD = int(os.getenv("DISCORD_GUILD"))
 
-	# allows privledged intents for monitoring members joining (has to be enabled for the bot in Discord dev)
+	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
 	intents = discord.Intents.default()
+	intents.guilds = True
 	intents.members = True
 
 	client = commands.Bot("~", intents=intents)  # bot command prefix
