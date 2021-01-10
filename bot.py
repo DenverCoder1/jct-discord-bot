@@ -33,6 +33,7 @@ if __name__ == "__main__":
 		"""When discord is connected"""
 		print(f"{client.user.name} has connected to Discord!")
 
+
 	@client.event
 	async def on_error(event, *args, **kwargs):
 		"""When an exception is raised, log it in err.log"""
@@ -42,5 +43,6 @@ if __name__ == "__main__":
 			else:
 				f.write(f"Event: {event}\nMessage: {args}\n")
 
-	# Run Discord bot
-	client.run(TOKEN)
+
+# Run Discord bot
+client.run(TOKEN)
