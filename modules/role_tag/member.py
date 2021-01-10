@@ -18,11 +18,11 @@ class Member:
 		)
 
 	def tags(self) -> List[str]:
-		return [
-			role.tag.strip()
-			for role in [Role(role) for role in self.inner_member.roles]
-			if role.has_tag()
-		]
+		roles = sorted(
+			self.inner_member.roles, key=lambda role: role.position, reverse=True
+		)
+		roles = [Role(role) for role in roles]
+		return [role.tag.strip() for role in roles if role.has_tag()]
 
 	def tags_str(self) -> str:
 		tags = self.tags()
