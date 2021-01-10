@@ -43,7 +43,7 @@ async def change_nick(member, first_name, last_name):
 
 def get_id(name):
 	'''gets the id of an object that has the name name'''
-	with open("modules\\new_user\\IDs.csv") as file:
+	with open("modules\new_user\IDs.csv") as file:
 		for line in file:
 			line = line.strip('\n')
 			(key, val) = line.split(',')
