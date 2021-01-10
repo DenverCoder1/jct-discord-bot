@@ -1,5 +1,7 @@
+from modules.role_tag.role import Role
 from modules.role_tag.admin_symbol import is_admin, add_symbol, remove_symbol
 from discord.ext import commands
+import discord
 
 
 class AdminSymbol(commands.Cog):
@@ -7,18 +9,13 @@ class AdminSymbol(commands.Cog):
 		self.bot = bot
 
 	@commands.Cog.listener()
-	async def on_member_update(self, before, after):
-		print("member updated")
-		print(before.nick)
-		print(after.nick)
+	async def on_member_update(self, before: discord.Member, after: discord.Member):
+		# - check which roles the user has
+		member_roles = [Role(role.name) for role in after.roles]
 
-		admin_before = is_admin(before)
-		admin_now = is_admin(after)
-
-		if not admin_before and admin_now:
-			await add_symbol(after)
-		elif admin_before and not admin_now:
-			await remove_symbol(after)
+		# - apply all said tags (if any) to username
+		for role in member_roles:
+			role.give_tag(after)
 
 
 def setup(bot):
