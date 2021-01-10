@@ -1,5 +1,5 @@
 from discord.utils import get
-from os.path import join
+import os
 
 def is_unassigned(member):
 	#if the member has the unassigned role
@@ -44,7 +44,7 @@ async def change_nick(member, first_name, last_name):
 
 def get_id(name):
 	'''gets the id of an object that has the name name'''
-	with open(join("modules", "new_user", "IDs.csv") as file:
+	with open(os.path.join("modules", "new_user", "IDs.csv") as file:
 		for line in file:
 			line = line.strip('\n')
 			(key, val) = line.split(',')
