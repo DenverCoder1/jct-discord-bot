@@ -1,4 +1,5 @@
 import os
+import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import Intents
@@ -10,11 +11,12 @@ if __name__ == "__main__":
 	# Discord setup
 	TOKEN = os.getenv("DISCORD_TOKEN")
 	DISCORD_GUILD = int(os.getenv("DISCORD_GUILD"))
-	
-	#gives bot privleged intents to monitor members joining
-	intents = Intents.default()
+
+	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
+	intents = discord.Intents.default()
+	intents.guilds = True
 	intents.members = True
-	
+
 	client = commands.Bot("~", intents=intents)  # bot command prefix
 
 	# Get the base file names of all the files in the modules folder

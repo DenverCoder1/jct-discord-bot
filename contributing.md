@@ -4,7 +4,7 @@ Please follow the instructions on this guide when making contributions to the JC
 
 ## First Time Contributor
 
-The first time you contribute to this project, feel free to add your name under the list of contributors in the [README.md](https://github.com/DenverCoder1/jct-discord-bot/blob/main/README.md) file. You can include this change along with the pull request you make.
+The first time you contribute to this project, feel free to add your name under the list of contributors in the [README.md](README.md) file. You can include this change along with the pull request you make.
 
 ## Contributing
 
@@ -24,16 +24,16 @@ This name will be referred to as _myfeature_ throughout this guide.
 
 Now you can write your code to implement your feature. You can commit and push to the dedicated branch as often and whenever you like.
 
-Always use tabs. Spaces suck.
+Please check out the [style guide](style_guide.md).
 
 #### 3.1 - Creating the Cog
 
-Create a file `myfeature_cog.py` (where _myfeature_ is the name of your command or feature) for whatever you feature you want to add in the folder `/modules`. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
+Create a file `/modules/my_feature/cog.py` (where _myfeature_ is the name of your command or feature) for whatever you feature you want to add. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
 
 ```py
 from discord.ext import commands
 
-class Myfeature(commands.Cog):
+class MyFeatureCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 ```
@@ -56,33 +56,31 @@ Finally, (this part is important,) add a function (outside the class) to add an 
 
 ```py
 def setup(bot):
-	bot.add_cog(Myfeature(bot))
+	bot.add_cog(MyFeatureCog(bot))
 ```
 
 #### 3.2 - Additional files
 
-If you need additional files, be it python modules (`.py` files with functions and/or classes) or other files such as `.txt`, `.json`, etc. this is how you add them.
-
-First, you can create a folder `/modules/myfeature`. All your files aside from you cog will go in here.
+If you need additional files, be it python modules (`.py` files with functions and/or classes) or other files such as `.txt`, `.json`, etc, you can put them in `/modules/my_feature/`
 
 ##### 3.2.1 - Using Additional Python Files
 
-Add an empty file `/modules/myfeature/__init__.py`. Then add any python files you need with whatever names you want. (Suppose your file is `/modules/myfeature/foo.py` and it contains a class or function `bar`).
+Suppose your additional file is `/modules/my_feature/foo.py` and it contains a class or function `bar`.
 
 You can import the file from anywhere with any one of the following.
 
 ```py
-import modules.myfeature.foo			# access bar with: modules.myfeature.foo.bar
-import modules.myfeature.foo as foo		# access bar with: foo.bar
-from modules.myfeature.foo import bar	# access bar with: bar
+import modules.my_feature.foo           # access bar with: modules.my_feature.foo.bar
+import modules.my_feature.foo as foo    # access bar with: foo.bar
+from modules.my_feature.foo import bar  # access bar with: bar
 ```
 
 ##### 3.2.2 - Using Additional Data Files
 
-You can add any data files you want to read from your python code in the `/modules/myfeature` folder. (Let's call one such file `biz.txt`.) To read them from your code, you can access them with the path relative to the repository root. For example:
+You can add any data files you want to read from your python code in the `/modules/my_feature/` folder. (Let's call one such file `biz.txt`.) To read them from your code, you can access them with the path relative to the repository root. For example:
 
 ```py
-with open('modules/myfeature/biz.txt') as biz:
+with open('modules/my_feature/biz.txt') as biz:
 	pass
 ```
 
@@ -94,10 +92,10 @@ To run the bot locally, you may want to first disable the hosted version of the 
 
 You will also need the `.env` file in the project's root directory. Again, ask [Jonah Lawrence](https://github.com/DenverCoder1) for this file, or check the pinned messages in the `#jct-bot-development` Discord channel.
 
-You will need to make sure you have the `discord` and `python-dotenv` libraries installed. You can install them by typing the following commands in your terminal.
+You will need to make sure you have the `discord.py` and `python-dotenv` libraries installed. You can install them by typing the following commands in your terminal.
 
 ```
-pip install discord
+pip install discord.py
 pip install python-dotenv
 ```
 
@@ -109,4 +107,4 @@ Once you have tested your feature and you think it is ready to be deployed, you 
 
 Start the description of the pull request with the line `Close #N` (where `N` is the number of the issue) in order to link the pull request with the corresponding issue. (This can also be done manually after the PR is created, but it's preferable if you do it this way.)
 
-Once the pull request is made, or while creating it, **add a reviewer** to your pull request. They will review your changes and additions, and if they approve, they will merge your pull request.
+Once the pull request is made, or while creating it, **add a reviewer** to your pull request. They will review your changes and additions, and if they approve, you can merge your pull request.
