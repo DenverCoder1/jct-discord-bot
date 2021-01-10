@@ -8,6 +8,7 @@ This bot was created by the contribution of the following members. If you would 
 
 - [Jonah Lawrence](https://github.com/DenverCoder1)
 - [Abraham Murciano](https://github.com/abrahammurciano)
+- [Pinny Silver](https://github.com/PSilver22)
 
 ## Issues and Feature Requests
 
