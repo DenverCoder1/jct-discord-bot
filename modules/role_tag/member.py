@@ -26,7 +26,7 @@ class Member:
 
 	def tags_str(self) -> str:
 		tags = self.tags()
-		return " " + self.sep + " " + " ".join(tags) if tags else ""
+		return f" {self.sep } {' '.join(tags)}" if tags else ""
 
 	async def apply_tags(self):
 		"""
