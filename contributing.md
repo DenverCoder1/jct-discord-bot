@@ -2,10 +2,6 @@
 
 Please follow the instructions on this guide when making contributions to the JCT Discord Bot.
 
-## First Time Contributor
-
-The first time you contribute to this project, feel free to add your name under the list of contributors in the [README.md](README.md) file. You can include this change along with the pull request you make.
-
 ## Contributing
 
 ### 1 - Creating an Issue
