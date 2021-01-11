@@ -35,8 +35,9 @@ class JoinParser:
 
 		# if only three components were found by splitting on comma
 		# then assume the comma between first and last name was missed
-		if len(self.decompose(enforce_well_formed=False)) == 3:
-			names = self.decomp[0].split()
+		decomposition = self.decompose(enforce_well_formed=False)
+		if len(decomposition) == 3:
+			names = decomposition[0].split()
 			if len(names) >= 2:
 				return " ".join([name.capitalize() for name in names])
 
