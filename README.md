@@ -6,9 +6,8 @@ Bot for JCT ESP CompSci Discord server
 
 This bot was created by the contribution of the following members. If you would like to contribute, please be in touch with one of the current contributors and then take a look at [the contributing guide](contributing.md)
 
-- [Jonah Lawrence](https://github.com/DenverCoder1)
-- [Abraham Murciano](https://github.com/abrahammurciano)
-- [Pinny Silver](https://github.com/PSilver22)
+<!-- readme: contributors -start -->
+<!-- readme: contributors -end -->
 
 ## Issues and Feature Requests
 
