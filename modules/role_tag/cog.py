@@ -11,9 +11,16 @@ class RoleTagsCog(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_update(self, before: discord.Member, after: discord.Member):
 		if before.roles != after.roles:
-			print("Renaming", before.nick)
-			await Member(after).apply_tags()
-			print("Renamed", before.nick, "to", after.nick)
+			before = Member(before)
+			after = Member(after)
+			if before.tags() != after.tags():
+				await after.apply_tags()
+				print(
+					"Renamed",
+					before.inner_member.display_name,
+					"to",
+					after.inner_member.display_name,
+				)
 
 	@commands.Cog.listener()
 	async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
