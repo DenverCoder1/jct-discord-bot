@@ -23,7 +23,6 @@ def main():
 	# TODO: remove this code by February (or whenever people get used to the new prefix)
 	@client.event
 	async def on_message(message: discord.Message):
-		print(message.content)
 		if message.content.startswith(
 			tuple(
 				f"~{command}"
