@@ -1,127 +1,113 @@
 import discord
-from discord.utils import get
+import discord.utils
 import os
-from collections.abc import Iterable
 import csv
-from typing import Dict
+import config
 
 
-async def assign(ctx, attempts: Dict[discord.Member, int]):
-	member = ctx.author
+async def assign(member: discord.Member, name: str, campus: str, year: int):
 	if is_unassigned(member):
-		try:
-			(first_name, last_name, machon, year) = await parse_join(ctx)
-
-		except TypeError:
-			check_attempts(ctx, attempts)
-			return
-
-		await change_nick(member, first_name, last_name)
-		await add_role(ctx, machon, year)
+		await member.edit(nick=name)
+		await add_role(member, campus, year)
 		await switch_unassigned(member)
 
 
 def is_unassigned(member: discord.Member):
 	# if the member has the unassigned role
-	return get(member.roles, id=get_id("UNASSIGNED_ROLE_ID")) != None
+	return get_discord_obj(member.roles, "UNASSIGNED_ROLE_ID") is not None
 
 
-def flatten(l):
-	for el in l:
-		if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
-			yield from flatten(el)
-		else:
-			yield el
-
-
-async def parse_join(ctx):
-	"""formats the command to get all the required arguments"""
-	message = ctx.message.content[5:].strip()  # remove ~join
-
-	# parse with commas
-	args = [chunk.strip() for chunk in message.split(",")]  # split on commas
-
-	if len(args) < 4:  # if too few arguments
-		args = flatten([arg.split(" ") for arg in args])  # try splitting on spaces
-
-	if len(args) < 4:  # if still too few arguments
-		await ctx.send(
-			"Please check the syntax of the command:\n\n~join **first-name**,"
-			" **last-name**, **campus**, **year**\n\n\t\t- **campus**: Lev or Tal (case"
-			" insensitive),\n\t\t- **year**: one of 1, 2, 3, or 4"
-		)
-		return None
-
-	return args
-
-
-async def add_role(ctx, machon, year):
+async def add_role(member: discord.Member, campus: str, year: int):
 	"""adds the right role to the user that used the command"""
-	member = ctx.author
+	# formatting role for csv file, eg LEV_YEAR_1_ROLE_ID
+	role_label = f"{campus.upper()}_YEAR_{year}_ROLE_ID"
+	class_role = get_discord_obj(member.guild.roles, role_label)
 
-	# formatting role for env file
-	role_id = (
-		machon.upper() + "_YEAR_" + year + "_ROLE_ID"
-	)  # format example: LEV_YEAR_1_ROLE_ID
-	new_role = get(member.guild.roles, id=get_id(role_id))
+	# check if the role was found
+	if class_role == None:
+		raise ValueError(f"Could not find the role for {role_label}.")
 
-	# check if the role was legal
-	if new_role == None:
-		await ctx.send(
-			"The Machon or year was wrong. Please try again or contact an admin for"
-			" help."
-		)
-		return
-
-	await member.add_roles(new_role)
-	print(f"Gave {new_role} to {member}")
+	await member.add_roles(class_role)
+	print(f"Gave {class_role.name} to {member.display_name}")
 
 
 async def switch_unassigned(member):
 	"""removes the unassigned role from member and gives assigned role"""
-	# remove unassigned role
-	role = get(member.guild.roles, id=get_id("UNASSIGNED_ROLE_ID"))
-	await member.remove_roles(role)
-
 	# add assigned role
-	role = get(member.guild.roles, id=get_id("ASSIGNED_ROLE_ID"))
+	role = get_discord_obj(member.guild.roles, "ASSIGNED_ROLE_ID")
 	await member.add_roles(role)
+
+	# remove unassigned role
+	role = get_discord_obj(member.guild.roles, "UNASSIGNED_ROLE_ID")
+	await member.remove_roles(role)
 
 	print(f"Removed Unassigned from {member} and added Assigned")
 
 
-async def change_nick(member, first_name, last_name):
-	"""changes the nick name of the member to their full name"""
-	name = first_name.capitalize() + " " + last_name.capitalize()
-	await member.edit(nick=name)
-	print(f"Set {member} nick to {name}")
+def get_discord_obj(iterable, label: str):
+	def get_id(label: str):
+		"""gets the id of an object that has the given label in the CSV file"""
+		with open(os.path.join("modules", "new_user", "ids.csv")) as csv_file:
+			csv_reader = csv.reader(csv_file, delimiter=",")
+
+			for row in csv_reader:
+				if row[0] == label:
+					return int(row[1])
+
+			return None
+
+	return discord.utils.get(iterable, id=get_id(label))
 
 
-def get_id(name):
-	"""gets the id of an object that has the name: name"""
-	with open(os.path.join("modules", "new_user", "IDs.csv")) as csv_file:
-		csv_reader = csv.reader(csv_file, delimiter=",")
-
-		for row in csv_reader:
-			if row[0] == name:
-				return int(row[1])
-
-		return None
+async def give_initial_role(member: discord.Member):
+	label = "BOT_ROLE_ID" if member.bot else "UNASSIGNED_ROLE_ID"
+	role = get_discord_obj(member.guild.roles, label)
+	await member.add_roles(get_discord_obj(member.guild.roles, label))
+	print(f"Gave {role.name} to {member.name}")
 
 
-async def check_attempts(ctx, attempts):
-	"""checks and updates the amount of failed attempts that have been made by the user"""
-	member = ctx.author.name
+async def server_greet(member: discord.Member):
+	# Sets the channel to the welcome channel and sends a message to it
+	channel = get_discord_obj(member.guild.channels, "WELCOME_CHANNEL_ID")
+	await channel.send(f"{member.name} joined the server!")
+	await channel.send(
+		f"""Welcome to the server, {member.mention}!
 
-	# check is this user needs extra help
-	if member not in attempts:
-		attempts[member] = 0
+Please type the following command so we know who you are:
 
-	elif attempts[member] >= 2:
-		admin = get(ctx.guild.roles, id=get_id("ADMIN_ROLE_ID"))
-		await ctx.send(
-			f"{admin.mention} I need some help! This user doesn't know how to read!"
-		)
+{config.prefix}join **first-name**, **last-name**, **campus**, **year**
 
-	else:
-		attempts[member] += 1
+Where:
+  - **first-name** is your first name,
+  - **last-name** is your last name,
+  - **campus** is *Lev* or *Tal* (case insensitive),
+  - **year** is one of 1, 2, 3, or 4
+
+If you have any trouble feel free to contact an admin using @Admin.
+"""
+	)
+
+
+async def private_greet(member: discord.Member):
+	"""privately messages the user who joined"""
+	if member.dm_channel == None:
+		await member.create_dm()
+
+	channel = get_discord_obj(member.guild.channels, "WELCOME_CHANNEL_ID")
+
+	await member.dm_channel.send(
+		f"""Welcome to the server, {member.mention}!
+
+If you haven't already done so, please type head over to the {channel.mention} channel in the JCT CompSci ESP server and type the following command so we know who you are:
+
+{config.prefix}join **first-name**, **last-name**, **campus**, **year**
+
+Where:
+  - **first-name** is your first name,
+  - **last-name** is your last name,
+  - **campus** is *Lev* or *Tal* (case insensitive),
+  - **year** is one of 1, 2, 3, or 4
+
+If you have any trouble feel free to contact an admin using @Admin in the {channel.mention} channel.
+"""
+	)
