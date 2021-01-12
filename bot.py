@@ -4,6 +4,7 @@ from discord.ext.commands.core import command
 import config
 from discord.ext import commands
 
+
 def main():
 	config.init()
 
