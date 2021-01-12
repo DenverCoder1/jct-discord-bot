@@ -1,0 +1,13 @@
+on: [push, pull_request]
+
+jobs:
+  contrib-readme-job:
+    runs-on: ubuntu-latest
+    name: Contributors-Readme-Action
+    steps:
+      - name: Contributors List
+        uses: akhilmhdh/contributors-readme-action@v2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commit_message: Updated contributors list
