@@ -47,7 +47,7 @@ async def switch_unassigned(member):
 def get_discord_obj(iterable, label: str):
 	def get_id(label: str):
 		"""gets the id of an object that has the given label in the CSV file"""
-		with open(os.path.join("modules", "new_user", "../../ids.csv")) as csv_file:
+		with open("ids.csv") as csv_file:
 			csv_reader = csv.reader(csv_file, delimiter=",")
 
 			for row in csv_reader:
