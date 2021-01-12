@@ -43,15 +43,6 @@ def main():
 		"""When discord is connected"""
 		print(f"{client.user.name} has connected to Discord!")
 
-	@client.event
-	async def on_error(event, *args, **kwargs):
-		"""When an exception is raised, log it in err.log"""
-		with open("err.log", "a") as f:
-			if event == "on_message":
-				f.write(f"Unhandled message: {args[0]}\n")
-			else:
-				f.write(f"Event: {event}\nMessage: {args}\n")
-
 	# Run Discord bot
 	client.run(config.token)
 

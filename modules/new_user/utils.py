@@ -1,7 +1,6 @@
 import discord
 import discord.utils
-import os
-import csv
+from modules.utils.utils import get_discord_obj
 import config
 
 
@@ -42,21 +41,6 @@ async def switch_unassigned(member):
 	await member.remove_roles(role)
 
 	print(f"Removed Unassigned from {member} and added Assigned")
-
-
-def get_discord_obj(iterable, label: str):
-	def get_id(label: str):
-		"""gets the id of an object that has the given label in the CSV file"""
-		with open(os.path.join("modules", "new_user", "ids.csv")) as csv_file:
-			csv_reader = csv.reader(csv_file, delimiter=",")
-
-			for row in csv_reader:
-				if row[0] == label:
-					return int(row[1])
-
-			return None
-
-	return discord.utils.get(iterable, id=get_id(label))
 
 
 async def give_initial_role(member: discord.Member):
