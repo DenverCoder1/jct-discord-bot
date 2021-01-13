@@ -25,26 +25,6 @@ class ErrorLogCog(commands.Cog):
 		await self.handler.handle(error, ctx.message)
 
 
-async def on_error(self, event, *args, **kwargs):
-	"""When an exception is raised, log it in err.log and bot log channel"""
-	_, error, _ = sys.exc_info()
-	# error while handling message
-	if event in [
-		"message",
-		"on_message",
-		"message_discarded",
-		"on_message_discarded",
-		"on_command_error",
-	]:
-		msg = f"**Error while handling a message**"
-		await ErrorHandler(args[0], error, msg).handle_error()
-	# other errors
-	else:
-		msg = f"An error occurred during an event and was not reported: {event}"
-		await ErrorHandler("", error, msg).handle_error()
-
-
 # setup functions for bot
 def setup(bot: commands.Bot):
 	bot.add_cog(ErrorLogCog(bot))
-	bot.on_error = on_error
