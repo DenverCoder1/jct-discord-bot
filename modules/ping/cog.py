@@ -3,11 +3,11 @@ import random
 
 
 class PingCog(commands.Cog):
-	def __init__(self, bot):
+	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 
 	@commands.command(name="ping")
-	async def ping(self, ctx):
+	async def ping(self, ctx: commands.Context):
 		"""A simple command which acknowledges the user's ping."""
 
 		# log in console that a ping was received
@@ -18,5 +18,5 @@ class PingCog(commands.Cog):
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
-def setup(bot):
+def setup(bot: commands.Bot):
 	bot.add_cog(PingCog(bot))
