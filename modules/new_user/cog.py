@@ -1,6 +1,5 @@
 from modules.error.friendly_error import FriendlyError
 from modules.new_user.join_parser import JoinParseError, JoinParser
-import config
 import discord
 from discord.ext import commands
 import modules.new_user.utils as utils

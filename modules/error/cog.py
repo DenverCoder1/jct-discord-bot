@@ -24,7 +24,16 @@ class ErrorLogCog(commands.Cog):
 		"""When a command exception is raised, log it in err.log and bot log channel"""
 		await self.handler.handle(error, ctx.message)
 
+	@commands.Cog.listener()
+	async def on_error(self, event, *args, **kwargs):
+		"""When an exception is raised, log it in err.log and bot log channel"""
+
+		_, error, _ = sys.exc_info()
+		await self.handler.handle(error)
+
 
 # setup functions for bot
 def setup(bot: commands.Bot):
-	bot.add_cog(ErrorLogCog(bot))
+	cog = ErrorLogCog(bot)
+	bot.add_cog(cog)
+	bot.on_error = cog.on_error

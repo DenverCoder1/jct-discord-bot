@@ -1,5 +1,6 @@
 import discord
 import discord.utils
+from modules.error.friendly_error import FriendlyError
 from utils.utils import get_discord_obj
 import config
 

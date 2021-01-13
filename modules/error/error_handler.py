@@ -13,7 +13,7 @@ class ErrorHandler:
 	def __init__(self, error_logger: ErrorLogger) -> None:
 		self.logger = error_logger
 
-	async def handle(self, error: Exception, message: discord.Message):
+	async def handle(self, error: Exception, message: discord.Message = None):
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
 
@@ -21,17 +21,20 @@ class ErrorHandler:
 			await self.handle(error.original, message)
 
 		else:
-			friendly_err = FriendlyError(
-				self.__user_error_message(error),
-				message.channel,
-				message.author,
-				error,
-			)
 			self.logger.log_to_file(error, message)
 			await self.logger.log_to_channel(error, message)
-			await self.handle(friendly_err, message)
+			if message is not None:
+				friendly_err = FriendlyError(
+					self.__user_error_message(error),
+					message.channel,
+					message.author,
+					error,
+				)
+				await self.handle(friendly_err, message)
 
-	async def __handle_friendly(self, error: FriendlyError, message: discord.Message):
+	async def __handle_friendly(
+		self, error: FriendlyError, message: discord.Message = None
+	):
 		if error.inner is not None:
 			self.logger.log_to_file(error.inner, message)
 		await error.reply()
