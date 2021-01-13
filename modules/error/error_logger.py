@@ -1,12 +1,14 @@
 from datetime import datetime
+from discord.ext import commands
 import traceback
 import discord
 
 
 class ErrorLogger:
-	def __init__(self, log_file: str, log_channel_id: int) -> None:
+	def __init__(self, log_file: str, log_channel_id: int, bot: commands.Bot) -> None:
 		self.log_file = log_file
 		self.log_channel_id = log_channel_id
+		self.bot = bot
 
 	def log_to_file(self, error: Exception, message: discord.Message = None):
 		"""appends the date and logs text to a file"""
@@ -17,9 +19,9 @@ class ErrorLogger:
 			f.write("--------------------------\n")
 
 	async def log_to_channel(self, error: Exception, message: discord.Message = None):
-		log_channel = message.guild.get_channel(self.log_channel_id)
+		log_channel = self.bot.get_channel(self.log_channel_id)
 		if message is None:
-			await log_channel.send(self.__get_err_text(error))
+			await log_channel.send(f"```{self.__get_err_text(error)}```")
 		else:
 			await log_channel.send(
 				f"Error triggered by {message.author.mention} in"
