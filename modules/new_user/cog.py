@@ -1,3 +1,4 @@
+from modules.error.friendly_error import FriendlyError
 from modules.new_user.join_parser import JoinParseError, JoinParser
 import config
 import discord
@@ -19,14 +20,15 @@ class NewUserCog(commands.Cog):
 		except JoinParseError as err:
 			if ctx.author not in self.attempts:
 				self.attempts[ctx.author] = 0
-			await ctx.send(f"{ctx.author.mention} {err}")
+			err_msg = str(err)
 			if self.attempts[ctx.author] > 1:
-				await ctx.send(
-					f"{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
+				err_msg += (
+					f"\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
 					f" Help! {ctx.author.mention} doesn't seem to be able to read"
 					" instructions."
 				)
 			self.attempts[ctx.author] += 1
+			raise FriendlyError(err_msg, ctx.channel, ctx.author)
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member: discord.Member):

@@ -30,7 +30,7 @@ Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of yo
 from discord.ext import commands
 
 class MyFeatureCog(commands.Cog):
-	def __init__(self, bot):
+	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 ```
 
@@ -38,7 +38,7 @@ Then as methods to that class, add any functions you need for the bot. For examp
 
 ```py
 	@commands.command(name='my_feature')
-	async def my_feature(self, ctx):
+	async def my_feature(self, ctx: commands.Context):
 		"""A simple command which replies to '++my_feature'."""
 
 		# log in console that a ping was received
@@ -51,7 +51,7 @@ Then as methods to that class, add any functions you need for the bot. For examp
 Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
 
 ```py
-def setup(bot):
+def setup(bot: commands.Bot):
 	bot.add_cog(MyFeatureCog(bot))
 ```
 
@@ -79,6 +79,20 @@ You can add any data files you want to read from your python code in the `/modul
 with open('modules/my_feature/biz.txt') as biz:
 	pass
 ```
+
+#### 3.3 - Error Handling
+
+If when trying to have the bot perform some action based on something a user said, you have to inform the user of an error, you can use the `FriendlyError` class to do so as follows:
+
+```py
+from modules.error.friendly_error import FriendlyError
+#...
+raise FriendlyError("user friendly error message", channel, member)
+```
+
+where `channel` is of type `discord.TextChannel` and `member` is of type `discord.Member`. Optionally, you can also pass as internal Exception, if applicable, and the error will be logged to `err.log`.
+
+When raising a `FriendlyError`, the message passed to it will be sent to the channel provided, tagging `member` if a member was passed.
 
 ### 4 - Testing your Code
 
