@@ -3,6 +3,7 @@ import discord.utils
 from modules.error.friendly_error import FriendlyError
 from utils.utils import get_discord_obj
 import config
+import random
 
 
 async def assign(member: discord.Member, name: str, campus: str, year: int):
@@ -101,4 +102,6 @@ If you have any trouble feel free to contact an admin using @Admin in the {chann
 async def server_welcome(member: discord.Member):
 	# Sets the channel to the welcome channel and sends a message to it
 	channel = get_discord_obj(member.guild.channels, "WELCOME_CHANNEL_ID")
-	await channel.send(f"{member.mention} joined the server! Welcome!")
+	welcome_emojis = ["🎉", "👋", "🌊", "🔥", "😎", "👏", "🎊", "🥳", "🙌", "✨", "⚡"]
+	random_emoji = random.choice(welcome_emojis)
+	await channel.send(f"{member.mention} joined the server! Welcome! {random_emoji}")
