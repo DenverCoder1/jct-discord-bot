@@ -3,7 +3,7 @@ from .help_command import NewHelpCommand
 
 
 class HelpCog(commands.Cog, name="Help"):
-	def __init__(self, bot):
+	def __init__(self, bot: commands.Bot):
 		self._original_help_command = bot.help_command
 		bot.help_command = NewHelpCommand()
 		bot.help_command.cog = self
@@ -13,5 +13,5 @@ class HelpCog(commands.Cog, name="Help"):
 
 
 # setup functions for bot
-def setup(bot):
+def setup(bot: commands.Bot):
 	bot.add_cog(HelpCog(bot))

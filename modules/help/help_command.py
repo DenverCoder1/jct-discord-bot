@@ -14,11 +14,11 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 		invoked_with = self.invoked_with
 		return f"Use {prefix}{invoked_with} [command] for more info on a command."
 
-	def get_command_signature(self, command):
+	def get_command_signature(self, command: commands.core.Command):
 		"""Retrieves the signature portion of the help page."""
 		return f"{command.qualified_name} {command.signature}"
 
-	async def send_bot_help(self, mapping):
+	async def send_bot_help(self, mapping: dict):
 		"""implements bot command help page"""
 		prefix = self.clean_prefix
 		embed = discord.Embed(title="Bot Commands", colour=self.COLOUR)
@@ -39,7 +39,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 		embed.set_footer(text=self.get_ending_note())
 		await self.get_destination().send(embed=embed)
 
-	async def send_cog_help(self, cog):
+	async def send_cog_help(self, cog: commands.Cog):
 		"""implements cog help page"""
 		embed = discord.Embed(
 			title=f"{cog.qualified_name} Commands", colour=self.COLOUR
@@ -58,7 +58,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 		embed.set_footer(text=self.get_ending_note())
 		await self.get_destination().send(embed=embed)
 
-	async def send_group_help(self, group):
+	async def send_group_help(self, group: commands.Group):
 		"""implements group help page and command help page"""
 		embed = discord.Embed(title=group.qualified_name, colour=self.COLOUR)
 		if group.help:
