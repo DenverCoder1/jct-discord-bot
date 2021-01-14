@@ -7,13 +7,16 @@ import config
 import discord.utils
 
 
-@commands.has_role('admin')
+# @commands.has_role('admin')
 async def create_channel(ctx, channel_name):
     guild = ctx.guild
     existing_channel = discord.utils.get(guild.channels, name=channel_name)
     if not existing_channel:
-        print(f'Creating a new channel: {channel_name}')
+        cts.send(
+            "Creating  a   new channel:    {channel_name}"
+        )  # should {} be in quotes?
         await guild.create_text_channel(channel_name)
+
 
 # async def give_initial_role(member: discord.Member):
 #     label = "BOT_ROLE_ID" if member.bot else "UNASSIGNED_ROLE_ID"
