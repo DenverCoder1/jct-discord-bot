@@ -1,8 +1,9 @@
+import discord
+import modules.new_user.utils as utils
+import config
 from modules.error.friendly_error import FriendlyError
 from modules.new_user.join_parser import JoinParseError, JoinParser
-import discord
 from discord.ext import commands
-import modules.new_user.utils as utils
 
 
 class NewUserCog(commands.Cog, name="New User"):
@@ -12,7 +13,21 @@ class NewUserCog(commands.Cog, name="New User"):
 
 	@commands.command(name="join")
 	async def join(self, ctx: commands.Context):
-		"""Command to get new users' information and place them in the right roles"""
+		"""
+		Join command to get new users information and place them in the right roles
+
+		Usage:
+		```
+		++join first name, last name, campus, year
+		```
+		Arguments:
+
+			> **first name**: Your first name
+			> **last name**: Your last name
+			> **campus**: Lev or Tal
+			> **year**: an integer from 1 to 4 (inclusive)
+
+		"""
 		try:
 			parser = JoinParser(ctx.message.content)
 			await utils.assign(ctx.author, parser.name, parser.campus, parser.year)
