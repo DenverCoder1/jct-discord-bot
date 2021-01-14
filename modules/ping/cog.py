@@ -2,7 +2,7 @@ from discord.ext import commands
 import random
 
 
-class PingCog(commands.Cog):
+class PingCog(commands.Cog, name="Ping"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 

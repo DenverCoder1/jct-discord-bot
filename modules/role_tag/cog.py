@@ -4,7 +4,7 @@ from discord.ext import commands
 import discord
 
 
-class RoleTagsCog(commands.Cog):
+class RoleTagsCog(commands.Cog, name="Role Tags"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 

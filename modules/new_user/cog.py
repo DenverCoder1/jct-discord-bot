@@ -5,14 +5,14 @@ from discord.ext import commands
 import modules.new_user.utils as utils
 
 
-class NewUserCog(commands.Cog):
+class NewUserCog(commands.Cog, name="New User"):
 	def __init__(self, bot):
 		self.bot = bot
 		self.attempts = {}
 
 	@commands.command(name="join")
 	async def join(self, ctx: commands.Context):
-		"""Join command to get new users information and place them in the right roles"""
+		"""Command to get new users' information and place them in the right roles"""
 		try:
 			parser = JoinParser(ctx.message.content)
 			await utils.assign(ctx.author, parser.name, parser.campus, parser.year)
