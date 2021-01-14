@@ -10,6 +10,7 @@ async def assign(member: discord.Member, name: str, campus: str, year: int):
 		await member.edit(nick=name)
 		await add_role(member, campus, year)
 		await switch_unassigned(member)
+		await server_welcome(member)
 
 
 def is_unassigned(member: discord.Member):
@@ -52,9 +53,8 @@ async def give_initial_role(member: discord.Member):
 
 
 async def server_greet(member: discord.Member):
-	# Sets the channel to the welcome channel and sends a message to it
-	channel = get_discord_obj(member.guild.channels, "WELCOME_CHANNEL_ID")
-	await channel.send(f"{member.name} joined the server!")
+	# Sets the channel to the introduce yourself channel and sends a message to it
+	channel = get_discord_obj(member.guild.channels, "INTRODUCTION_CHANNEL_ID")
 	await channel.send(
 		f"""Welcome to the server, {member.mention}!
 
@@ -78,7 +78,7 @@ async def private_greet(member: discord.Member):
 	if member.dm_channel == None:
 		await member.create_dm()
 
-	channel = get_discord_obj(member.guild.channels, "WELCOME_CHANNEL_ID")
+	channel = get_discord_obj(member.guild.channels, "INTRODUCTION_CHANNEL_ID")
 
 	await member.dm_channel.send(
 		f"""Welcome to the server, {member.mention}!
@@ -96,3 +96,9 @@ Where:
 If you have any trouble feel free to contact an admin using @Admin in the {channel.mention} channel.
 """
 	)
+
+
+async def server_welcome(member: discord.Member):
+	# Sets the channel to the welcome channel and sends a message to it
+	channel = get_discord_obj(member.guild.channels, "WELCOME_CHANNEL_ID")
+	await channel.send(f"{member.mention} joined the server! Welcome!")
