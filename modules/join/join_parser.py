@@ -80,9 +80,9 @@ class JoinParser:
 			4: {"fourth", "four"},
 		}
 
-		for n, words in numbers:
-			for word in words:
-				string = string.replace(word, n)
+		for n in numbers:
+			for word in numbers[n]:
+				string = string.replace(word, str(n))
 
 		numbers = re.findall(r"[1-4]", string)
 		if len(numbers) == 1:

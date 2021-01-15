@@ -7,8 +7,7 @@ from discord.ext import commands
 class NewUserCog(commands.Cog, name="New User"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		guild = bot.get_guild(utils.get_id("JCT_GUILD_ID"))
-		self.greeter = Greeter(guild.get_channel("INTRO_CHANNEL"))
+		self.greeter = Greeter(bot)
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member: discord.Member):

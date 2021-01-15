@@ -5,10 +5,10 @@ from modules.join.join_parser import JoinParseError, JoinParser
 from discord.ext import commands
 
 
-class NewUserCog(commands.Cog, name="New User"):
+class JoinCog(commands.Cog, name="Join"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.assigner = Assigner(bot.get_guild(utils.get_id("JCT_GUILD_ID")))
+		self.assigner = Assigner(bot)
 		self.attempts = {}
 
 	@commands.command(name="join")
@@ -49,4 +49,4 @@ class NewUserCog(commands.Cog, name="New User"):
 
 # setup functions for bot
 def setup(bot: commands.Bot):
-	bot.add_cog(NewUserCog(bot))
+	bot.add_cog(JoinCog(bot))
