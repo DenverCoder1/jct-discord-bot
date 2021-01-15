@@ -8,7 +8,13 @@ class PingCog(commands.Cog, name="Ping"):
 
 	@commands.command(name="ping")
 	async def ping(self, ctx: commands.Context):
-		"""A simple command which acknowledges the user's ping."""
+		"""A command which simply acknowledges the user's ping.
+
+		Usage:
+		```
+		++ping
+		```
+		"""
 
 		# log in console that a ping was received
 		print("Received ping")

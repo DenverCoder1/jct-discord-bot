@@ -13,7 +13,13 @@ class ErrorLogCog(commands.Cog, name="Error Logs"):
 
 	@commands.command(name="logs")
 	async def logs(self, ctx: commands.Context, num_lines: int = 50):
-		"""Show recent logs from err.log"""
+		"""Show recent logs from err.log
+
+		Usage:
+		```
+		++logs
+		```
+		"""
 		# log in console that a ping was received
 		print('Executing command "logs".')
 		# send the logs
