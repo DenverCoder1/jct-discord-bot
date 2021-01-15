@@ -1,59 +1,25 @@
+from modules.new_user.greeter import Greeter
 import discord
-import modules.new_user.utils as utils
-import config
-from modules.error.friendly_error import FriendlyError
-from modules.new_user.join_parser import JoinParseError, JoinParser
+import utils.utils as utils
 from discord.ext import commands
 
 
 class NewUserCog(commands.Cog, name="New User"):
-	def __init__(self, bot):
+	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.attempts = {}
-
-	@commands.command(name="join")
-	async def join(self, ctx: commands.Context):
-		"""
-		Join command to get new users information and place them in the right roles
-
-		Usage:
-		```
-		++join first name, last name, campus, year
-		```
-		Arguments:
-
-			> **first name**: Your first name
-			> **last name**: Your last name
-			> **campus**: Lev or Tal
-			> **year**: an integer from 1 to 4 (inclusive)
-
-		"""
-		try:
-			parser = JoinParser(ctx.message.content)
-			await utils.assign(ctx.author, parser.name, parser.campus, parser.year)
-		except JoinParseError as err:
-			if ctx.author not in self.attempts:
-				self.attempts[ctx.author] = 0
-			err_msg = str(err)
-			if self.attempts[ctx.author] > 1:
-				err_msg += (
-					f"\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
-					f" Help! {ctx.author.mention} doesn't seem to be able to read"
-					" instructions."
-				)
-			self.attempts[ctx.author] += 1
-			raise FriendlyError(err_msg, ctx.channel, ctx.author)
+		guild = bot.get_guild(utils.get_id("JCT_GUILD_ID"))
+		self.greeter = Greeter(guild.get_channel("INTRO_CHANNEL"))
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member: discord.Member):
-		"""Welcome members who join."""
+		"""Ask members who join to use the join command."""
 		print(f"{member.name} joined the server.")
 
-		await utils.give_initial_role(member)
+		await self.greeter.give_initial_role(member)
 
 		if not member.bot:
-			await utils.server_greet(member)
-			await utils.private_greet(member)
+			await self.greeter.server_greet(member)
+			await self.greeter.private_greet(member)
 
 
 # setup functions for bot
