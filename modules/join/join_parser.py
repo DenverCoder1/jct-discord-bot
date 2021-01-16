@@ -18,15 +18,12 @@ class JoinParser:
 
 		self.command = command[len(config.prefix) + 4 :].strip()  # remove {prefix}join
 		self.decomp = self.decompose()
-		self.name = self.extract_name()
-		self.campus = self.extract_campus()
-		self.year = self.extract_year()
 
 	def decompose(self, enforce_well_formed=True) -> List[str]:
 		decomp = [component.strip() for component in self.command.split(",")]
 		return decomp if len(decomp) == 4 or not enforce_well_formed else None
 
-	def extract_name(self) -> str:
+	def name(self) -> str:
 		# if there are 4 components (or more) take the first 2 components as first and last names
 		if self.decomp is not None:
 			return " ".join(
@@ -42,9 +39,9 @@ class JoinParser:
 				return " ".join([name.capitalize() for name in names])
 
 		# switch to fallback mode: look for first two words which aren't special
-		return self.extract_name_fallback()
+		return self.__name_fallback()
 
-	def extract_name_fallback(self):
+	def __name_fallback(self):
 		def is_special(word):
 			return word.lower() in {"machon", "lev", "tal"} or any(
 				char.isdigit() for char in word
@@ -59,7 +56,7 @@ class JoinParser:
 
 		return words[0].capitalize() + " " + words[1].capitalize()
 
-	def extract_campus(self) -> str:
+	def campus(self) -> str:
 		string = (self.decomp[2] if self.decomp is not None else self.command).lower()
 		has_lev = bool(re.search(r"\blev\b", string))
 		has_tal = bool(re.search(r"\btal\b", string))
@@ -73,12 +70,20 @@ class JoinParser:
 				" *Tal* as shown in the command description above."
 			)
 
-	def extract_year(self) -> int:
+	def year(self) -> int:
 		string = self.decomp[3] if self.decomp is not None else self.command
-		string = string.replace("first", "1")
-		string = string.replace("second", "2")
-		string = string.replace("third", "3")
-		string = string.replace("fourth", "4")
+
+		numbers = {
+			1: {"first", "one"},
+			2: {"second", "two"},
+			3: {"third", "three"},
+			4: {"fourth", "four"},
+		}
+
+		for n in numbers:
+			for word in numbers[n]:
+				string = string.replace(word, str(n))
+
 		numbers = re.findall(r"[1-4]", string)
 		if len(numbers) == 1:
 			return int(numbers[0])

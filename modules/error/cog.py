@@ -5,7 +5,7 @@ from modules.error.error_handler import ErrorHandler
 from modules.error.error_logger import ErrorLogger
 
 
-class ErrorLogCog(commands.Cog):
+class ErrorLogCog(commands.Cog, name="Error Logs"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL_ID"), bot)
@@ -13,7 +13,13 @@ class ErrorLogCog(commands.Cog):
 
 	@commands.command(name="logs")
 	async def logs(self, ctx: commands.Context, num_lines: int = 50):
-		"""Show recent logs from err.log"""
+		"""Show recent logs from err.log
+
+		Usage:
+		```
+		++logs
+		```
+		"""
 		# log in console that a ping was received
 		print('Executing command "logs".')
 		# send the logs

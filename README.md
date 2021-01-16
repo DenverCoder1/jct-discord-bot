@@ -43,17 +43,33 @@ If you'd like a new feature added to the bot, or you have discovered some misbeh
 
 Here is a list of the available commands the bot responds to and how it does so.
 
+#### ++logs
+
+Replies with an extract from the error log file.
+
+#### ++help
+
+Replies with a list of available commands.
+
+#### ++join first name, last name, campus, year
+
+Assigns the user a role based on their campus and year. Assigns them their name as a nickname. Replaces their Unassigned role with the Assigned role. Once this is done, the bot will introduce them to everyone else in the welcome channel.
+
+#### ++piglatin lots of words
+
+This command will reply with your message _lots of words_ but in pig latin.
+
 #### ++ping
 
 This command does just what you'd think it does. When a user types `++ping` into a channel which the bot is in, the bot will respond with a message to acknowledge your ping.
 
-#### ++piglatin _lots of words_
-
-This command will reply with your message _lots of words_ but in pig latin.
-
 ### Automated Tasks
 
 This is a list of the tasks that the bot performs automatically based on some event.
+
+#### New User
+
+When a user joins, they are given the Unassigned role, greeted by the bot, and asked to introduce themselves with the join command.
 
 #### Role Tags
 

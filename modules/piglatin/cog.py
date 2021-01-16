@@ -2,13 +2,22 @@ from modules.piglatin.translate import translate
 from discord.ext import commands
 
 
-class PigLatinCog(commands.Cog):
+class PigLatinCog(commands.Cog, name="Pig Latin"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 
 	@commands.command(name="piglatin")
 	async def piglatin(self, ctx: commands.Context, *args):
-		"""Will convert message to pig latin."""
+		"""Convert message to pig latin.
+
+		Usage:
+		```
+		++piglatin Hello, World!
+		```
+		Arguments:
+
+			> **Hello, World!**: Replace this with whatever you want to convert to pig latin.
+		"""
 
 		# log in console that a ping was received
 		print('Executing command "piglatin".')
