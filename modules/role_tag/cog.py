@@ -5,7 +5,7 @@ import discord
 
 
 class RoleTagsCog(commands.Cog):
-	def __init__(self, bot):
+	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 
 	@commands.Cog.listener()
@@ -32,5 +32,5 @@ class RoleTagsCog(commands.Cog):
 				await Member(member).apply_tags()
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
 	bot.add_cog(RoleTagsCog(bot))
