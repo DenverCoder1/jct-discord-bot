@@ -8,7 +8,7 @@ from modules.new_user.utils import get_discord_obj
 from modules.new_user import utils
 
 
-class AddCourseChannelCog(commands.cog):
+class AddCourseChannelCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
