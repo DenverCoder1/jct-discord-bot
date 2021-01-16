@@ -14,12 +14,16 @@ import config
 class Search(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.last_paragraph = [None]
+		self.last_paragraph = {}
 
 	@commands.command(name="search")
 	async def search(self, ctx):
 		"""search command to message Google links and a small summary (when feasible) for a given prompt"""
 		searched_string = ctx.message.content[len(config.prefix) + 6 :].strip()
+
+		channel_id = ctx.channel.id
+		if channel_id not in self.last_paragraph:
+			self.last_paragraph[channel_id] = None
 
 		if (
 			searched_string.lower() == ":continue"
@@ -29,8 +33,8 @@ class Search(commands.Cog):
 
 		async with ctx.typing():
 			links = search(searched_string, num_results=1)
-			wiki = sf.get_wiki(searched_string)
-			wiki_intro = sf.get_wiki_intro(wiki, self.last_paragraph)
+			wiki, wiki_link = sf.get_wiki(searched_string)
+			wiki_intro = sf.get_wiki_intro(wiki, wiki_link, self.last_paragraph, channel_id)
 
 		await sf.send_message(ctx, searched_string, wiki_intro, links)
 

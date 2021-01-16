@@ -45,10 +45,11 @@ def get_wiki(searched_string: str):
 		):  # if there is no link received the first time or the link isn't from wikipedia
 			url = "https://en.wikipedia.org/wiki/" + searched_string
 			exception_caught = True
-	return wiki_html
+	return (wiki_html,
+		 url if exception_caught else url[0])
 
 
-def get_wiki_intro(wiki, last_paragraph):
+def get_wiki_intro(wiki, wiki_link, last_paragraph, channel_id):
 	"""finds the into to the wiki from the text of the wiki"""
 
 	# iterate through the paragraphs of the wiki
@@ -61,22 +62,23 @@ def get_wiki_intro(wiki, last_paragraph):
 
 		# " is " and " was " will be one of the first words in 99.99% of wiki intros
 		if (" is " in current_paragraph) or (" was " in current_paragraph):
-			last_paragraph[0] = i
-			return f"\n> {remove_citations(current_paragraph).strip()}\n~ Wikipedia.\n"
+			last_paragraph[channel_id] = i
+			return f"\n> {remove_citations(current_paragraph).strip()}\n~ Wikipedia (<{wiki_link}>).\n"
 
 	return ""
 
 
 async def next_paragraph(ctx: commands.Context, last_paragraph):
 	"""finds the next paragraph in the last searched wiki"""
-	if last_paragraph[0] != None:
+	channel_id = ctx.channel.id
+	if last_paragraph[channel_id] != None:
 		try:  # attempt to get the next paragraph in the wiki
-			next_paragraph = last_paragraph[0].find_next("p")
-			last_paragraph[0] = next_paragraph
+			next_paragraph = last_paragraph[channel_id].find_next("p")
+			last_paragraph[channel_id] = next_paragraph
 			await ctx.send(remove_citations(next_paragraph.get_text()))
 
 		except discord.HTTPException:  # raised when trying to get a non existent piece of html
-			last_paragraph[0] = None
+			last_paragraph[channel_id] = None
 			raise FriendlyError("The end of the search has been reached.", ctx.channel)
 	else:
 		raise FriendlyError("There is no search to continue.", ctx.channel)
