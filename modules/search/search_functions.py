@@ -62,7 +62,7 @@ def get_wiki_intro(wiki, last_paragraph):
 		# " is " and " was " will be one of the first words in 99.99% of wiki intros
 		if (" is " in current_paragraph) or (" was " in current_paragraph):
 			last_paragraph[0] = i
-			return f"\n{remove_citations(current_paragraph)}-From Wikipedia.\n"
+			return f"\n> {remove_citations(current_paragraph).strip()}\n~ Wikipedia.\n"
 
 	return ""
 
