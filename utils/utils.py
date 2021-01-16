@@ -1,6 +1,7 @@
 import csv
 import os
 import discord
+import re
 
 
 def get_discord_obj(iterable, label: str):
@@ -15,3 +16,8 @@ def get_id(label: str):
 			if row[0] == label:
 				return int(row[1])
 		return None
+
+
+def remove_tabs(string: str) -> str:
+	"""removed up to limit_per_line (default infinitely many) tabs from the beginning of each line of string"""
+	return re.sub(r"\n\t*", "\n", string).strip()

@@ -1,2 +1,4 @@
 discord.py==1.6.0
 python-dotenv==0.15.0
+googlesearch-python==2020.0.2
+beautifulsoup4==4.9.3
