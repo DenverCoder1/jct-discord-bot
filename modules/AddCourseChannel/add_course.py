@@ -10,9 +10,9 @@ import discord.utils
 # @commands.has_role('admin')
 async def create_channel(ctx, channel_name):
     guild = ctx.guild
-    existing_channel = discord.utils.get(guild.channels, name=channel_name)
+    existing_channel = discord.utils.get(guild.text_channels, name=channel_name)
     if not existing_channel:
-        cts.send(
+        await ctx.send(
             "Creating  a   new channel:    {channel_name}"
         )  # should {} be in quotes?
         await guild.create_text_channel(channel_name)
