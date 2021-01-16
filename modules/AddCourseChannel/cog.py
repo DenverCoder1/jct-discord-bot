@@ -13,7 +13,7 @@ class AddCourseChannelCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="add_course")
+    @commands.command(name="addcourse")
     async def add_course(self, ctx: commands.Context, *args):
         # checking if user is an admin, ie has an admin ID
         if self.get_discord_object("ADMIN_ROLE-ID") not in ctx.author.roles:
