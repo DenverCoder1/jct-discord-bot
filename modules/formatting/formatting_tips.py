@@ -55,14 +55,14 @@ class FormattingTips:
 
 	def __normalize(self, ctx: commands.Context, format: str) -> str:
 		"""normalize format to match format keys"""
-		# strip whitespace and convert to lowercase
-		normal_format = format.lower()
+		# convert to lowercase
+		lower_format = format.lower()
 		# check if inputted format is recognized
-		if normal_format in self.formats:
-			return normal_format
+		if lower_format in self.formats:
+			return lower_format
 		# check for aliases
-		elif normal_format in self.aliases:
-			return self.aliases[normal_format]
+		elif lower_format in self.aliases:
+			return self.aliases[lower_format]
 		# format is not recognized
 		else:
 			raise FriendlyError(
