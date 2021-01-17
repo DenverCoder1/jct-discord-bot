@@ -11,7 +11,7 @@ import modules.search.search_functions as sf
 import config
 
 
-class Search(commands.Cog):
+class SearchCog(commands.Cog, name="Search"):
 	def __init__(self, bot):
 		self.bot = bot
 		self.last_paragraph = {}
@@ -34,11 +34,13 @@ class Search(commands.Cog):
 		async with ctx.typing():
 			links = search(searched_string, num_results=1)
 			wiki, wiki_link = sf.get_wiki(searched_string)
-			wiki_intro = sf.get_wiki_intro(wiki, wiki_link, self.last_paragraph, channel_id)
+			wiki_intro = sf.get_wiki_intro(
+				wiki, wiki_link, self.last_paragraph, channel_id
+			)
 
 		await sf.send_message(ctx, searched_string, wiki_intro, links)
 
 
 # setup functions for bot
 def setup(bot):
-	bot.add_cog(Search(bot))
+	bot.add_cog(SearchCog(bot))
