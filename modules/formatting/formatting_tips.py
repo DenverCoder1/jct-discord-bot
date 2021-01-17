@@ -74,10 +74,8 @@ class FormattingTips:
 		(_, escaped) = self.formats["codeblock"]
 		return (
 			"Did you know you can format your code with a monospace font and syntax"
-			" highlighting on Discord?\n\n"
-			f"{blockquote(escaped)}\n\n"
-			"Copy the snippet above"
-			" into a message and insert your code in the middle. You can also change"
-			" the syntax highlighting language by replacing `cpp` with another"
+			f" highlighting on Discord?\n\n{blockquote(escaped)}\n\nCopy the snippet"
+			" above into a message and insert your code in the middle. You can also"
+			" change the syntax highlighting language by replacing `cpp` with another"
 			" language, for example, `js`, `py`, or `java`."
 		)
