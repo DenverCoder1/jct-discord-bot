@@ -20,7 +20,7 @@ class FormattingCog(commands.Cog, name="Formatting Tips"):
 
 			> **format** (optional): The format to display information about (ex. "bold", "italics", "codeblock", ...)
 
-		If no argument is specified, all markdown tips will be displayed
+		If no argument is specified, all markdown tips will be displayed.
 		"""
 		if len(args) == 0:
 			message = self.tips.all_markdown_tips()
