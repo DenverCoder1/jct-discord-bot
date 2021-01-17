@@ -26,7 +26,7 @@ class FormattingCog(commands.Cog, name="Formatting Tips"):
 			message = self.tips.all_markdown_tips()
 			await ctx.send(message)
 		else:
-			message = self.tips.individual_info(ctx, " ".join(args))
+			message = self.tips.individual_info(ctx, "".join(args))
 			await ctx.send(message)
 
 

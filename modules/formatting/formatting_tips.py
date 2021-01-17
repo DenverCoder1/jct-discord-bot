@@ -53,10 +53,10 @@ class FormattingTips:
 				"Copy the snippet into a message replacing the text with your own."
 			)
 
-	def __normalize(self, ctx: commands.Context, format: str):
+	def __normalize(self, ctx: commands.Context, format: str) -> str:
 		"""normalize format to match format keys"""
 		# strip whitespace and convert to lowercase
-		normal_format = format.lower().replace(" ", "")
+		normal_format = format.lower()
 		# check if inputted format is recognized
 		if normal_format in self.formats:
 			return normal_format
