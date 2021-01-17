@@ -22,7 +22,10 @@ class FormattingTips:
 		self.aliases = {
 			"italic": "italics",
 			"inlinecode": "inline",
+			"spoilers": "spoiler",
+			"underlines": "underline",
 			"code": "codeblock",
+			"codeblocks": "codeblock",
 			"codesnippet": "codeblock",
 			"snippet": "codeblock",
 			"strike": "strikethrough",
