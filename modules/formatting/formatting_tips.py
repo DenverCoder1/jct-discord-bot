@@ -1,10 +1,80 @@
-class FormattingTips:
-	def markdown_info(self):
-		return (
-			"test"
-		)
+from utils.utils import blockquote
+from modules.error.friendly_error import FriendlyError
+from discord.ext import commands
 
-	def codeblock_info(self):
+
+class FormattingTips:
+	def __init__(self):
+		# maps format name to pair containing preview markdown and escaped markdown
+		self.formats = {
+			"italics": ("*italics*", "\*italics* or \_italics_"),
+			"bold": ("**bold text**", "\**bold text**"),
+			"underline": ("__underline__", "\__underline__"),
+			"strikethrough": ("~~strikethrough~~", "\~~strikethrough~~"),
+			"spoiler": ("||spoiler|| (click to reveal)", "\||spoiler||"),
+			"inline": ("`inline code`", "\`inline code`"),
+			"codeblock": (
+				'```cpp\ncout << "Code Block";\n```',
+				'\```cpp\n// replace this with your code\ncout << "Code Block";\n```',
+			),
+		}
+		# alternative ways to request formats (spaces and case is already ignored)
+		self.aliases = {
+			"italic": "italics",
+			"inlinecode": "inline",
+			"code": "codeblock",
+			"codesnippet": "codeblock",
+			"snippet": "codeblock",
+			"strike": "strikethrough",
+		}
+
+	def all_markdown_tips(self) -> str:
+		"""return a list of all markdown tips"""
+		message = "**__Markdown Tips__**\n\n"
+		for format in self.formats:
+			(preview, escaped) = self.formats[format]
+			message += f"{preview}\n"
+			message += f"{blockquote(escaped)}\n\n"
+		return message
+
+	def individual_info(self, ctx: commands.Context, format: str) -> str:
+		"""return info for given format"""
+		normalized = self.__normalize(ctx, format)
+		if normalized == "codeblock":
+			return self.__codeblock_info()
+		else:
+			(preview, escaped) = self.formats[normalized]
+			return (
+				f"Did you know you can format your message with {preview}?\n\n"
+				f"{blockquote(escaped)}\n\n"
+				"Copy the snippet into a message replacing the text with your own."
+			)
+
+	def __normalize(self, ctx: commands.Context, format: str):
+		"""normalize format to match format keys"""
+		# strip whitespace and convert to lowercase
+		normal_format = format.lower().replace(" ", "")
+		# check if inputted format is recognized
+		if normal_format in self.formats:
+			return normal_format
+		# check for aliases
+		elif normal_format in self.aliases:
+			return self.aliases[normal_format]
+		# format is not recognized
+		else:
+			raise FriendlyError(
+				f"'{format}' is not a recognized format.", ctx.channel, ctx.author
+			)
+
+	def __codeblock_info(self) -> str:
+		"""Returns info about using codeblocks."""
+		(_, escaped) = self.formats["codeblock"]
 		return (
-			"test"
+			"Did you know you can format your code with a monospace font and syntax"
+			" highlighting on Discord?\n\n"
+			f"{blockquote(escaped)}\n\n"
+			"Copy the snippet above"
+			" into a message and insert your code in the middle. You can also change"
+			" the syntax highlighting language by replacing `cpp` with another"
+			" language, for example, `js`, `py`, or `java`."
 		)
