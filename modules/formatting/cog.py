@@ -1,11 +1,11 @@
 from discord.ext import commands
-from .formatting_tips import FormattingTips
+from .tip_formatter import TipFormatter
 
 
 class FormattingCog(commands.Cog, name="Formatting Tips"):
 	def __init__(self, bot):
 		self.bot = bot
-		self.tips = FormattingTips()
+		self.tips = TipFormatter()
 
 	@commands.command(name="markdown", aliases=["md"])
 	async def markdown(self, ctx, *args):

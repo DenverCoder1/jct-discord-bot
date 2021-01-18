@@ -1,19 +1,20 @@
 from utils.utils import blockquote
 from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
+from .formatting_tip import Tip
 
 
-class FormattingTips:
+class TipFormatter:
 	def __init__(self):
 		# maps format name to pair containing preview markdown and escaped markdown
 		self.formats = {
-			"italics": ("*italics*", "\*italics* or \_italics_"),
-			"bold": ("**bold text**", "\**bold text**"),
-			"underline": ("__underline__", "\__underline__"),
-			"strikethrough": ("~~strikethrough~~", "\~~strikethrough~~"),
-			"spoiler": ("||spoiler|| (click to reveal)", "\||spoiler||"),
-			"inline": ("`inline code`", "\`inline code`"),
-			"codeblock": (
+			"italics": Tip("*italics*", "\*italics* or \_italics_"),
+			"bold": Tip("**bold text**", "\**bold text**"),
+			"underline": Tip("__underline__", "\__underline__"),
+			"strikethrough": Tip("~~strikethrough~~", "\~~strikethrough~~"),
+			"spoiler": Tip("||spoiler|| (click to reveal)", "\||spoiler||"),
+			"inline": Tip("`inline code`", "\`inline code`"),
+			"codeblock": Tip(
 				'```cpp\ncout << "Code Block";\n```',
 				'\```cpp\n// replace this with your code\ncout << "Code Block";\n```',
 			),
@@ -35,23 +36,19 @@ class FormattingTips:
 		"""return a list of all markdown tips"""
 		message = "**__Markdown Tips__**\n\n"
 		for format in self.formats:
-			(preview, escaped) = self.formats[format]
-			message += f"{preview}\n"
-			message += f"{blockquote(escaped)}\n\n"
+			tip = self.formats[format]
+			message += f"{tip.preview}\n"
+			message += f"{blockquote(tip.escaped)}\n\n"
 		return message
 
 	def individual_info(self, ctx: commands.Context, format: str) -> str:
 		"""return info for given format"""
-		normalized = self.__normalize(ctx, format)
-		if normalized == "codeblock":
-			return self.__codeblock_info()
-		else:
-			(preview, escaped) = self.formats[normalized]
-			return (
-				f"Did you know you can format your message with {preview}?\n\n"
-				f"{blockquote(escaped)}\n\n"
-				"Copy the snippet into a message replacing the text with your own."
-			)
+		format = self.__normalize(ctx, format)
+		tip = self.formats[format]
+		header_text = self.__header(format, tip)
+		how_to = blockquote(tip.escaped)
+		footer_text = self.__footer(format)
+		return f"{header_text}\n\n{how_to}\n\n{footer_text}"
 
 	def __normalize(self, ctx: commands.Context, format: str) -> str:
 		"""normalize format to match format keys"""
@@ -69,13 +66,22 @@ class FormattingTips:
 				f"'{format}' is not a recognized format.", ctx.channel, ctx.author
 			)
 
-	def __codeblock_info(self) -> str:
-		"""Returns info about using codeblocks."""
-		(_, escaped) = self.formats["codeblock"]
-		return (
-			"Did you know you can format your code with a monospace font and syntax"
-			f" highlighting on Discord?\n\n{blockquote(escaped)}\n\nCopy the snippet"
-			" above into a message and insert your code in the middle. You can also"
-			" change the syntax highlighting language by replacing `cpp` with another"
-			" language, for example, `js`, `py`, or `java`."
-		)
+	def __header(self, format: str, tip: Tip) -> str:
+		if format == "codeblock":
+			return (
+				"Did you know you can format your code with a monospace font and syntax"
+				" highlighting on Discord?"
+			)
+		else:
+			return f"Did you know you can format your message with {tip.preview}?"
+
+	def __footer(self, format: str) -> str:
+		if format == "codeblock":
+			return (
+				"Copy the snippet above into a message and insert your code in the"
+				" middle. You can also change the syntax highlighting language by"
+				" replacing `cpp` with another language, for example, `js`, `py`, or"
+				" `java`."
+			)
+		else:
+			return "Copy the snippet into a message replacing the text with your own."
