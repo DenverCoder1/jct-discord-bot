@@ -26,3 +26,8 @@ def get_id(label: str) -> int:
 def remove_tabs(string: str) -> str:
 	"""removed up to limit_per_line (default infinitely many) tabs from the beginning of each line of string"""
 	return re.sub(r"\n\t*", "\n", string).strip()
+
+
+def blockquote(string: str) -> str:
+	"""Add blockquotes to a string"""
+	return re.sub(r"(^|\n)", r"\1> ", string)
