@@ -17,17 +17,17 @@ This bot was created by the contribution of the following members. If you would 
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/PSilver22">
-            <img src="https://avatars1.githubusercontent.com/u/75566318?v=4" width="100;" alt="PSilver22"/>
-            <br />
-            <sub><b>PSilver22</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/DenverCoder1">
             <img src="https://avatars0.githubusercontent.com/u/20955511?v=4" width="100;" alt="DenverCoder1"/>
             <br />
             <sub><b>Jonah Lawrence</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/PSilver22">
+            <img src="https://avatars1.githubusercontent.com/u/75566318?v=4" width="100;" alt="PSilver22"/>
+            <br />
+            <sub><b>PSilver22</b></sub>
         </a>
     </td></tr>
 </table>
