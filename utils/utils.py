@@ -31,3 +31,7 @@ def remove_tabs(string: str) -> str:
 def blockquote(string: str) -> str:
 	"""Add blockquotes to a string"""
 	return re.sub(r"(^|\n)", r"\1> ", string)
+
+
+def ordinal(n: int):
+	return "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4])
