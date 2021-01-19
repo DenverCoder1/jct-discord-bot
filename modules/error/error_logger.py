@@ -1,4 +1,5 @@
 from datetime import datetime
+from discord.channel import TextChannel
 from discord.ext import commands
 import traceback
 import discord
@@ -23,9 +24,14 @@ class ErrorLogger:
 		if message is None:
 			await log_channel.send(f"```{self.__get_err_text(error)}```")
 		else:
+			channel = (
+				message.channel.mention
+				if isinstance(message.channel, discord.TextChannel)
+				else "DM"
+			)
 			await log_channel.send(
 				f"Error triggered by {message.author.mention} in"
-				f" {message.channel.mention}\n```{self.__get_err_text(error, message)}```"
+				f" {channel}\n```{self.__get_err_text(error, message)}```"
 			)
 
 	def __get_err_text(self, error: Exception, message: discord.Message = None):
