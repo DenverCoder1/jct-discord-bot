@@ -6,7 +6,7 @@ Bot for JCT ESP CompSci Discord server
 
 This bot was created by the contribution of the following members. If you would like to contribute, please be in touch with one of the current contributors and then take a look at [the contributing guide](contributing.md)
 
-<!-- readme: contributors -start -->
+<!-- readme: contributors -start --> 
 <table>
 <tr>
     <td align="center">
