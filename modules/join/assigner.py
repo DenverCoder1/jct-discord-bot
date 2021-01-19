@@ -22,9 +22,9 @@ class Assigner:
 		self.__set_guild()
 		return self.guild.get_role(utils.get_id("UNASSIGNED_ROLE_ID"))
 
-	def __assigned_role(self):
+	def __student_role(self):
 		self.__set_guild()
-		return self.guild.get_role(utils.get_id("ASSIGNED_ROLE_ID"))
+		return self.guild.get_role(utils.get_id("STUDENT_ROLE_ID"))
 
 	def __welcome_channel(self):
 		self.__set_guild()
@@ -34,9 +34,9 @@ class Assigner:
 		if self.__unassigned_role() in member.roles:
 			await member.edit(nick=name)
 			await self.__add_role(member, campus, year)
-			await member.add_roles(self.__assigned_role())
+			await member.add_roles(self.__student_role())
 			await member.remove_roles(self.__unassigned_role())
-			print(f"Removed Unassigned from {member} and added Assigned")
+			print(f"Removed Unassigned from {member} and added Student")
 			await self.server_welcome(member)
 
 	async def __add_role(self, member: discord.Member, campus: str, year: int):

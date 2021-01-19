@@ -6,7 +6,7 @@ Bot for JCT ESP CompSci Discord server
 
 This bot was created by the contribution of the following members. If you would like to contribute, please be in touch with one of the current contributors and then take a look at [the contributing guide](contributing.md)
 
-<!-- readme: contributors -start --> 
+<!-- readme: contributors -start -->
 <table>
 <tr>
     <td align="center">
@@ -35,7 +35,7 @@ This bot was created by the contribution of the following members. If you would 
 
 ## Issues and Feature Requests
 
-If you'd like a new feature added to the bot, or you have discovered some misbehaviour by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://https://github.com/DenverCoder1/jct-discord-bot/issues).
+If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://https://github.com/DenverCoder1/jct-discord-bot/issues).
 
 ## Features
 
@@ -53,7 +53,7 @@ Replies with a list of available commands.
 
 #### ++join first name, last name, campus, year
 
-Assigns the user a role based on their campus and year. Assigns them their name as a nickname. Replaces their Unassigned role with the Assigned role. Once this is done, the bot will introduce them to everyone else in the welcome channel.
+Assigns the user a role based on their campus and year. Assigns them their name as a nickname. Replaces their Unassigned role with the Student role. Once this is done, the bot will introduce them to everyone else in the welcome channel.
 
 #### ++piglatin lots of words
 
