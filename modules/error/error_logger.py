@@ -51,11 +51,14 @@ class ErrorLogger:
 		)
 
 	def read_logs(self, n_lines: int = 50, char_lim: int = 2000) -> str:
-		with open(self.log_file, "r", encoding="utf-8") as f:
-			# read logs file
-			lines = f.readlines()
-			last_n_lines = "".join(lines[-n_lines:])
-			# trim the logs if too long
-			if len(last_n_lines) > char_lim - 10:
-				last_n_lines = f"․․․\n{last_n_lines[-(char_lim - 10):]}"
-			return f"```{last_n_lines}```"
+		try:
+			with open(self.log_file, "r", encoding="utf-8") as f:
+				# read logs file
+				lines = f.readlines()
+				last_n_lines = "".join(lines[-n_lines:])
+				# trim the logs if too long
+				if len(last_n_lines) > char_lim - 10:
+					last_n_lines = f"․․․\n{last_n_lines[-(char_lim - 10):]}"
+				return f"```{last_n_lines}```"
+		except FileNotFoundError:
+			return "https://i.imgur.com/ieVbGv2.jpg"
