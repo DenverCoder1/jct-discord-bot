@@ -55,7 +55,7 @@ class Assigner:
 		# Sets the channel to the welcome channel and sends a message to it
 		welcome_emojis = ["🎉", "👋", "🌊", "🔥", "😎", "👏", "🎊", "🥳", "🙌", "✨", "⚡"]
 		random_emoji = random.choice(welcome_emojis)
-		nth = utils.ordinal(len(self.__student_role.members))
+		nth = utils.ordinal(len(self.__student_role().members))
 		await self.__welcome_channel().send(
 			f"Everyone welcome our {nth} student {member.mention} to the"
 			f" server! Welcome! {random_emoji}"
