@@ -61,4 +61,4 @@ class ErrorLogger:
 					last_n_lines = f"․․․\n{last_n_lines[-(char_lim - 10):]}"
 				return f"```{last_n_lines}```"
 		except FileNotFoundError:
-			return "https://i.imgur.com/ieVbGv2.jpg"
+			return "https://tenor.com/view/nothing-to-see-here-explosion-explode-bomb-fire-gif-4923610"
