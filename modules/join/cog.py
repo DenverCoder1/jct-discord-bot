@@ -13,11 +13,10 @@ class JoinCog(commands.Cog, name="Join"):
 
 	@commands.Cog.listener()
 	async def on_ready(self):
-		self.assigner = Assigner(
-			self.bot.get_guild(utils.get_id("OFF_TOPIC_CHANNEL_ID"))
-		)
+		self.assigner = Assigner(self.bot.get_guild(utils.get_id("JCT_GUILD_ID")))
 
 	@commands.command(name="join")
+	@commands.has_role(utils.get_id("UNASSIGNED_ROLE_ID"))
 	async def join(self, ctx: commands.Context):
 		"""
 		Join command to get new users information and place them in the right roles
