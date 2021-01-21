@@ -19,28 +19,11 @@ def main():
 		if os.path.exists(os.path.join("modules", folder, "cog.py")):
 			client.load_extension(f"modules.{folder}.cog")
 
-	# TODO: remove this code by February (or whenever people get used to the new prefix)
-	@client.event
-	async def on_message(message: discord.Message):
-		if message.content.startswith(
-			tuple(
-				f"~{command}"
-				for command in os.listdir("modules")
-				if os.path.exists(os.path.join("modules", command, "cog.py"))
-			)
-			+ ("~help",)
-		):
-			channel = message.channel
-			await channel.send(
-				f"The prefix `~` has been changed to `{config.prefix}`. Please use that"
-				" instead."
-			)
-		await client.process_commands(message)
-
 	@client.event
 	async def on_ready():
 		"""When discord is connected"""
 		print(f"{client.user.name} has connected to Discord!")
+		await client.change_presence(activity=discord.Game("with students' patience"))
 
 	# Run Discord bot
 	client.run(config.token)
