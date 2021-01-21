@@ -1,4 +1,4 @@
-import utils.utils as utils
+from utils import utils
 from modules.join.assigner import Assigner
 from modules.error.friendly_error import FriendlyError
 from modules.join.join_parser import JoinParseError, JoinParser
@@ -8,10 +8,15 @@ from discord.ext import commands
 class JoinCog(commands.Cog, name="Join"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.assigner = Assigner(bot)
+		self.assigner = None
 		self.attempts = {}
 
+	@commands.Cog.listener()
+	async def on_ready(self):
+		self.assigner = Assigner(self.bot.get_guild(utils.get_id("JCT_GUILD_ID")))
+
 	@commands.command(name="join")
+	@commands.has_role(utils.get_id("UNASSIGNED_ROLE_ID"))
 	async def join(self, ctx: commands.Context):
 		"""
 		Join command to get new users information and place them in the right roles

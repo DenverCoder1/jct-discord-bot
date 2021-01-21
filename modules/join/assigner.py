@@ -9,32 +9,17 @@ class Assigner:
 	Assigns users their roles and name, and welcomes them once done.
 	"""
 
-	def __init__(self, bot: commands.Bot):
-		self.bot = bot
-		self.guild = None
-
-	def __set_guild(self):
-		if self.guild is None:
-			self.guild = self.bot.get_guild(utils.get_id("JCT_GUILD_ID"))
-
-	def __unassigned_role(self):
-		self.__set_guild()
-		return self.guild.get_role(utils.get_id("UNASSIGNED_ROLE_ID"))
-
-	def __student_role(self):
-		self.__set_guild()
-		return self.guild.get_role(utils.get_id("STUDENT_ROLE_ID"))
-
-	def __welcome_channel(self):
-		self.__set_guild()
-		return self.guild.get_channel(utils.get_id("WELCOME_CHANNEL_ID"))
+	def __init__(self, guild: discord.Guild):
+		self.unassigned_role = guild.get_role(utils.get_id("UNASSIGNED_ROLE_ID"))
+		self.student_role = guild.get_role(utils.get_id("STUDENT_ROLE_ID"))
+		self.welcome_channel = guild.get_channel(utils.get_id("OFF_TOPIC_CHANNEL_ID"))
 
 	async def assign(self, member: discord.Member, name: str, campus: str, year: int):
-		if self.__unassigned_role() in member.roles:
+		if self.unassigned_role in member.roles:
 			await member.edit(nick=name)
 			await self.__add_role(member, campus, year)
-			await member.add_roles(self.__student_role())
-			await member.remove_roles(self.__unassigned_role())
+			await member.add_roles(self.student_role)
+			await member.remove_roles(self.unassigned_role)
 			print(f"Removed Unassigned from {member} and added Student")
 			await self.server_welcome(member)
 
@@ -55,8 +40,8 @@ class Assigner:
 		# Sets the channel to the welcome channel and sends a message to it
 		welcome_emojis = ["🎉", "👋", "🌊", "🔥", "😎", "👏", "🎊", "🥳", "🙌", "✨", "⚡"]
 		random_emoji = random.choice(welcome_emojis)
-		nth = utils.ordinal(len(self.__student_role().members))
-		await self.__welcome_channel().send(
+		nth = utils.ordinal(len(self.student_role.members))
+		await self.welcome_channel.send(
 			f"Everyone welcome our {nth} student {member.mention} to the"
 			f" server! Welcome! {random_emoji}"
 		)
