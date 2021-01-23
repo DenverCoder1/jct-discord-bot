@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="73a12c1e-d4cf-4c34-8091-f1bb213b9fb7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/AddCourseChannel/add_course.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/AddCourseChannel/add_course.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/AddCourseChannel/cog.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/AddCourseChannel/cog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/new_user/ids.csv" beforeDir="false" afterPath="$PROJECT_DIR$/modules/new_user/ids.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,36 +146,48 @@
       <workItem from="1611059818010" duration="2407000" />
       <workItem from="1611064169260" duration="1664000" />
       <workItem from="1611251617922" duration="3523000" />
+      <workItem from="1611422245058" duration="4542000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="WindowStateProjectService">
     <state x="426" y="47" key="#cog_(1)" timestamp="1611059808056">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="426" y="47" key="#cog_(1)/0.0.1440.900@0.0.1440.900" timestamp="1611059808056" />
-    <state width="1398" height="304" key="GridCell.Tab.0.bottom" timestamp="1611259499638">
+    <state width="1398" height="66" key="GridCell.Tab.0.bottom" timestamp="1611426573218">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="304" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1611259499638" />
+    <state width="1398" height="66" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1611426573218" />
     <state width="1398" height="128" key="GridCell.Tab.0.bottom/0.23.1440.808@0.23.1440.808" timestamp="1610823718889" />
-    <state width="1398" height="304" key="GridCell.Tab.0.center" timestamp="1611259499636">
+    <state width="1398" height="66" key="GridCell.Tab.0.center" timestamp="1611426573213">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="304" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1611259499636" />
+    <state width="1398" height="66" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1611426573213" />
     <state width="1398" height="128" key="GridCell.Tab.0.center/0.23.1440.808@0.23.1440.808" timestamp="1610823718887" />
-    <state width="1398" height="304" key="GridCell.Tab.0.left" timestamp="1611259499635">
+    <state width="1398" height="66" key="GridCell.Tab.0.left" timestamp="1611426573211">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="304" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1611259499635" />
+    <state width="1398" height="66" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1611426573211" />
     <state width="1398" height="128" key="GridCell.Tab.0.left/0.23.1440.808@0.23.1440.808" timestamp="1610823718886" />
-    <state width="1398" height="304" key="GridCell.Tab.0.right" timestamp="1611259499637">
+    <state width="1398" height="66" key="GridCell.Tab.0.right" timestamp="1611426573217">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="304" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1611259499637" />
+    <state width="1398" height="66" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1611426573217" />
     <state width="1398" height="128" key="GridCell.Tab.0.right/0.23.1440.808@0.23.1440.808" timestamp="1610823718888" />
     <state width="1398" height="304" key="GridCell.Tab.1.bottom" timestamp="1611259499641">
       <screen x="0" y="0" width="1440" height="900" />
@@ -182,7 +212,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/jct_discord_bot$cog__1_.coverage" NAME="cog (1) Coverage Results" MODIFIED="1611060755809" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/ping" />
-    <SUITE FILE_PATH="coverage/jct_discord_bot$bot.coverage" NAME="bot Coverage Results" MODIFIED="1611255557270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/jct_discord_bot$bot.coverage" NAME="bot Coverage Results" MODIFIED="1611426275417" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jct_discord_bot$cog.coverage" NAME="cog Coverage Results" MODIFIED="1611062741041" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/AddCourseChannel" />
   </component>
 </project>
