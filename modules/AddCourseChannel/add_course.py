@@ -17,7 +17,6 @@ async def create_channel(ctx, channel_name):
         )  # should {} be in quotes?
         await guild.create_text_channel(channel_name)
 
-
 # async def give_initial_role(member: discord.Member):
 #     label = "BOT_ROLE_ID" if member.bot else "UNASSIGNED_ROLE_ID"
 #     role = get_discord_obj(member.guild.roles, label)

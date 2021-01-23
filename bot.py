@@ -1,4 +1,6 @@
 import os
+import ssl
+
 import discord
 from discord.ext.commands.core import command
 import config
@@ -54,6 +56,7 @@ def main():
 
 	# Run Discord bot
 	client.run(config.token)
+
 
 
 if __name__ == "__main__":
