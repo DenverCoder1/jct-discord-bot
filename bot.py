@@ -5,8 +5,6 @@ from discord.ext import commands
 
 
 def main():
-	config.init()
-
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
 	intents = discord.Intents.default()
 	intents.guilds = True
