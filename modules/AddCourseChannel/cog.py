@@ -1,4 +1,6 @@
 import discord
+
+# from discord import Forbidden
 import csv
 from discord.ext.commands import has_permissions
 import config
@@ -9,11 +11,12 @@ from modules.new_user import utils
 
 
 class AddCourseChannelCog(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
     @has_permissions(manage_channels=True)
+    # except discord.Forbidden:
+    #     await ctx.send('I do not have permission to delete this role')
     @commands.command(name="addcourse")
     async def add_course(self, ctx: commands.Context, *args):
         # log in console that a ping was received
@@ -26,9 +29,16 @@ class AddCourseChannelCog(commands.Cog):
         #     print("Received addcourse inside IF")
         # else:
         #     # log in console that a ping was received
-        course_name = "-".join(args)  # does this correctly input name?
+        names = " ".join(args)
+        split_names = names.split(",")
+
+        course_name = split_names[
+            0
+        ]  # "-".join(args)  # does this correctly input name?
         course_name.lower()
-        await add_course.create_channel(ctx, course_name)
+        category_name = split_names[1]  # " ".join(args)
+        category_name.upper()
+        await add_course.create_channel(ctx, course_name, category_name)
         # log in console that a ping was received
 
 
