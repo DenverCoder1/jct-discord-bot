@@ -1,5 +1,4 @@
 import discord
-from discord import colour
 
 
 class FriendlyError(Exception):
