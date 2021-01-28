@@ -1,4 +1,4 @@
-from modules.teacher_emails.email_crud import EmailCrud
+from modules.teacher_emails.email_finder import EmailFinder
 from discord.ext import commands
 import config
 
@@ -6,7 +6,7 @@ import config
 class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.crud = EmailCrud(config.conn)
+		self.finder = EmailFinder(config.conn)
 
 	@commands.command(name="getemail", aliases=["get email", "emailof", "email of"])
 	async def get_email(self, ctx: commands.Context, *args):
@@ -19,7 +19,7 @@ class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 		Arguments:
 		> **query**: A string which contains the professor's name and/or any of the subjects they teach (e.g. eitan computer science)
 		"""
-		profs = self.crud.search(" ".join(args))
+		profs = self.finder.search(args)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
