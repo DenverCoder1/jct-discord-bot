@@ -1,5 +1,6 @@
 from modules.teacher_emails.professor_embedder import ProfessorEmbedder
 from modules.teacher_emails.email_finder import EmailFinder
+from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
 import config
 
@@ -25,7 +26,7 @@ class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
 		)
 		if not profs:
-			await ctx.send(embed=self.embedder.err_embed())
+			raise FriendlyError("Sorry, no professors were found.", ctx.channel)
 		else:
 			title = (
 				"**_YOU_ get an email!! _YOU_ get an email!!**\nEveryone gets an email!"

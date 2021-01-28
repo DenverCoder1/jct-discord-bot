@@ -17,8 +17,3 @@ class ProfessorEmbedder:
 			)
 
 		return embed
-
-	def err_embed(self):
-		return discord.Embed(
-			title="Sorry, no professors were found.", colour=discord.Colour.red()
-		)
