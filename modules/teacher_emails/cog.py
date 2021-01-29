@@ -26,7 +26,7 @@ class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
 		)
 		if not profs:
-			raise FriendlyError("Sorry, no professors were found.", ctx.channel)
+			raise FriendlyError("The email you are looking for aught to be here... But it isn't. Perhaps the archives are incomplete.", ctx.channel)
 		else:
 			title = (
 				"**_YOU_ get an email!! _YOU_ get an email!!**\nEveryone gets an email!"
