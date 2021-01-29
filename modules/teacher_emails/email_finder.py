@@ -11,9 +11,9 @@ class EmailFinder:
 		self.conn = conn
 		self.search_weights = {
 			"keyword": 1,
-			"curr_channel": 2,
-			"mentioned_channel": 10,
-			"mentioned_teacher": 20,
+			"curr_channel": 1,
+			"mentioned_channel": 2,
+			"mentioned_teacher": 3,
 		}
 
 	def search(
