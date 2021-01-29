@@ -20,7 +20,9 @@ class FriendlyError(Exception):
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
-		return f"{self.member.mention} " if self.member is not None else ""
+		return f"Sorry {self.member.display_name}, " if self.member is not None else ""
 
 	async def reply(self):
-		await self.channel.send(str(self))
+		await self.channel.send(
+			embed=discord.Embed(title=str(self), colour=discord.Colour.red())
+		)
