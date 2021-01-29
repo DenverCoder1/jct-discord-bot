@@ -1,4 +1,4 @@
-import os
+from modules.teacher_emails.sql_path import sql_path
 from modules.teacher_emails.teacher_weights import TeacherWeights
 from typing import Iterable, Set, List, Optional
 from modules.teacher_emails.professor import Professor
@@ -51,7 +51,7 @@ class EmailFinder:
 
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the teachers who teach that course"""
-		query = open(self.__sql_path("search_channel.sql"), "r").read()
+		query = open(sql_path("search_channel.sql"), "r").read()
 		cursor = self.conn.cursor()
 		cursor.execute(query, {"channel_id": id})
 		ids = {row[0] for row in cursor.fetchall()}
@@ -60,7 +60,7 @@ class EmailFinder:
 
 	def __search_member(self, id: int) -> Optional[int]:
 		"""searches the database for a teacher's id and returns the IDs of the teachers who match it"""
-		query = open(self.__sql_path("search_member.sql"), "r").read()
+		query = open(sql_path("search_member.sql"), "r").read()
 		cursor = self.conn.cursor()
 		row = cursor.execute(query, {"member_id": id}).fetchone()
 		cursor.close()
@@ -68,7 +68,7 @@ class EmailFinder:
 
 	def __search_kw(self, keyword: str) -> Set[int]:
 		"""searches the database for a single keyword and returns the IDs of the teachers who match it"""
-		query = open(self.__sql_path("search_kw.sql"), "r").read()
+		query = open(sql_path("search_kw.sql"), "r").read()
 		cursor = self.conn.cursor()
 		cursor.execute(query, {"kw": keyword})
 		ids = {row[0] for row in cursor.fetchall()}
@@ -79,12 +79,9 @@ class EmailFinder:
 		"""searches the database for a teacher with a given id and returns a Professor object"""
 		if not ids:
 			return set()
-		query = open(self.__sql_path("get_professors.sql"), "r").read()
+		query = open(sql_path("get_professors.sql"), "r").read()
 		cursor = self.conn.cursor()
 		cursor.execute(query, {"ids": tuple(ids)})
-		profs = {Professor(row[0], row[1], row[2]) for row in cursor.fetchall()}
+		profs = {Professor(row[0], row[1], row[2], row[3]) for row in cursor.fetchall()}
 		cursor.close()
 		return profs
-
-	def __sql_path(self, file):
-		return os.path.join("modules", "teacher_emails", "queries", file)

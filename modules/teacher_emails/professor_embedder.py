@@ -10,10 +10,11 @@ class ProfessorEmbedder:
 		embed = discord.Embed(colour=discord.Colour.green())
 
 		for prof in profs:
-			embed.add_field(
-				name=prof.name,
-				value=f"> {prof.linked_emails()}\n> {prof.subjects}",
-				inline=False,
-			)
+			if prof.emails:
+				embed.add_field(
+					name=prof.name,
+					value=f"> {prof.linked_emails()}\n> {prof.subjects}",
+					inline=False,
+				)
 
 		return embed

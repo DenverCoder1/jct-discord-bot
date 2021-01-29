@@ -1,5 +1,7 @@
+import discord
 from modules.teacher_emails.professor_embedder import ProfessorEmbedder
 from modules.teacher_emails.email_finder import EmailFinder
+from modules.teacher_emails.email_adder import EmailAdder
 from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
 import config
@@ -10,6 +12,7 @@ class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 		self.bot = bot
 		self.finder = EmailFinder(config.conn)
 		self.embedder = ProfessorEmbedder()
+		self.adder = EmailAdder(config.conn)
 
 	@commands.command(name="getemail", aliases=["email", "emailof"])
 	async def get_email(self, ctx: commands.Context, *args):
@@ -25,6 +28,7 @@ class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 		profs = self.finder.search(
 			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
 		)
+		profs = {prof for prof in profs if prof.emails}
 		if not profs:
 			raise FriendlyError(
 				"The email you are looking for aught to be here... But it isn't."
@@ -44,12 +48,34 @@ class TeacherEmailsCog(commands.Cog, name="Teacher Emails"):
 
 		Usage:
 		```
-		++addemail teacher email [course]
+		++addemail query emails
 		```
 		Arguments:
-		> **teacher**: The teacher's name (or @mention)
-		> **email**: One or more of the teacher's email addresses
+		> **query**: A string to identify a teacher. Must be specific enough to match a single teacher. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
+		> **emails**: One or more of the teacher's email addresses
 		"""
+		# search for professor's details
+		profs = self.finder.search(
+			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
+		)
+		if not profs:
+			raise FriendlyError(
+				"Unable to find a professor to match your query.", ctx.channel
+			)
+		if len(profs) > 1:
+			raise FriendlyError(
+				"I cannot accurately determine which of these professors you're"
+				" referring to. Please provide a more specific query.\n"
+				+ ", ".join(prof.name for prof in profs),
+				ctx.channel,
+			)
+		# add the emails to the database
+		self.adder.add_emails(next(iter(profs)), self.adder.filter_emails(args))
+		# update professors set from database
+		profs = self.finder.search(
+			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
+		)
+		await ctx.send(embed=self.embedder.gen_embed(profs))
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
