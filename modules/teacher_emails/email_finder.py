@@ -35,7 +35,7 @@ class EmailFinder:
 		for t_id in self.__search_channel(curr_channel.id) or []:
 			teachers[t_id] += self.search_weights["curr_channel"]
 
-		# add the teacher found (if any) by mention of their discord accont
+		# add the teacher found (if any) by mention of their discord account
 		for member in mentioned_members:
 			t_id = self.__search_member(member.id)
 			if t_id is not None:
