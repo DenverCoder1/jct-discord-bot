@@ -1,1 +1,2 @@
-insert into emails (person, email) values (%(person_id)s, %(email)s)
+INSERT INTO emails (person, email)
+VALUES (%(person_id)s, %(email)s)

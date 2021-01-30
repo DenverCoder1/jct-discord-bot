@@ -1,11 +1,10 @@
-select
-	people.id,
-	concat(people.name, ' ', people.surname) as name,
+SELECT people.id,
+	concat(people.name, ' ', people.surname) AS name,
 	string_agg(emails.email, ' '),
-	string_agg(categories.name, ', ') as categories
-from people
-left join person_category on people.id = person_category.person
-left join categories on person_category.category = categories.id
-left join emails on people.id = emails.person
-where people.id in %(ids)s
-group by people.id
+	string_agg(categories.name, ', ') AS categories
+FROM people
+LEFT JOIN person_category ON people.id = person_category.person
+LEFT JOIN categories ON person_category.category = categories.id
+LEFT JOIN emails ON people.id = emails.person
+WHERE people.id IN %(ids)s
+GROUP BY people.id

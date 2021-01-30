@@ -1,7 +1,10 @@
+from modules.email_registry.categoriser import Categoriser
 from modules.email_registry.person_embedder import PersonEmbedder
-from modules.email_registry.email_finder import EmailFinder
+from modules.email_registry.person_finder import PersonFinder
 from modules.email_registry.email_adder import EmailAdder
+from modules.email_registry.person_adder import PersonAdder
 from modules.error.friendly_error import FriendlyError
+from modules.role_tag.member import Member
 from discord.ext import commands
 import config
 
@@ -9,9 +12,11 @@ import config
 class EmailRegistryCog(commands.Cog, name="Email Registry"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.finder = EmailFinder(config.conn)
+		self.finder = PersonFinder(config.conn)
 		self.embedder = PersonEmbedder()
-		self.adder = EmailAdder(config.conn)
+		self.email_adder = EmailAdder(config.conn)
+		self.person_adder = PersonAdder(config.conn)
+		self.categoriser = Categoriser(config.conn)
 
 	@commands.command(name="getemail", aliases=["email", "emailof"])
 	async def get_email(self, ctx: commands.Context, *args):
@@ -54,30 +59,72 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		> **emails**: One or more of the teacher's email addresses
 		"""
 		# search for professor's details
-		people = self.finder.search(
+		person = self.finder.search_one(
 			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
 		)
-		if not people:
-			raise FriendlyError(
-				"Unable to find someone who matches your query. Check your spelling or"
-				" try a different query. If you still can't find them, You can add"
-				f" them with `{config.prefix}addperson`.",
-				ctx.channel,
-			)
-		if len(people) > 1:
-			raise FriendlyError(
-				"I cannot accurately determine which of these people you're"
-				" referring to. Please provide a more specific query.\n"
-				+ ", ".join(person.name for person in people),
-				ctx.channel,
-			)
 		# add the emails to the database
-		self.adder.add_emails(next(iter(people)), self.adder.filter_emails(args))
+		self.email_adder.add_emails(person, self.email_adder.filter_emails(args))
 		# update professors set from database
 		people = self.finder.search(
 			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
 		)
 		await ctx.send(embed=self.embedder.gen_embed(people))
+
+	@commands.command(name="addperson")
+	@commands.has_guild_permissions(manage_roles=True)
+	async def add_person(self, ctx: commands.Context, *args):
+		"""Add a faculty member to the email registry
+
+		Usage:
+		```
+		++addperson @member channel-mentions
+		```or
+		```
+		++addperson name surname channel-mentions
+		```
+		Arguments:
+		> **@member**: A mention of the person you want to add, if they are in the server
+		> **name**: The first name of the person you want to add (use quotes if it contains a space)
+		> **surname**: The last name of the person you want to add
+		> **channel-mentions**: A (possibly empty) space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
+		"""
+		if ctx.message.mentions:
+			if len(ctx.message.mentions) > 1:
+				raise FriendlyError("Please mention only one member.")
+			full_name = Member(ctx.message.mentions[0]).base_name
+			member_id = ctx.message.mentions[0].id
+			name, surname = full_name.rsplit(" ", 1)
+		else:
+			name, surname = (s.strip() for s in args[0:2])
+			member_id = None
+			if "<" in {name[0], surname[0]}:
+				raise FriendlyError(
+					"The first two arguments must be a first name and a last name if"
+					" you haven't mentioned the person you want to add."
+				)
+		self.person_adder.add_person(
+			name, surname, ctx.message.channel_mentions, self.categoriser, member_id
+		)
+
+	@commands.command(name="categoriseperson", aliases=["categorizeperson"])
+	@commands.has_guild_permissions(manage_roles=True)
+	async def categorise_person(self, ctx: commands.Context, *args):
+		"""Link a person to a category (for example a professor to a course they teach)
+
+		Usage:
+		```
+		++categoriseperson query channel-mentions
+		```
+		Arguments:
+		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
+		> **channel-mentions**: A space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
+		"""
+		# search for professor's details
+		# TODO: differentiate between mentions in the query and in channel-mentions
+		person = self.finder.search_one(
+			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
+		)
+		self.categoriser.categorise_person(person.id, ctx.message.channel_mentions)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

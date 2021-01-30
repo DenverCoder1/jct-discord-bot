@@ -1,1 +1,3 @@
-select id from people where member_id = %(member_id)s
+SELECT id
+FROM people
+WHERE member_id = %(member_id)s

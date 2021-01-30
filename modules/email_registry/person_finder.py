@@ -1,12 +1,14 @@
 from modules.email_registry.sql_path import sql_path
 from modules.email_registry.weighted_set import WeightedSet
-from typing import Iterable, Set, List, Optional
+from typing import Iterable, Set, Optional
 from modules.email_registry.person import Person
 import discord
 import psycopg2.extensions as sql
+from modules.error.friendly_error import FriendlyError
+import config
 
 
-class EmailFinder:
+class PersonFinder:
 	def __init__(self, conn: sql.connection) -> None:
 		self.conn = conn
 		self.search_weights = {
@@ -18,10 +20,10 @@ class EmailFinder:
 
 	def search(
 		self,
-		query: List[str],
-		mentioned_channels: List[discord.TextChannel],
+		query: Iterable[str],
+		mentioned_channels: Iterable[discord.TextChannel],
 		curr_channel: discord.TextChannel,
-		mentioned_members: List[discord.Member],
+		mentioned_members: Iterable[discord.Member],
 	) -> Set[Person]:
 		"""returns a list of people who best match the query"""
 		weights = WeightedSet()
@@ -48,6 +50,31 @@ class EmailFinder:
 
 		people = self.__get_people(weights.heaviest_items())
 		return people
+
+	def search_one(
+		self,
+		query: Iterable[str],
+		mentioned_channels: Iterable[discord.TextChannel],
+		curr_channel: discord.TextChannel,
+		mentioned_members: Iterable[discord.Member],
+	) -> Person:
+		"""returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one."""
+		people = self.search(query, mentioned_channels, curr_channel, mentioned_members)
+		if not people:
+			raise FriendlyError(
+				"Unable to find someone who matches your query. Check your spelling or"
+				" try a different query. If you still can't find them, You can add"
+				f" them with `{config.prefix}addperson`.",
+				curr_channel,
+			)
+		if len(people) > 1:
+			raise FriendlyError(
+				"I cannot accurately determine which of these people you're"
+				" referring to. Please provide a more specific query.\n"
+				+ ", ".join(person.name for person in people),
+				curr_channel,
+			)
+		return next(iter(people))
 
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the people who belong to its category"""
