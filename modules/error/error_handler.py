@@ -1,3 +1,4 @@
+from modules.error.quiet_warning import QuietWarning
 import discord
 import config
 from modules.error.error_logger import ErrorLogger
@@ -16,6 +17,9 @@ class ErrorHandler:
 	async def handle(self, error: Exception, message: discord.Message = None):
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
+
+		elif isinstance(error, QuietWarning):
+			self.__handle_quiet_warning(error)
 
 		elif isinstance(error, discord_err.CommandInvokeError):
 			await self.handle(error.original, message)
@@ -37,6 +41,9 @@ class ErrorHandler:
 		if error.inner is not None:
 			self.logger.log_to_file(error.inner, message)
 		await error.reply()
+
+	def __handle_quiet_warning(self, warning: QuietWarning):
+		self.logger.log_to_file(warning)
 
 	def __user_error_message(self, error: Exception):
 		"""Given an error, will return a user-friendly string, and whether or not to log the error in the channel"""

@@ -1,7 +1,9 @@
+from modules.error.quiet_warning import QuietWarning
 from typing import Iterable, Set
 from modules.email_registry.person import Person
 from modules.email_registry.sql_path import sql_path
 import psycopg2.extensions as sql
+from psycopg2.errors import UniqueViolation
 import re
 
 
@@ -13,7 +15,13 @@ class EmailAdder:
 		cursor = self.conn.cursor()
 		query = open(sql_path("add_email.sql"), "r").read()
 		for email in emails:
-			cursor.execute(query, {"person_id": person.id, "email": email})
+			try:
+				cursor.execute(query, {"person_id": person.id, "email": email})
+			except UniqueViolation as e:
+				raise QuietWarning(
+					f"Ignoring request to add {email} to {person.name}; it already"
+					" exists."
+				)
 		self.conn.commit()
 		cursor.close()
 
