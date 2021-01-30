@@ -1,0 +1,1 @@
+insert into emails (person, email) values (%(person_id)s, %(email)s)
