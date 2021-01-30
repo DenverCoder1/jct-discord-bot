@@ -1,10 +1,11 @@
 select
-	concat(teachers.name, ' ', teachers.surname) as name,
+	people.id,
+	concat(people.name, ' ', people.surname) as name,
 	string_agg(emails.email, ' '),
-	string_agg(courses.name, ', ') as courses
-from teachers
-left join teach on teachers.id = teach.teacher
-left join courses on teach.course = courses.id
-inner join emails on teachers.id = emails.teacher
-where teachers.id in %(ids)s
-group by teachers.id
+	string_agg(categories.name, ', ') as categories
+from people
+left join person_category on people.id = person_category.person
+left join categories on person_category.category = categories.id
+left join emails on people.id = emails.person
+where people.id in %(ids)s
+group by people.id

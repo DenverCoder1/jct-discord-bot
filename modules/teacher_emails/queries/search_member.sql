@@ -1,1 +1,1 @@
-select id from teachers where member_id = %(member_id)s
+select id from people where member_id = %(member_id)s

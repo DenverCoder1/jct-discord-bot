@@ -1,9 +1,9 @@
-select distinct teachers.id
-from teachers
-left join teach on teachers.id = teach.teacher
-left join courses on teach.course = courses.id
-left join course_abbr on courses.id = course_abbr.course
-where teachers.name ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
-or teachers.surname ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
+select distinct people.id
+from people
+left join person_category on people.id = person_category.person
+left join categories on person_category.category = categories.id
+left join labels on categories.id = labels.category
+where people.name ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
+or people.surname ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
 or abbreviation ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
-or courses.name ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
+or categories.name ~* concat('(^|\s|\m)', f_regexp_escape(%(kw)s), '(\M|\s|$)')
