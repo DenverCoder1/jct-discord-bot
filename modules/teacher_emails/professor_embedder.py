@@ -1,7 +1,6 @@
 from typing import Iterable
-
-from discord import colour
 from modules.teacher_emails.professor import Professor
+from utils import utils
 import discord
 
 
@@ -13,7 +12,7 @@ class ProfessorEmbedder:
 			if prof.emails:
 				embed.add_field(
 					name=prof.name,
-					value=f"> {prof.linked_emails()}\n> {prof.subjects}",
+					value=utils.blockquote(f"{prof.linked_emails()}\n{prof.subjects}"),
 					inline=False,
 				)
 
