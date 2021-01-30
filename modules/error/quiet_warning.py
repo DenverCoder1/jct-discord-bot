@@ -1,6 +1,3 @@
-import discord
-
-
 class QuietWarning(Exception):
 	"""
 	An error type that will be logged quietly in the log file.
