@@ -56,13 +56,22 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
 		> **emails**: One or more of the teacher's email addresses
 		"""
-		# search for professor's details
-		person = self.finder.search_one(args, ctx.channel)
-		# add the emails to the database
-		self.email_adder.add_emails(person, self.email_adder.filter_emails(args))
-		# update professors set from database
-		person = self.finder.get_people([person.id])
-		await ctx.send(embed=self.embedder.gen_embed(person))
+		await self.__add_remove_emails(args, ctx, self.email_adder.add_emails)
+
+	@commands.command(name="removeemail")
+	@commands.has_guild_permissions(manage_roles=True)
+	async def remove_email(self, ctx: commands.Context, *args):
+		"""Remove the email of a professor with this command.
+
+		Usage:
+		```
+		++removeemail query emails
+		```
+		Arguments:
+		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
+		> **emails**: One or more of the teacher's email addresses
+		"""
+		await self.__add_remove_emails(args, ctx, self.email_adder.remove_emails)
 
 	@commands.command(name="addperson")
 	@commands.has_guild_permissions(manage_roles=True)
@@ -134,6 +143,15 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		await self.__link_unlink(
 			args, ctx, "from", self.categoriser.decategorise_person
 		)
+
+	async def __add_remove_emails(self, args, ctx: commands.Context, func):
+		# search for professor's details
+		person = self.finder.search_one(args, ctx.channel)
+		# add/remove the emails to the database
+		func(person, self.email_adder.filter_emails(args))
+		# update professors set from database
+		person = self.finder.get_people([person.id])
+		await ctx.send(embed=self.embedder.gen_embed(person))
 
 	async def __link_unlink(self, args, ctx: commands.Context, sep_word: str, func):
 		# search for professor's detailschannel-mentions

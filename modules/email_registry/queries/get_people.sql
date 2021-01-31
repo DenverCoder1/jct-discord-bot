@@ -1,6 +1,6 @@
 SELECT people.id,
 	concat(people.name, ' ', people.surname) AS name,
-	string_agg(emails.email, ', '),
+	string_agg(emails.email, ', ') AS emails,
 	string_agg(categories.name, ', ') AS categories
 FROM people
 LEFT JOIN person_category ON people.id = person_category.person

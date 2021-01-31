@@ -12,7 +12,15 @@ class EmailAdder:
 		self.conn = conn
 
 	def add_emails(self, person: Person, emails: Iterable[str]) -> None:
-		query = open(sql_path("add_email.sql"), "r").read()
+		self.__add_remove_emails("add_email.sql", person, emails)
+
+	def remove_emails(self, person: Person, emails: Iterable[str]) -> None:
+		self.__add_remove_emails("remove_email.sql", person, emails)
+
+	def __add_remove_emails(
+		self, sql_file: str, person: Person, emails: Iterable[str]
+	) -> None:
+		query = open(sql_path(sql_file), "r").read()
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for email in emails:
