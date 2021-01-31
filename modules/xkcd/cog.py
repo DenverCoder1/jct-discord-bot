@@ -12,16 +12,17 @@ class XKCDCog(commands.Cog, name="XKCD"):
 
 	@commands.command(name="xkcd")
 	async def xkcd(self, ctx: commands.Context, *args):
-		"""Displays the latest XKCD comic, a random comic, or a comic given its id.
+		"""Displays xkcd comics for your search terms.
 
 		Usage:
-		```
-		++xkcd 327
-		```
-		Arguments:
+		
+		`++xkcd` - displays a random xkcd comic
 
-			> **327**: Replace this with one of "latest", "random", or the comic id of an XKCD comic. \
-			If no argument is provided, a random XKCD comic will be displayed.
+		`++xkcd latest` - displays the latest xkcd comic
+
+		`++xkcd [number]` - displays an xkcd comic given its id (ex. `++xkcd 327`)
+
+		`++xkcd [search term]` - displays a comic for your search term (ex. `++xkcd sql`)
 		"""
 		
 		search = " ".join(args).lower()
