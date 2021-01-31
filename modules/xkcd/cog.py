@@ -24,7 +24,7 @@ class XKCDCog(commands.Cog, name="XKCD"):
 			If no argument is provided, a random XKCD comic will be displayed.
 		"""
 		
-		comic_arg = "".join(args)
+		comic_arg = "".join(args).lower()
 
 		try:
 			# ++xkcd latest
