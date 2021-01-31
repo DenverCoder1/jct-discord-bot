@@ -53,7 +53,7 @@ class XKCDCog(commands.Cog, name="XKCD"):
 			)
 		except ConnectionError as error:
 			# XKCD API did not return a 200 response code
-			raise FriendlyError(error.args[0], ctx.channel)
+			raise FriendlyError(error.args[0], ctx.channel, ctx.message.author, error)
 
 
 def setup(bot: commands.Bot):
