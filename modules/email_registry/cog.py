@@ -29,9 +29,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		Arguments:
 		> **query**: A string with the professor's name and/or any courses they teach (or their channels) (e.g. eitan computer science)
 		"""
-		people = self.finder.search(
-			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
-		)
+		people = self.finder.search(args, ctx.channel)
 		people = {person for person in people if person.emails}
 		if not people:
 			raise FriendlyError(
@@ -59,15 +57,11 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		> **emails**: One or more of the teacher's email addresses
 		"""
 		# search for professor's details
-		person = self.finder.search_one(
-			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
-		)
+		person = self.finder.search_one(args, ctx.channel)
 		# add the emails to the database
 		self.email_adder.add_emails(person, self.email_adder.filter_emails(args))
 		# update professors set from database
-		people = self.finder.search(
-			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
-		)
+		people = self.finder.search(args, ctx.channel)
 		await ctx.send(embed=self.embedder.gen_embed(people))
 
 	@commands.command(name="addperson")
@@ -106,25 +100,34 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			name, surname, ctx.message.channel_mentions, self.categoriser, member_id
 		)
 
-	@commands.command(name="categoriseperson", aliases=["categorizeperson"])
+	@commands.command(name="link")
 	@commands.has_guild_permissions(manage_roles=True)
-	async def categorise_person(self, ctx: commands.Context, *args):
+	async def link_person_to_category(self, ctx: commands.Context, *args):
 		"""Link a person to a category (for example a professor to a course they teach)
 
 		Usage:
 		```
-		++categoriseperson query channel-mentions
+		++link query to channel-mentions
 		```
 		Arguments:
 		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
 		> **channel-mentions**: A space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
 		"""
-		# search for professor's details
-		# TODO: differentiate between mentions in the query and in channel-mentions
-		person = self.finder.search_one(
-			args, ctx.message.channel_mentions, ctx.channel, ctx.message.mentions
+		# search for professor's detailschannel-mentions
+		try:
+			index_to = len(args) - 1 - args[::-1].index("to")  # last index
+		except ValueError as e:
+			raise FriendlyError(
+				'You must include the word "to" in between your query and the channel'
+				" mentions",
+				ctx.channel,
+			)
+		person = self.finder.search_one(args[:index_to], ctx.channel)
+		success, error_msg = self.categoriser.categorise_person(
+			person.id, args[index_to + 1 :]
 		)
-		self.categoriser.categorise_person(person.id, ctx.message.channel_mentions)
+		if not success:
+			raise FriendlyError(error_msg, ctx.channel, ctx.author)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

@@ -1,5 +1,6 @@
 import csv
 import os
+from typing import Optional, Tuple
 import discord
 import re
 
@@ -35,3 +36,13 @@ def blockquote(string: str) -> str:
 
 def ordinal(n: int):
 	return "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4])
+
+
+def decode_mention(mention: str) -> Tuple[Optional[str], Optional[int]]:
+	"""returns whether mention is a member mention or a channel mention (or neither) as well as the id of the mentioned object"""
+	match = re.search(r"<(#|@)!?(\d+)>", mention)
+	if match is None:
+		return None, None
+	else:
+		groups = match.groups()
+		return "channel" if groups[0] == "#" else "member", groups[1]

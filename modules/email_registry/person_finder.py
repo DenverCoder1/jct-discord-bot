@@ -1,11 +1,12 @@
+import discord
+import config
+import psycopg2.extensions as sql
+from typing import Iterable, Set, Optional
 from modules.email_registry.sql_path import sql_path
 from modules.email_registry.weighted_set import WeightedSet
-from typing import Iterable, Set, Optional
 from modules.email_registry.person import Person
-import discord
-import psycopg2.extensions as sql
 from modules.error.friendly_error import FriendlyError
-import config
+from utils.utils import decode_mention
 
 
 class PersonFinder:
@@ -19,47 +20,42 @@ class PersonFinder:
 		}
 
 	def search(
-		self,
-		query: Iterable[str],
-		mentioned_channels: Iterable[discord.TextChannel],
-		curr_channel: discord.TextChannel,
-		mentioned_members: Iterable[discord.Member],
+		self, query: Iterable[str], curr_channel: discord.TextChannel
 	) -> Set[Person]:
 		"""returns a list of people who best match the query"""
 		weights = WeightedSet()
 
-		# add all people found by mention of the channel of a category they belong to
-		for channel in mentioned_channels:
-			for person_id in self.__search_channel(channel.id):
-				weights[person_id] += self.search_weights["mentioned_channel"]
-
 		# add the people belonging to the category of the current channel (if any)
-		for person_id in self.__search_channel(curr_channel.id) or []:
+		for person_id in self.__search_channel(curr_channel.id):
 			weights[person_id] += self.search_weights["curr_channel"]
-
-		# add the person found (if any) by mention of their discord account
-		for member in mentioned_members:
-			person_id = self.__search_member(member.id)
-			if person_id is not None:
-				weights[person_id] += self.search_weights["mentioned_person"]
 
 		# add all people whose name/course match the search query
 		for keyword in query:
-			for person_id in self.__search_kw(keyword):
-				weights[person_id] += self.search_weights["keyword"]
+			mention_type, mentioned_id = decode_mention(keyword)
+			# add all people found by mention of the channel of a category they belong to
+			if mention_type == "channel":
+				for person_id in self.__search_channel(mentioned_id):
+					weights[person_id] += self.search_weights["mentioned_channel"]
+
+			# add the person found (if any) by mention of their discord account
+			elif mention_type == "member":
+				person_id = self.__search_member(mentioned_id)
+				if person_id is not None:
+					weights[person_id] += self.search_weights["mentioned_person"]
+
+			# search their name and categories for the keyword
+			else:
+				for person_id in self.__search_kw(keyword):
+					weights[person_id] += self.search_weights["keyword"]
 
 		people = self.__get_people(weights.heaviest_items())
 		return people
 
 	def search_one(
-		self,
-		query: Iterable[str],
-		mentioned_channels: Iterable[discord.TextChannel],
-		curr_channel: discord.TextChannel,
-		mentioned_members: Iterable[discord.Member],
+		self, query: Iterable[str], curr_channel: discord.TextChannel,
 	) -> Person:
 		"""returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one."""
-		people = self.search(query, mentioned_channels, curr_channel, mentioned_members)
+		people = self.search(query, curr_channel)
 		if not people:
 			raise FriendlyError(
 				"Unable to find someone who matches your query. Check your spelling or"
@@ -83,7 +79,7 @@ class PersonFinder:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"channel_id": id})
 				ids = {row[0] for row in cursor.fetchall()}
-		return ids
+		return ids or {}
 
 	def __search_member(self, id: int) -> Optional[int]:
 		"""searches the database for a person's id and returns the IDs of the people who match it"""

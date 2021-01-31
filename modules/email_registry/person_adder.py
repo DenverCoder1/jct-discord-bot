@@ -24,4 +24,6 @@ class PersonAdder:
 					query, {"name": name, "surname": surname, "member_id": member_id}
 				)
 				person_id = cursor.fetchone()[0]
-		categoriser.categorise_person(person_id, channels)
+		categoriser.categorise_person(
+			person_id, [channel.mention for channel in channels]
+		)
