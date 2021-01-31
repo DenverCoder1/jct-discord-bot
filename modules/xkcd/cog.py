@@ -30,21 +30,21 @@ class XKCDCog(commands.Cog, name="XKCD"):
 			# ++xkcd latest
 			if search == "latest":
 				# get the latest XKCD comic
-				json = self.xkcd_fetcher.get_latest()
+				comic = self.xkcd_fetcher.get_latest()
 			# ++xkcd [num]
 			elif search.isdigit():
 				# get response from the XKCD API with search as the id
-				json = self.xkcd_fetcher.get_comic_by_id(int(search))
+				comic = self.xkcd_fetcher.get_comic_by_id(int(search))
 			# ++xkcd [search term]
 			elif len(args) > 0:
 				# get relevant xkcd for search term
-				json = self.xkcd_fetcher.search_relevant(search)
+				comic = self.xkcd_fetcher.search_relevant(search)
 			# ++xkcd
 			else:
 				# get a random XKCD comic
-				json = self.xkcd_fetcher.get_random()
+				comic = self.xkcd_fetcher.get_random()
 			# embed the response
-			embed = self.xkcd_embedder.gen_embed(json)
+			embed = self.xkcd_embedder.gen_embed(comic)
 			# reply with the embed
 			await ctx.send(embed=embed)
 		except ConnectionError as error:
