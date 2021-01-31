@@ -1,5 +1,5 @@
-select distinct people.id
-from people
-inner join person_category on people.id = person_category.person
-inner join categories on person_category.category = categories.id
-where categories.channel_id = %(channel_id)s
+SELECT DISTINCT people.id
+FROM people
+INNER JOIN person_category ON people.id = person_category.person
+INNER JOIN categories ON person_category.category = categories.id
+WHERE categories.channel_id = %(channel_id)s
