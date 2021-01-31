@@ -12,7 +12,7 @@ class XKCDCog(commands.Cog, name="xkcd"):
 
 	@commands.command(name="xkcd")
 	async def xkcd(self, ctx: commands.Context, *args):
-		"""Displays xkcd comics for your search terms.
+		"""Displays the latest xkcd comic, random comics, or comics for your search terms.
 
 		Usage:
 		
