@@ -5,6 +5,8 @@ class SqlFetcher:
 	def __init__(self, sql_folder: str) -> None:
 		self.sql = {}
 		self.sql_folder = sql_folder
+		for f in [f for f in os.listdir(sql_folder) if f.endswith(".sql")]:
+			self[f]  # load all sql files on initialisation
 
 	def __getitem__(self, file_name: str):
 		if file_name in self.sql:
