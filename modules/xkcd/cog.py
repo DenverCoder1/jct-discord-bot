@@ -4,7 +4,7 @@ from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
 
 
-class XKCDCog(commands.Cog, name="XKCD"):
+class XKCDCog(commands.Cog, name="xkcd"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.xkcd_fetcher = XKCDFetcher()
@@ -30,11 +30,11 @@ class XKCDCog(commands.Cog, name="XKCD"):
 		try:
 			# ++xkcd latest
 			if search == "latest":
-				# get the latest XKCD comic
+				# get the latest xkcd comic
 				comic = self.xkcd_fetcher.get_latest()
 			# ++xkcd [num]
 			elif search.isdigit():
-				# get response from the XKCD API with search as the id
+				# get response from the xkcd API with search as the id
 				comic = self.xkcd_fetcher.get_comic_by_id(int(search))
 			# ++xkcd [search term]
 			elif len(args) > 0:
@@ -42,7 +42,7 @@ class XKCDCog(commands.Cog, name="XKCD"):
 				comic = self.xkcd_fetcher.search_relevant(search)
 			# ++xkcd
 			else:
-				# get a random XKCD comic
+				# get a random xkcd comic
 				comic = self.xkcd_fetcher.get_random()
 			# embed the response
 			embed = self.xkcd_embedder.gen_embed(comic)
