@@ -31,3 +31,24 @@ class XKCDFetcher:
 		latest_num = self.get_latest_num()
 		random_id = random.randrange(1, latest_num + 1)
 		return self.get_comic_by_id(random_id)
+
+	def search_relevant(self, search: str) -> dict:
+		relevant_xkcd_url = "https://relevant-xkcd-backend.herokuapp.com/search"
+		body = {"search": search}
+		response = requests.post(relevant_xkcd_url, data=body)
+		data = response.json()
+		if response.status_code != 200 and data["message"]:
+			# Relevant XKCD did not return a 200 response code
+			raise ConnectionError("Failed to fetch search results.")
+		elif len(data["results"]) == 0:
+			# Relevant XKCD did not return a 200 response code
+			raise ConnectionError("No results found.")
+		first_result = data["results"][0]
+		json = {
+			"num": first_result["number"],
+			"safe_title": first_result["title"],
+			"title": first_result["title"],
+			"alt": first_result["titletext"],
+			"img": first_result["image"]
+		}
+		return json
