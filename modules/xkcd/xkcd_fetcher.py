@@ -44,7 +44,7 @@ class XKCDFetcher:
 			# Relevant xkcd did not return a 200 response code
 			raise ConnectionError("Failed to fetch search results.")
 		elif len(data["results"]) == 0:
-			# Relevant xkcd did not return a 200 response code
+			# Relevant xkcd did not return any results
 			raise ConnectionError("No results found.")
 		comic = data["results"][0]
 		return Comic(comic["number"], comic["title"], comic["titletext"], comic["image"])
