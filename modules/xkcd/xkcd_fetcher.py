@@ -13,7 +13,7 @@ class XKCDFetcher:
 	
 	def get_latest(self) -> dict:
 		"""returns the json of the latest XKCD comic"""
-		response = requests.get(f"https://xkcd.com/info.0.json")
+		response = requests.get("https://xkcd.com/info.0.json")
 		if response.status_code != 200:
 			# XKCD API did not return a 200 response code
 			raise ConnectionError("Failed to fetch the latest comic.")
