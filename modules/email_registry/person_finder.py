@@ -79,27 +79,27 @@ class PersonFinder:
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the people who belong to its category"""
 		query = open(sql_path("search_channel.sql"), "r").read()
-		cursor = self.conn.cursor()
-		cursor.execute(query, {"channel_id": id})
-		ids = {row[0] for row in cursor.fetchall()}
-		cursor.close()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"channel_id": id})
+				ids = {row[0] for row in cursor.fetchall()}
 		return ids
 
 	def __search_member(self, id: int) -> Optional[int]:
 		"""searches the database for a person's id and returns the IDs of the people who match it"""
 		query = open(sql_path("search_member.sql"), "r").read()
-		cursor = self.conn.cursor()
-		row = cursor.execute(query, {"member_id": id}).fetchone()
-		cursor.close()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				row = cursor.execute(query, {"member_id": id}).fetchone()
 		return row[0] if row is not None else None
 
 	def __search_kw(self, keyword: str) -> Set[int]:
 		"""searches the database for a single keyword and returns the IDs of the people who match it"""
 		query = open(sql_path("search_kw.sql"), "r").read()
-		cursor = self.conn.cursor()
-		cursor.execute(query, {"kw": keyword})
-		ids = {row[0] for row in cursor.fetchall()}
-		cursor.close()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"kw": keyword})
+				ids = {row[0] for row in cursor.fetchall()}
 		return ids
 
 	def __get_people(self, ids: Iterable[int]) -> Set[Person]:
@@ -107,8 +107,10 @@ class PersonFinder:
 		if not ids:
 			return set()
 		query = open(sql_path("get_people.sql"), "r").read()
-		cursor = self.conn.cursor()
-		cursor.execute(query, {"ids": tuple(ids)})
-		people = {Person(row[0], row[1], row[2], row[3]) for row in cursor.fetchall()}
-		cursor.close()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"ids": tuple(ids)})
+				people = {
+					Person(row[0], row[1], row[2], row[3]) for row in cursor.fetchall()
+				}
 		return people

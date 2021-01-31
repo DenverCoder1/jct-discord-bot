@@ -12,18 +12,17 @@ class EmailAdder:
 		self.conn = conn
 
 	def add_emails(self, person: Person, emails: Iterable[str]) -> None:
-		cursor = self.conn.cursor()
 		query = open(sql_path("add_email.sql"), "r").read()
-		for email in emails:
-			try:
-				cursor.execute(query, {"person_id": person.id, "email": email})
-			except UniqueViolation as e:
-				raise QuietWarning(
-					f"Ignoring request to add {email} to {person.name}; it already"
-					" exists."
-				)
-		self.conn.commit()
-		cursor.close()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				for email in emails:
+					try:
+						cursor.execute(query, {"person_id": person.id, "email": email})
+					except UniqueViolation:
+						raise QuietWarning(
+							f"Ignoring request to add {email} to {person.name}; it"
+							" already exists."
+						)
 
 	def filter_emails(self, strings: Iterable[str]) -> Set[str]:
 		"""Given a list of strings returns only those which are email addresses"""

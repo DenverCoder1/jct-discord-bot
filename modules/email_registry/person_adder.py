@@ -17,12 +17,11 @@ class PersonAdder:
 		categoriser: Categoriser,
 		member_id: int = None,
 	):
-		cursor = self.conn.cursor()
 		query = open(sql_path("add_person.sql"), "r").read()
-		cursor.execute(
-			query, {"name": name, "surname": surname, "member_id": member_id}
-		)
-		person_id = cursor.fetchone()[0]
-		self.conn.commit()
-		cursor.close()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(
+					query, {"name": name, "surname": surname, "member_id": member_id}
+				)
+				person_id = cursor.fetchone()[0]
 		categoriser.categorise_person(person_id, channels)
