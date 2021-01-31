@@ -2,22 +2,23 @@ import discord
 import config
 import psycopg2.extensions as sql
 from typing import Iterable, Set, Optional
-from modules.email_registry.sql_path import sql_path
 from modules.email_registry.weighted_set import WeightedSet
 from modules.email_registry.person import Person
 from modules.error.friendly_error import FriendlyError
+from utils.sql_fetcher import SqlFetcher
 from utils.utils import decode_mention
 
 
 class PersonFinder:
-	def __init__(self, conn: sql.connection) -> None:
+	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
 		self.conn = conn
 		self.search_weights = {
-			"keyword": 1,
+			"keyword": 2,
 			"curr_channel": 1,
-			"mentioned_channel": 2,
-			"mentioned_person": 3,
+			"mentioned_channel": 4,
+			"mentioned_person": 6,
 		}
+		self.sql_fetcher = sql_fetcher
 
 	def search(
 		self, query: Iterable[str], curr_channel: discord.TextChannel
@@ -76,7 +77,7 @@ class PersonFinder:
 		"""searches the database for a person with a given id and returns a Person object"""
 		if not ids:
 			return set()
-		query = open(sql_path("get_people.sql"), "r").read()
+		query = self.sql_fetcher["get_people.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"ids": tuple(ids)})
@@ -87,7 +88,7 @@ class PersonFinder:
 
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the people who belong to its category"""
-		query = open(sql_path("search_channel.sql"), "r").read()
+		query = self.sql_fetcher["search_channel.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"channel_id": id})
@@ -96,7 +97,7 @@ class PersonFinder:
 
 	def __search_member(self, id: int) -> Optional[int]:
 		"""searches the database for a person's id and returns the IDs of the people who match it"""
-		query = open(sql_path("search_member.sql"), "r").read()
+		query = self.sql_fetcher["search_member.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				row = cursor.execute(query, {"member_id": id}).fetchone()
@@ -104,7 +105,7 @@ class PersonFinder:
 
 	def __search_kw(self, keyword: str) -> Set[int]:
 		"""searches the database for a single keyword and returns the IDs of the people who match it"""
-		query = open(sql_path("search_kw.sql"), "r").read()
+		query = self.sql_fetcher["search_kw.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"kw": keyword})

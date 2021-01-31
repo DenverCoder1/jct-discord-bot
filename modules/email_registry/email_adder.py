@@ -1,15 +1,16 @@
+from utils.sql_fetcher import SqlFetcher
 from modules.error.quiet_warning import QuietWarning
 from typing import Iterable, Set
 from modules.email_registry.person import Person
-from modules.email_registry.sql_path import sql_path
 import psycopg2.extensions as sql
 from psycopg2.errors import UniqueViolation
 import re
 
 
 class EmailAdder:
-	def __init__(self, conn: sql.connection) -> None:
+	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
 		self.conn = conn
+		self.sql_fetcher = sql_fetcher
 
 	def add_emails(self, person: Person, emails: Iterable[str]) -> None:
 		self.__add_remove_emails("add_email.sql", person, emails)
@@ -20,7 +21,7 @@ class EmailAdder:
 	def __add_remove_emails(
 		self, sql_file: str, person: Person, emails: Iterable[str]
 	) -> None:
-		query = open(sql_path(sql_file), "r").read()
+		query = self.sql_fetcher[sql_file]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for email in emails:

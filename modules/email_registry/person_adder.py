@@ -1,13 +1,14 @@
-from typing import Iterable
 import discord
 import psycopg2.extensions as sql
-from modules.email_registry.sql_path import sql_path
+from typing import Iterable
 from modules.email_registry.categoriser import Categoriser
+from utils.sql_fetcher import SqlFetcher
 
 
 class PersonAdder:
-	def __init__(self, conn: sql.connection) -> None:
+	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
 		self.conn = conn
+		self.sql_fetcher = sql_fetcher
 
 	def add_person(
 		self,
@@ -17,7 +18,7 @@ class PersonAdder:
 		categoriser: Categoriser,
 		member_id: int = None,
 	) -> int:
-		query = open(sql_path("add_person.sql"), "r").read()
+		query = self.sql_fetcher["add_person.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

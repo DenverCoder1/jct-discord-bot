@@ -5,18 +5,23 @@ from modules.email_registry.email_adder import EmailAdder
 from modules.email_registry.person_adder import PersonAdder
 from modules.error.friendly_error import FriendlyError
 from modules.role_tag.member import Member
+from utils.sql_fetcher import SqlFetcher
 from discord.ext import commands
+import os
 import config
 
 
 class EmailRegistryCog(commands.Cog, name="Email Registry"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.finder = PersonFinder(config.conn)
+		self.sql_fetcher = SqlFetcher(
+			os.path.join("modules", "email_registry", "queries")
+		)
+		self.finder = PersonFinder(config.conn, self.sql_fetcher)
 		self.embedder = PersonEmbedder()
-		self.email_adder = EmailAdder(config.conn)
-		self.person_adder = PersonAdder(config.conn)
-		self.categoriser = Categoriser(config.conn)
+		self.email_adder = EmailAdder(config.conn, self.sql_fetcher)
+		self.person_adder = PersonAdder(config.conn, self.sql_fetcher)
+		self.categoriser = Categoriser(config.conn, self.sql_fetcher)
 
 	@commands.command(name="getemail", aliases=["email", "emailof"])
 	async def get_email(self, ctx: commands.Context, *args):
