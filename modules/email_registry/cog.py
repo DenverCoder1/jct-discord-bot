@@ -61,8 +61,8 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		# add the emails to the database
 		self.email_adder.add_emails(person, self.email_adder.filter_emails(args))
 		# update professors set from database
-		people = self.finder.search(args, ctx.channel)
-		await ctx.send(embed=self.embedder.gen_embed(people))
+		person = self.finder.get_people([person.id])
+		await ctx.send(embed=self.embedder.gen_embed(person))
 
 	@commands.command(name="addperson")
 	@commands.has_guild_permissions(manage_roles=True)
@@ -96,9 +96,11 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 					"The first two arguments must be a first name and a last name if"
 					" you haven't mentioned the person you want to add."
 				)
-		self.person_adder.add_person(
+		person_id = self.person_adder.add_person(
 			name, surname, ctx.message.channel_mentions, self.categoriser, member_id
 		)
+		person = self.finder.get_people([person_id])
+		await ctx.send(self.embedder.gen_embed(person))
 
 	@commands.command(name="link")
 	@commands.has_guild_permissions(manage_roles=True)
@@ -114,20 +116,41 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		> **channel-mentions**: A space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
 		"""
 		# search for professor's detailschannel-mentions
+		await self.__link_unlink(args, ctx, "to", self.categoriser.categorise_person)
+
+	@commands.command(name="unlink")
+	@commands.has_guild_permissions(manage_roles=True)
+	async def unlink_person_from_category(self, ctx: commands.Context, *args):
+		"""Unlink a person from a category (for example a professor from a course they no longer teach)
+
+		Usage:
+		```
+		++unlink query from channel-mentions
+		```
+		Arguments:
+		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
+		> **channel-mentions**: A space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
+		"""
+		await self.__link_unlink(
+			args, ctx, "from", self.categoriser.decategorise_person
+		)
+
+	async def __link_unlink(self, args, ctx: commands.Context, sep_word: str, func):
+		# search for professor's detailschannel-mentions
 		try:
-			index_to = len(args) - 1 - args[::-1].index("to")  # last index
+			index_to = len(args) - 1 - args[::-1].index(sep_word)  # last index
 		except ValueError as e:
 			raise FriendlyError(
-				'You must include the word "to" in between your query and the channel'
-				" mentions",
+				f'You must include the word "{sep_word}" in between your query and the'
+				" channel mentions",
 				ctx.channel,
 			)
 		person = self.finder.search_one(args[:index_to], ctx.channel)
-		success, error_msg = self.categoriser.categorise_person(
-			person.id, args[index_to + 1 :]
-		)
+		success, error_msg = func(person.id, args[index_to + 1 :])
 		if not success:
 			raise FriendlyError(error_msg, ctx.channel, ctx.author)
+		person = self.finder.get_people([person.id])
+		await ctx.send(embed=self.embedder.gen_embed(person))
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

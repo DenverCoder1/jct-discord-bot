@@ -16,7 +16,7 @@ class PersonAdder:
 		channels: Iterable[discord.TextChannel],
 		categoriser: Categoriser,
 		member_id: int = None,
-	):
+	) -> int:
 		query = open(sql_path("add_person.sql"), "r").read()
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -27,3 +27,4 @@ class PersonAdder:
 		categoriser.categorise_person(
 			person_id, [channel.mention for channel in channels]
 		)
+		return person_id

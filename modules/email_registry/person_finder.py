@@ -48,7 +48,7 @@ class PersonFinder:
 				for person_id in self.__search_kw(keyword):
 					weights[person_id] += self.search_weights["keyword"]
 
-		people = self.__get_people(weights.heaviest_items())
+		people = self.get_people(weights.heaviest_items())
 		return people
 
 	def search_one(
@@ -71,6 +71,19 @@ class PersonFinder:
 				curr_channel,
 			)
 		return next(iter(people))
+
+	def get_people(self, ids: Iterable[int]) -> Set[Person]:
+		"""searches the database for a person with a given id and returns a Person object"""
+		if not ids:
+			return set()
+		query = open(sql_path("get_people.sql"), "r").read()
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"ids": tuple(ids)})
+				people = {
+					Person(row[0], row[1], row[2], row[3]) for row in cursor.fetchall()
+				}
+		return people
 
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the people who belong to its category"""
@@ -97,16 +110,3 @@ class PersonFinder:
 				cursor.execute(query, {"kw": keyword})
 				ids = {row[0] for row in cursor.fetchall()}
 		return ids
-
-	def __get_people(self, ids: Iterable[int]) -> Set[Person]:
-		"""searches the database for a person with a given id and returns a Person object"""
-		if not ids:
-			return set()
-		query = open(sql_path("get_people.sql"), "r").read()
-		with self.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"ids": tuple(ids)})
-				people = {
-					Person(row[0], row[1], row[2], row[3]) for row in cursor.fetchall()
-				}
-		return people
