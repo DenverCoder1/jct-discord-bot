@@ -29,5 +29,5 @@ class XKCDFetcher:
 		"""returns the json for a random XKCD comic"""
 		random.seed()
 		latest_num = self.get_latest_num()
-		random_id = random.randrange(1, latest_num)
+		random_id = random.randrange(1, latest_num + 1)
 		return self.get_comic_by_id(random_id)
