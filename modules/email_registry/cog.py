@@ -12,6 +12,7 @@ import config
 
 
 class EmailRegistryCog(commands.Cog, name="Email Registry"):
+	"""Update and retrieve faculty emails from the registry"""
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.sql_fetcher = SqlFetcher(

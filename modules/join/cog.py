@@ -6,6 +6,7 @@ from discord.ext import commands
 
 
 class JoinCog(commands.Cog, name="Join"):
+	"""Join command to get new users information and place them in the right roles"""
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.assigner = None

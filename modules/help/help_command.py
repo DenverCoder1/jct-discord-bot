@@ -10,9 +10,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 
 	def get_ending_note(self):
 		"""Returns note to display at the bottom"""
-		prefix = self.clean_prefix
-		invoked_with = self.invoked_with
-		return f"Use {prefix}{invoked_with} [command] for more info on a command."
+		return ""
 
 	def get_command_signature(self, command: commands.core.Command):
 		"""Retrieves the signature portion of the help page."""
@@ -21,20 +19,22 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 	async def send_bot_help(self, mapping: dict):
 		"""implements bot command help page"""
 		prefix = self.clean_prefix
+		invoked_with = self.invoked_with
 		embed = discord.Embed(title="Bot Commands", colour=self.COLOUR)
-		description = self.context.bot.description
-		if description:
-			embed.description = description
+		embed.description = (
+			f'Use "{prefix}{invoked_with} command" for more info on a command.\n' 
+			f'Use "{prefix}{invoked_with} category" for more info on a category.'
+		)
 
 		for cog, commands in mapping.items():
 			name = "No Category" if cog is None else cog.qualified_name
 			filtered = await self.filter_commands(commands, sort=True)
 			if filtered:
 				# \u2002 = middle dot
-				value = "\u2002".join(f"{prefix}{c.name}" for c in commands)
+				value = "\u2002".join(f"`{prefix}{c.name}`" for c in commands)
 				if cog and cog.description:
 					value = f"{cog.description}\n{value}"
-				embed.add_field(name=name, value=value)
+				embed.add_field(name=name, value=value, inline=True)
 
 		embed.set_footer(text=self.get_ending_note())
 		await self.get_destination().send(embed=embed)
@@ -52,7 +52,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 			embed.add_field(
 				name=self.get_command_signature(command),
 				value=command.short_doc or "...",
-				inline=False,
+				inline=False
 			)
 
 		embed.set_footer(text=self.get_ending_note())
@@ -70,7 +70,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 				embed.add_field(
 					name=self.get_command_signature(command),
 					value=command.short_doc or "...",
-					inline=False,
+					inline=False
 				)
 
 		embed.set_footer(text=self.get_ending_note())

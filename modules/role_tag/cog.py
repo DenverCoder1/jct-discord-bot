@@ -5,6 +5,7 @@ import discord
 
 
 class RoleTagsCog(commands.Cog, name="Role Tags"):
+	"""Changes nicknames to include tags represented by the user's roles"""
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 
