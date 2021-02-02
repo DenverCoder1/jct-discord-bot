@@ -8,9 +8,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 	# embed colour
 	COLOUR = discord.Colour.blurple()
 
-	def get_ending_note(self):
-		"""Returns note to display at the bottom"""
-		return ""
+
 
 	def get_command_signature(self, command: commands.core.Command):
 		"""Retrieves the signature portion of the help page."""
@@ -36,7 +34,6 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 					value = f"{cog.description}\n{value}"
 				embed.add_field(name=name, value=value, inline=True)
 
-		embed.set_footer(text=self.get_ending_note())
 		await self.get_destination().send(embed=embed)
 
 	async def send_cog_help(self, cog: commands.Cog):
@@ -55,7 +52,6 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 				inline=False
 			)
 
-		embed.set_footer(text=self.get_ending_note())
 		await self.get_destination().send(embed=embed)
 
 	async def send_group_help(self, group: commands.Group):
@@ -73,7 +69,6 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 					inline=False
 				)
 
-		embed.set_footer(text=self.get_ending_note())
 		await self.get_destination().send(embed=embed)
 
 	# Use the same function as group help for command help
