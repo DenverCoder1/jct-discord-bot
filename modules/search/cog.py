@@ -12,13 +12,14 @@ import config
 
 
 class SearchCog(commands.Cog, name="Search"):
+	"""Searches Google for links and includes summaries from Wikipedia when relevant"""
 	def __init__(self, bot):
 		self.bot = bot
 		self.last_paragraph = {}
 
 	@commands.command(name="search")
 	async def search(self, ctx):
-		"""search command to message Google links and a small summary (when feasible) for a given prompt"""
+		"""Search command to message Google links and a small summary (when feasible) for a given prompt"""
 		searched_string = ctx.message.content[len(config.prefix) + 6 :].strip()
 
 		channel_id = ctx.channel.id

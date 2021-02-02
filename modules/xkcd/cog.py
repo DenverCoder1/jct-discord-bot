@@ -5,6 +5,7 @@ from discord.ext import commands
 
 
 class XKCDCog(commands.Cog, name="XKCD Comics"):
+	"""Displays the latest xkcd comic, random comics, or comics for your search terms"""
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.xkcd_fetcher = XKCDFetcher()
@@ -12,7 +13,7 @@ class XKCDCog(commands.Cog, name="XKCD Comics"):
 
 	@commands.command(name="xkcd")
 	async def xkcd(self, ctx: commands.Context, *args):
-		"""Displays the latest xkcd comic, random comics, or comics for your search terms.
+		"""Displays the latest xkcd comic, random comics, or comics for your search terms
 
 		Usage:
 		
