@@ -30,6 +30,7 @@ Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of yo
 from discord.ext import commands
 
 class MyFeatureCog(commands.Cog):
+	"""A cog which has no features and does nothing"""
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 ```
@@ -39,7 +40,7 @@ Then as methods to that class, add any functions you need for the bot. For examp
 ````py
 	@commands.command(name='my_feature')
 	async def my_feature(self, ctx: commands.Context, n: int, word: str):
-		"""A command which takes two argument and does nothing.
+		"""A command which takes two arguments and does nothing
 
 		Usage:
 		```
