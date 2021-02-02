@@ -22,6 +22,9 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 		"""implements bot command help page"""
 		prefix = self.clean_prefix
 		embed = discord.Embed(title="Bot Commands", colour=self.COLOUR)
+		description = self.context.bot.description
+		if description:
+			embed.description = description
 
 		for cog, commands in mapping.items():
 			name = "No Category" if cog is None else cog.qualified_name
@@ -29,6 +32,8 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 			if filtered:
 				# \u2002 = middle dot
 				value = "\u2002".join(f"{prefix}{c.name}" for c in commands)
+				if cog and cog.description:
+					value = f"{cog.description}\n{value}"
 				embed.add_field(name=name, value=value)
 
 		embed.set_footer(text=self.get_ending_note())
