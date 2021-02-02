@@ -10,7 +10,8 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 
 	def get_command_signature(self, command: commands.core.Command):
 		"""Retrieves the signature portion of the help page."""
-		return f"{command.qualified_name} {command.signature}"
+		prefix = self.clean_prefix
+		return f"{prefix}{command.qualified_name} {command.signature}"
 
 	async def send_bot_help(self, mapping: dict):
 		"""implements bot command help page"""
