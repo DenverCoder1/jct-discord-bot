@@ -51,6 +51,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 				inline=False
 			)
 
+		embed.set_footer(text="Use ++help [command] for more info on a command.")
 		await self.get_destination().send(embed=embed)
 
 	async def send_group_help(self, group: commands.Group):
