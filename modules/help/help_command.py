@@ -8,8 +8,6 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 	# embed colour
 	COLOUR = discord.Colour.blurple()
 
-
-
 	def get_command_signature(self, command: commands.core.Command):
 		"""Retrieves the signature portion of the help page."""
 		return f"{command.qualified_name} {command.signature}"
