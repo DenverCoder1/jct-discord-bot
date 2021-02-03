@@ -126,3 +126,6 @@ dmypy.json
 
 # VS Code stuff
 .vscode/
+
+# Google OAUTH
+jct-compsci-esp-*.json
