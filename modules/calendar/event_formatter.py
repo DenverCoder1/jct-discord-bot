@@ -19,12 +19,22 @@ class EventFormatter:
 			for event in events:
 				embed.add_field(
 					name=event['summary'], 
-					value=self.get_formatted_date_range(event)
+					value=self.__get_formatted_date_range(event)
 				)
 		embed.set_footer(text=f"Times are shown for {self.default_time_zone}")
 		return embed
 
-	def get_formatted_date_range(self, event: dict) -> str:
+	def embed_link(self, title: str, links: dict) -> discord.Embed:
+		embed = discord.Embed(
+			title=title,
+			colour=discord.Colour.green()
+		)
+		# add links to embed
+		desc = "\n".join(f"\n**[{text}]({url})**" for text, url in links.items())
+		embed.description = desc
+		return embed
+
+	def __get_formatted_date_range(self, event: dict) -> str:
 		"""Extract dates from event and convert to readable format"""
 		start = event['start'].get('dateTime', event['start'].get('date'))
 		end = event['end'].get('dateTime', event['end'].get('date'))

@@ -9,6 +9,20 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.calendar = Calendar()
 		self.event_formatter = EventFormatter()
 
+	@commands.command(name="calendarlinks", aliases=["calendarlink","calendar_links"])
+	async def calendarlinks(self, ctx):
+		"""
+		Command to get the link to add the calendar to a Google Calendar account
+
+		Usage:
+		```
+		++calendarlinks
+		```
+		"""
+		links = self.calendar.get_links()
+		embed = self.event_formatter.embed_link("Calendar Links", links)
+		await ctx.send(embed=embed)
+
 	@commands.command(name="upcoming")
 	async def upcoming(self, ctx):
 		"""
