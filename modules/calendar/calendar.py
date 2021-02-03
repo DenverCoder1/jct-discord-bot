@@ -1,3 +1,4 @@
+from typing import Dict
 import os
 from dotenv.main import load_dotenv
 from googleapiclient.discovery import build
@@ -27,19 +28,20 @@ class Calendar:
 		self.service = build('calendar', 'v3', credentials=self.creds)
 		self.calendar_id = os.getenv("GOOGLE_CALENDAR_ID")
 
-	def get_links(self) -> dict:
+	def get_links(self) -> Dict[str, str]:
 		return {
 			"Add to Google Calendar": (
 				"https://calendar.google.com/calendar/render"
-				f"?cid=https://www.google.com/calendar/feeds/{self.calendar_id}/public/basic"
+				f"?cid=https://www.google.com/calendar/feeds/{self.calendar_id}"
+				"/public/basic"
 			),
 			"View the Events": (
 				"https://calendar.google.com/calendar/u/0/embed"
 				f"?src={self.calendar_id}&ctz=Asia/Jerusalem"
 			),
 			"iCal Format": (
-				"https://calendar.google.com/calendar/ical/"
-				f"{self.calendar_id.replace('@','%40')}/public/basic.ics"
+				"https://calendar.google.com/calendar/ical"
+				f"/{self.calendar_id.replace('@','%40')}/public/basic.ics"
 			)
 		}
 

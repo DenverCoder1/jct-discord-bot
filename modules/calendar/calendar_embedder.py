@@ -1,12 +1,12 @@
-from typing import Iterable
+from typing import Iterable, Dict
 import discord
 import dateparser
 
-class EventFormatter:
+class CalendarEmbedder:
 	def __init__(self):
 		self.default_time_zone = "Asia/Jerusalem"
 
-	def format_event_list(self, title: str, events: Iterable[dict]) -> discord.Embed:
+	def embed_event_list(self, title: str, events: Iterable[dict]) -> discord.Embed:
 		"""Generates an embed with a field for each event in the given list"""
 		embed = discord.Embed(
 			title=title,
@@ -24,17 +24,17 @@ class EventFormatter:
 		embed.set_footer(text=f"Times are shown for {self.default_time_zone}")
 		return embed
 
-	def embed_link(self, title: str, links: dict) -> discord.Embed:
+	def embed_link(self, title: str, links: Dict[str, str]) -> discord.Embed:
 		embed = discord.Embed(
 			title=title,
 			colour=discord.Colour.green()
 		)
 		# add links to embed
-		desc = "\n".join(f"\n**[{text}]({url})**" for text, url in links.items())
-		embed.description = desc
+		description = (f"\n**[{text}]({url})**" for text, url in links.items())
+		embed.description = "\n".join(description)
 		return embed
 
-	def __get_formatted_date_range(self, event: dict) -> str:
+	def __get_formatted_date_range(self, event: Dict[str, str]) -> str:
 		"""Extract dates from event and convert to readable format"""
 		start = event['start'].get('dateTime', event['start'].get('date'))
 		end = event['end'].get('dateTime', event['end'].get('date'))
@@ -42,5 +42,8 @@ class EventFormatter:
 
 	def __format_date(self, date_str: str) -> str:
 		"""Convert dates to format: 'Jan 1 2021 1:23 AM'"""
-		date = dateparser.parse(date_str, settings={'TO_TIMEZONE': self.default_time_zone})
+		date = dateparser.parse(
+			date_str,
+			settings={'TO_TIMEZONE': self.default_time_zone}
+		)
 		return date.strftime("%b %d %Y %I:%M %p").replace(" 0", " ")
