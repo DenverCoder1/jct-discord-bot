@@ -3,3 +3,4 @@ python-dotenv==0.15.0
 googlesearch-python==2020.0.2
 beautifulsoup4==4.9.3
 psycopg2-binary==2.8.6
+pyluach==1.2.1
