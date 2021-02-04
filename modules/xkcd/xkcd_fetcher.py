@@ -2,6 +2,7 @@ import requests
 import random
 from .comic import Comic
 
+
 class XKCDFetcher:
 	def get_comic_by_id(self, comic_id: int) -> Comic:
 		"""returns a Comic object of an xkcd comic given its id"""
@@ -12,7 +13,7 @@ class XKCDFetcher:
 		# load json from response
 		comic = response.json()
 		return Comic(comic["num"], comic["safe_title"], comic["alt"], comic["img"])
-	
+
 	def get_latest(self) -> Comic:
 		"""returns a Comic object of the latest xkcd comic"""
 		response = requests.get("https://xkcd.com/info.0.json")
@@ -47,4 +48,6 @@ class XKCDFetcher:
 			# Relevant xkcd did not return any results
 			raise ConnectionError("No results found.")
 		comic = data["results"][0]
-		return Comic(comic["number"], comic["title"], comic["titletext"], comic["image"])
+		return Comic(
+			comic["number"], comic["title"], comic["titletext"], comic["image"]
+		)

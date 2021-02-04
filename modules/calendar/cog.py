@@ -4,8 +4,10 @@ from .calendar_embedder import CalendarEmbedder
 from modules.error.friendly_error import FriendlyError
 from utils.utils import is_email
 
+
 class CalendarCog(commands.Cog, name="Calendar"):
 	"""Display and update Google Calendar events"""
+
 	def __init__(self, bot):
 		self.bot = bot
 		self.calendar = Calendar()
@@ -50,11 +52,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		"""
 		message = " ".join(args)
-		if ' on ' in message and ' to ' in message:
-			[summary, times] = message.split(' on ', 2)
-			[start, end] = times.split(' to ', 2)
+		if " on " in message and " to " in message:
+			[summary, times] = message.split(" on ", 2)
+			[start, end] = times.split(" to ", 2)
 			event = self.calendar.add_event(summary, start, end)
-			embed = self.calendar_embedder.embed_event("Event created successfully", event)
+			embed = self.calendar_embedder.embed_event(
+				"Event created successfully", event
+			)
 			await ctx.send(embed=embed)
 
 	@commands.command(name="addmanager", aliases=["add_manager", "addcalendarmanager"])
@@ -75,7 +79,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar = "JCT CompSci ESP"
 		# add manager to calendar
 		self.calendar.add_manager(email)
-		embed = self.calendar_embedder.embed_success(f"Successfully added manager to {calendar}")
+		embed = self.calendar_embedder.embed_success(
+			f"Successfully added manager to {calendar}"
+		)
 		await ctx.send(embed=embed)
 
 
