@@ -1,4 +1,3 @@
-from modules.scheduler.scheduler import Scheduler
 from discord.ext import commands
 import random
 import datetime
