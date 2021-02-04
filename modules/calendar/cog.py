@@ -37,6 +37,24 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		embed = self.calendar_embedder.embed_event_list("Upcoming Events", events)
 		await ctx.send(embed=embed)
 
+	@commands.command(name="addevent")
+	async def addevent(self, ctx, *args):
+		"""
+		Command to display upcoming events from the Google Calendar
+
+		Usage:
+		```
+		++addevent AOOPD Moed Alef on February 9, 2021 at 8:30 am to 10:30 am
+		```
+		"""
+		message = " ".join(args)
+		if ' on ' in message and ' to ' in message:
+			[summary, times] = message.split(' on ', 2)
+			[start, end] = times.split(' to ', 2)
+			event = self.calendar.add_event(summary, start, end)
+			embed = self.calendar_embedder.embed_event("Event created successfully", event)
+			await ctx.send(embed=embed)
+
 
 # setup functions for bot
 def setup(bot):

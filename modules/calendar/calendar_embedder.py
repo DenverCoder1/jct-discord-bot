@@ -16,11 +16,8 @@ class CalendarEmbedder:
 			embed.description = "No events found"
 		else:
 			# add events to embed
-			for event in events:
-				embed.add_field(
-					name=event['summary'], 
-					value=self.__get_formatted_date_range(event)
-				)
+			event_details = map(self.__get_formatted_event_details, events)
+			embed.description = "\n".join(event_details)
 		embed.set_footer(text=f"Times are shown for {self.default_time_zone}")
 		return embed
 
@@ -33,6 +30,21 @@ class CalendarEmbedder:
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
 		embed.description = "\n".join(description)
 		return embed
+
+	def embed_event(self, title: str, event: Dict[str, str]) -> discord.Embed:
+		embed = discord.Embed(
+			title=title,
+			colour=discord.Colour.green()
+		)
+		# add overview of event to the embed
+		embed.description = self.__get_formatted_event_details(event)
+		return embed
+
+	def __get_formatted_event_details(self, event: Dict[str, str]) -> str:
+		return (
+			f"**[{event.get('summary')}]({event.get('htmlLink')})**\n" 
+			f"{self.__get_formatted_date_range(event)}\n"
+		)
 
 	def __get_formatted_date_range(self, event: Dict[str, str]) -> str:
 		"""Extract dates from event and convert to readable format"""
