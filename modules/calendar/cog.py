@@ -57,7 +57,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			embed = self.calendar_embedder.embed_event("Event created successfully", event)
 			await ctx.send(embed=embed)
 
-	@commands.command(name="addmanager", aliases=["addcalendarmanager"])
+	@commands.command(name="addmanager", aliases=["add_manager", "addcalendarmanager"])
 	async def addmanager(self, ctx, email):
 		"""
 		Command to display upcoming events from the Google Calendar

@@ -115,6 +115,13 @@ class Calendar:
 
 		return event
 
+	def delete_event(self, event_id: str) -> None:
+		# delete event
+		self.service.events().delete(
+			calendarId=self.calendar_id,
+			eventId=event_id
+		).execute()
+
 	def add_manager(self, email: str) -> Dict[str, str]:
 		rule = {
 			'scope': {
