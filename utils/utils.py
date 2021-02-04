@@ -46,3 +46,6 @@ def decode_mention(mention: str) -> Tuple[Optional[str], Optional[int]]:
 	else:
 		groups = match.groups()
 		return "channel" if groups[0] == "#" else "member", groups[1]
+
+def is_email(email: str) -> bool:
+		return bool(re.search(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", email))

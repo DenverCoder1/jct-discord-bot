@@ -114,3 +114,17 @@ class Calendar:
 		).execute()
 
 		return event
+
+	def add_manager(self, email: str) -> Dict[str, str]:
+		rule = {
+			'scope': {
+				'type': 'user',
+				'value': email,
+			},
+			'role': 'writer'
+		}
+		created_rule = self.service.acl().insert(
+			calendarId=self.calendar_id,
+			body=rule
+		).execute()
+		return created_rule

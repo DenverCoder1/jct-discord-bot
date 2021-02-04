@@ -1,4 +1,5 @@
 from utils.sql_fetcher import SqlFetcher
+from utils.utils import is_email
 from modules.error.quiet_warning import QuietWarning
 from typing import Iterable, Set
 from modules.email_registry.person import Person
@@ -36,7 +37,4 @@ class EmailAdder:
 	def filter_emails(self, strings: Iterable[str]) -> Set[str]:
 		"""Given a list of strings returns only those which are email addresses"""
 		strings = {s.replace(",", " ").strip() for s in strings}
-		return {s for s in strings if self.__is_email(s)}
-
-	def __is_email(self, email: str) -> bool:
-		return bool(re.search(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", email))
+		return {s for s in strings if is_email(s)}

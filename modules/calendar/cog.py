@@ -1,6 +1,8 @@
 from discord.ext import commands
 from .calendar import Calendar
 from .calendar_embedder import CalendarEmbedder
+from modules.error.friendly_error import FriendlyError
+from utils.utils import is_email
 
 class CalendarCog(commands.Cog, name="Calendar"):
 	"""Display and update Google Calendar events"""
@@ -54,6 +56,27 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			event = self.calendar.add_event(summary, start, end)
 			embed = self.calendar_embedder.embed_event("Event created successfully", event)
 			await ctx.send(embed=embed)
+
+	@commands.command(name="addmanager", aliases=["addcalendarmanager"])
+	async def addmanager(self, ctx, email):
+		"""
+		Command to display upcoming events from the Google Calendar
+
+		Usage:
+		```
+		++addmanager email
+		```
+		Arguments:
+		> **email**: Email address to add as a calendar manager
+		"""
+		if not is_email(email):
+			raise FriendlyError("Invalid email address", ctx.channel, ctx.author)
+		# TODO: get calendar based on role
+		calendar = "JCT CompSci ESP"
+		# add manager to calendar
+		self.calendar.add_manager(email)
+		embed = self.calendar_embedder.embed_success(f"Successfully added manager to {calendar}")
+		await ctx.send(embed=embed)
 
 
 # setup functions for bot

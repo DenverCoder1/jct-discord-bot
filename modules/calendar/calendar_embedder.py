@@ -40,6 +40,9 @@ class CalendarEmbedder:
 		embed.description = self.__get_formatted_event_details(event)
 		return embed
 
+	def embed_success(self, title: str) -> discord.Embed:
+		return discord.Embed(title=title, colour=discord.Colour.green())
+
 	def __get_formatted_event_details(self, event: Dict[str, str]) -> str:
 		return (
 			f"**[{event.get('summary')}]({event.get('htmlLink')})**\n" 
