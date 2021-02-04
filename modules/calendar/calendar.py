@@ -108,6 +108,24 @@ class Calendar:
 			calendarId=self.calendar_id, eventId=event_id
 		).execute()
 
+	def create_calendar(self, summary: str) -> Dict[str, str]:
+		calendar = {"summary": summary, "timeZone": self.default_time_zone}
+		created_calendar = self.service.calendars().insert(body=calendar).execute()
+		return created_calendar
+
+	def get_calendar_list(self) -> Iterable[dict]:
+		page_token = None
+		calendars = []
+		while True:
+			calendar_list = (
+				self.service.calendarList().list(pageToken=page_token).execute()
+			)
+			calendars += calendar_list["items"]
+			page_token = calendar_list.get("nextPageToken")
+			if not page_token:
+				break
+		return calendars
+
 	def add_manager(self, email: str) -> Dict[str, str]:
 		rule = {"scope": {"type": "user", "value": email,}, "role": "writer"}
 		created_rule = (

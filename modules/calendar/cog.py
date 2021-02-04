@@ -16,7 +16,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(name="calendarlinks", aliases=["calendarlink", "links"])
 	async def calendarlinks(self, ctx):
 		"""
-		Command to get the link to add the calendar to a Google Calendar account
+		Command to get the links to add the calendar to a Google Calendar account
 
 		Usage:
 		```
@@ -44,12 +44,16 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(name="addevent")
 	async def addevent(self, ctx, *args):
 		"""
-		Command to display upcoming events from the Google Calendar
+		Command to add events to the Google Calendar.
 
 		Usage:
 		```
-		++addevent AOOPD Moed Alef on February 9, 2021 at 8:30 am to 10:30 am
+		++addevent Calculus Moed Alef on February 9, 2021 at 8:30 am to 10:30 am
 		```
+		Arguments:
+		**Calculus Moed Alef** - the name of the event to add
+		**February 9, 2021 at 8:30 am** - start time of the event
+		**10:30 am** - end time of the event
 		"""
 		message = " ".join(args)
 		if " on " in message and " to " in message:
@@ -64,7 +68,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(name="addmanager", aliases=["add_manager", "addcalendarmanager"])
 	async def addmanager(self, ctx, email):
 		"""
-		Command to display upcoming events from the Google Calendar
+		Command to add a Google account as a manager of your class's calendar
 
 		Usage:
 		```
@@ -83,6 +87,44 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			f"Successfully added manager to {calendar}"
 		)
 		await ctx.send(embed=embed)
+
+	@commands.command(name="createcalendar")
+	@commands.has_permissions(administrator=True)
+	async def createcalendar(self, ctx, *args):
+		"""
+		Command to display upcoming events from the Google Calendar
+
+		Usage:
+		```
+		++createcalendar JCT CompSci Lev 2022
+		```
+		Arguments:
+		> **JCT CompSci Lev 2022**: name of the calendar to create
+		"""
+		summary = " ".join(args)
+		# create calendar
+		new_calendar = self.calendar.create_calendar(summary)
+		embed = self.calendar_embedder.embed_success(
+			f"Successfully created '{new_calendar['summary']}' calendar.",
+			f"Calendar ID: {new_calendar['id']}",
+		)
+		await ctx.send(embed=embed)
+
+	@commands.command(name="listcalendars")
+	@commands.has_permissions(administrator=True)
+	async def listcalendars(self, ctx):
+		"""
+		Command to display upcoming events from the Google Calendar
+
+		Usage:
+		```
+		++listcalendars
+		```
+		"""
+		# get calendar list
+		calendars = self.calendar.get_calendar_list()
+		details = (f"{calendar['summary']}: {calendar['id']}" for calendar in calendars)
+		await ctx.send("\n".join(details))
 
 
 # setup functions for bot
