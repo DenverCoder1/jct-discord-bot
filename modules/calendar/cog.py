@@ -87,6 +87,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		message = " ".join(args)
 		grad_year = None
 		campus = None
+		summary = None
 		times = None
 		if " on " in message:
 			# separate summary from rest of message
@@ -154,10 +155,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			await ctx.send(embed=embed)
 
 	@commands.command(name="createcalendar")
-	@commands.has_permissions(administrator=True)
+	@commands.has_permissions(manage_server=True)
 	async def createcalendar(self, ctx, *args):
 		"""
-		Command to display upcoming events from the Google Calendar
+		Command to create a public calendar on the service account
 
 		Usage:
 		```
@@ -176,10 +177,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		await ctx.send(embed=embed)
 
 	@commands.command(name="listcalendars")
-	@commands.has_permissions(administrator=True)
+	@commands.has_permissions(manage_server=True)
 	async def listcalendars(self, ctx):
 		"""
-		Command to display upcoming events from the Google Calendar
+		Command to get a list of all calendars on the service account
 
 		Usage:
 		```
