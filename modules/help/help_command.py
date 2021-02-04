@@ -19,7 +19,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 		invoked_with = self.invoked_with
 		embed = discord.Embed(title="Bot Commands", colour=self.COLOUR)
 		embed.description = (
-			f'Use "{prefix}{invoked_with} command" for more info on a command.\n' 
+			f'Use "{prefix}{invoked_with} command" for more info on a command.\n'
 			f'Use "{prefix}{invoked_with} category" for more info on a category.'
 		)
 
@@ -48,7 +48,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 			embed.add_field(
 				name=self.get_command_signature(command),
 				value=command.short_doc or "...",
-				inline=False
+				inline=False,
 			)
 
 		embed.set_footer(text="Use ++help [command] for more info on a command.")
@@ -66,7 +66,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 				embed.add_field(
 					name=self.get_command_signature(command),
 					value=command.short_doc or "...",
-					inline=False
+					inline=False,
 				)
 
 		await self.get_destination().send(embed=embed)

@@ -6,6 +6,7 @@ from discord.ext import commands
 
 class NewUserCog(commands.Cog, name="New User"):
 	"""Ask members who join to use the join command"""
+
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.greeter = Greeter(bot)
