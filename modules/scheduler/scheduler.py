@@ -42,6 +42,7 @@ class Scheduler:
 		self.__await_event(secs, "on_new_academic_year", self.__await_new_academic_year)
 
 	def __await_winter_semester_start(self):
+		"""Event that will run every year on Tishrei 18 at 4pm"""
 		secs = self.__secs_to_heb_date(7, 18, 16)
 		self.__await_event(
 			secs, "on_winter_semester_start", self.__await_winter_semester_start
