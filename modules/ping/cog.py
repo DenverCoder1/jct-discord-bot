@@ -1,6 +1,5 @@
 from discord.ext import commands
 import random
-import datetime
 
 
 class PingCog(commands.Cog, name="Ping"):
