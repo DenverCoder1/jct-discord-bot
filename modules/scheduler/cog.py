@@ -7,7 +7,7 @@ class SchedulerCog(commands.Cog, name="Scheduler"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.scheduler = Scheduler()
+		self.scheduler = Scheduler(bot)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

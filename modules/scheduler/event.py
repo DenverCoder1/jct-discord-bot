@@ -1,6 +1,7 @@
 from collections import defaultdict
-from typing import DefaultDict, Dict, List
+from typing import DefaultDict, List
 from .func_instance import FuncInstance
+from discord.ext import commands
 
 
 class Event:
@@ -10,7 +11,7 @@ class Event:
 	def add_function(self, func_instance, dependency_index: int = 0):
 		self.func_instances[dependency_index].append(func_instance)
 
-	def fire(self):
+	async def fire(self, bot: commands.Bot):
 		for dependency_index in sorted(self.func_instances):
 			for instance in self.func_instances[dependency_index]:
-				instance.call()
+				await instance.call(bot.cogs)

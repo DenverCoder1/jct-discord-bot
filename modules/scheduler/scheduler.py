@@ -1,16 +1,17 @@
 import threading
 import datetime as dt
 from typing import Dict
+from discord.ext import commands
 from .func_instance import FuncInstance
 from .event import Event
 from pyluach import dates
+import asyncio
 
 
 class Scheduler:
 	events: Dict[str, Event] = {
 		"on_new_academic_year": Event(),
 		"on_winter_semester_start": Event(),
-		"on_test": Event(),
 	}
 
 	@staticmethod
@@ -31,32 +32,25 @@ class Scheduler:
 
 		return decorator
 
-	def __init__(self) -> None:
+	def __init__(self, bot: commands.Bot) -> None:
+		self.bot = bot
 		self.__await_new_academic_year()
 		self.__await_winter_semester_start()
-		self.__await_test()
 
 	def __await_new_academic_year(self):
 		secs = self.__secs_to_heb_date(5, 26, 16)
-		threading.Timer(
-			secs,
-			self.__trigger_event,
-			args=("on_new_academic_year", self.__await_new_academic_year),
-		)
+		self.__await_event(secs, "on_new_academic_year", self.__await_new_academic_year)
 
 	def __await_winter_semester_start(self):
 		secs = self.__secs_to_heb_date(7, 18, 16)
-		threading.Timer(
-			secs,
-			self.__trigger_event,
-			args=("on_winter_semester_start", self.__await_winter_semester_start),
+		self.__await_event(
+			secs, "on_winter_semester_start", self.__await_winter_semester_start
 		)
 
-	def __await_test(self):
-		secs = self.__secs_to_heb_date(11, 22, 18, 59)
+	def __await_event(self, secs: int, event_name: str, on_complete):
 		threading.Timer(
-			secs, self.__trigger_event, args=("on_test", self.__await_test),
-		)
+			secs, asyncio.run, args=(self.__trigger_event(event_name, on_complete),)
+		).start()
 
 	def __secs_to_heb_date(
 		self, h_month: int, h_day: int, hour: int = 0, min: int = 0, sec: int = 0
@@ -80,6 +74,6 @@ class Scheduler:
 
 		return (dt_trigger - now).total_seconds()
 
-	def __trigger_event(self, name: str, on_complete):
-		Scheduler.events[name].fire()
+	async def __trigger_event(self, name: str, on_complete):
+		await Scheduler.events[name].fire(self.bot)
 		on_complete()
