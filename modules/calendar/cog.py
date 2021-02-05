@@ -9,7 +9,7 @@ from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email, decode_mention, build_aliases
+from utils.utils import is_email, build_aliases
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -71,6 +71,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**[query]**: The query to search for within event titles (default: shows any events)
 		**[max_results]**: The maximum number of events to display (default: 10)
 		"""
+		# convert channel mentions to full names
+		args = list(map(self.course_mentions.map_channel_mention, args))
+		# extract query string
 		query = (
 			# all arguments are query if last argument is not a number
 			" ".join(args)
@@ -81,7 +84,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			# no query if no arguments or only 1 argument and it's a number
 			else ""
 		)
-		# last argument if last argument is a number, otherwise use default value
+		# extract max_results - last argument if it is a number, otherwise, default value
 		max_results = args[-1] if len(args) > 0 and args[-1].isdigit() else 10
 		# get class roles of the author
 		class_roles = self.finder.get_class_roles(ctx.author)
@@ -124,17 +127,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<End Time>**: The end time of the event. If not specified, the start time is used.
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
-
-		def convert_channel_mention(word: str):
-			mention_type, channel_id = decode_mention(word)
-			# convert mention to full name if word is a mention
-			if mention_type == "channel":
-				return self.course_mentions.get_channel_full_name(channel_id)
-			# not a channel mention
-			return word
-
 		# replace channel mentions with course names
-		message = " ".join(map(convert_channel_mention, args))
+		message = " ".join(map(self.course_mentions.map_channel_mention, args))
 		grad_year = None
 		campus = None
 		summary = None
