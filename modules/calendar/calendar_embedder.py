@@ -8,15 +8,19 @@ class CalendarEmbedder:
 	def __init__(self):
 		self.default_time_zone = "Asia/Jerusalem"
 
-	def embed_event_list(self, title: str, events: Iterable[dict]) -> discord.Embed:
+	def embed_event_list(
+		self, title: str, events: Iterable[dict], query: str = ""
+	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list"""
 		embed = discord.Embed(title=title, colour=discord.Colour.green())
+		# set initial description with search query if available
+		embed.description = "" if query == "" else f'Showing results for "{query}"\n\n'
 		if not events:
-			embed.description = "No events found"
+			embed.description += "No events found"
 		else:
 			# add events to embed
 			event_details = map(self.__get_formatted_event_details, events)
-			embed.description = "\n".join(event_details)
+			embed.description += "\n".join(event_details)
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 

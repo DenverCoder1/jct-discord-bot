@@ -93,7 +93,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
 			events = self.calendar.fetch_upcoming(calendar_id, max_results, query)
 			embed = self.calendar_embedder.embed_event_list(
-				f"Upcoming Events for {campus} {grad_year}", events
+				f"Upcoming Events for {campus} {grad_year}", events, query
 			)
 			await ctx.send(embed=embed)
 
