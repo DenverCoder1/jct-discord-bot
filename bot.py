@@ -2,6 +2,7 @@ import os
 import discord
 import config
 from discord.ext import commands
+from utils.scheduler.scheduler import Scheduler
 
 
 def main():
@@ -25,6 +26,9 @@ def main():
 
 	# Run Discord bot
 	client.run(config.token)
+
+	# Start Scheduler
+	Scheduler(client)
 
 
 if __name__ == "__main__":

@@ -50,9 +50,10 @@ class Scheduler:
 		)
 
 	def __await_event(self, secs: int, event_name: str, on_complete):
-		threading.Timer(
-			secs, asyncio.run, args=(self.__trigger_event(event_name, on_complete),)
-		).start()
+		if threading.TIMEOUT_MAX > secs:
+			threading.Timer(
+				secs, asyncio.run, args=(self.__trigger_event(event_name, on_complete),)
+			).start()
 
 	def __secs_to_heb_date(
 		self, h_month: int, h_day: int, hour: int = 0, min: int = 0, sec: int = 0
