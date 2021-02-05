@@ -45,8 +45,7 @@ def get_wiki(searched_string: str):
 		):  # if there is no link received the first time or the link isn't from wikipedia
 			url = "https://en.wikipedia.org/wiki/" + searched_string
 			exception_caught = True
-	return (wiki_html,
-		 url if exception_caught else url[0])
+	return (wiki_html, url if exception_caught else url[0])
 
 
 def get_wiki_intro(wiki, wiki_link, last_paragraph, channel_id):
@@ -63,7 +62,10 @@ def get_wiki_intro(wiki, wiki_link, last_paragraph, channel_id):
 		# " is " and " was " will be one of the first words in 99.99% of wiki intros
 		if (" is " in current_paragraph) or (" was " in current_paragraph):
 			last_paragraph[channel_id] = i
-			return f"\n> {remove_citations(current_paragraph).strip()}\n~ Wikipedia (<{wiki_link}>).\n"
+			return (
+				f"\n> {remove_citations(current_paragraph).strip()}\n~ Wikipedia"
+				f" (<{wiki_link}>).\n"
+			)
 
 	return ""
 

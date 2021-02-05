@@ -4,6 +4,7 @@ from .help_command import NewHelpCommand
 
 class HelpCog(commands.Cog, name="Help"):
 	"""Displays help information for commands and cogs"""
+
 	def __init__(self, bot: commands.Bot):
 		self._original_help_command = bot.help_command
 		bot.help_command = NewHelpCommand()

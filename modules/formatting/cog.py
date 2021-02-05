@@ -4,6 +4,7 @@ from .tip_formatter import TipFormatter
 
 class FormattingCog(commands.Cog, name="Formatting Tips"):
 	"""Display markdown tips for Discord messages"""
+
 	def __init__(self, bot):
 		self.bot = bot
 		self.tips = TipFormatter()

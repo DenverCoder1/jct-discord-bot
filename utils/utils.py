@@ -1,6 +1,7 @@
 import csv
+from itertools import product
 import os
-from typing import Optional, Tuple
+from typing import Iterable, List, Mapping, Optional, Tuple
 import discord
 import re
 
@@ -46,3 +47,22 @@ def decode_mention(mention: str) -> Tuple[Optional[str], Optional[int]]:
 	else:
 		groups = match.groups()
 		return "channel" if groups[0] == "#" else "member", groups[1]
+
+
+def is_email(email: str) -> bool:
+	return bool(re.search(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", email))
+
+
+def build_aliases(
+	name: str,
+	prefix: Iterable[str],
+	suffix: Iterable[str],
+	more_aliases: Iterable[str] = (),
+	include_dots: bool = True,
+) -> Mapping:
+	dots = ("", ".") if include_dots else ("")
+	return {
+		"name": name,
+		"aliases": list(more_aliases)
+		+ [a + b + c for a, b, c in product(prefix, dots, suffix) if a + b + c != name],
+	}

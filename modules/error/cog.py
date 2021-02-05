@@ -7,6 +7,7 @@ from modules.error.error_logger import ErrorLogger
 
 class ErrorLogCog(commands.Cog, name="Error Logs"):
 	"""Show recent error logs"""
+
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL_ID"), bot)

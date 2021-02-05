@@ -3,4 +3,8 @@ python-dotenv==0.15.0
 googlesearch-python==2020.0.2
 beautifulsoup4==4.9.3
 psycopg2-binary==2.8.6
+google-api-python-client==1.12.8
+google-auth-httplib2==0.0.4
+google-auth-oauthlib==0.4.2
+dateparser==1.0.0
 pyluach==1.2.1
