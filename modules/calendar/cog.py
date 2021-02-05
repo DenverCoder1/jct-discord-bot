@@ -4,11 +4,12 @@ from discord.ext import commands
 from .calendar import Calendar
 from .calendar_embedder import CalendarEmbedder
 from .calendar_finder import CalendarFinder
+from .course_mentions import CourseMentions
 from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email, build_aliases
+from utils.utils import is_email, decode_mention, build_aliases
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -20,6 +21,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.calendar_embedder = CalendarEmbedder()
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
+		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
 
 	@commands.command(
 		**build_aliases(
@@ -61,12 +63,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Usage:
 		```
 		++events.list
-		++events.list [query]
-		++events.list [max_results]
-		++events.list [query] [max_results]
+		++events.list <query>
+		++events.list <max_results>
+		++events.list <query> <max_results>
 		```
 		Arguments:
-		**[query]**: The query to search for within event titles (default: shows all events)
+		**[query]**: The query to search for within event titles (default: shows any events)
 		**[max_results]**: The maximum number of events to display (default: 10)
 		"""
 		query = (
@@ -122,7 +124,17 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<End Time>**: The end time of the event. If not specified, the start time is used.
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
-		message = " ".join(args)
+
+		def convert_channel_mention(word: str):
+			mention_type, channel_id = decode_mention(word)
+			# convert mention to full name if word is a mention
+			if mention_type == "channel":
+				return self.course_mentions.get_channel_full_name(channel_id)
+			# not a channel mention
+			return word
+
+		# replace channel mentions with course names
+		message = " ".join(map(convert_channel_mention, args))
 		grad_year = None
 		campus = None
 		summary = None
