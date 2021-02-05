@@ -133,8 +133,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
-		**<Start Time>**: The start time of the event.
-		**<End Time>**: The end time of the event. If not specified, the start time is used.
+		**<Start Time>**: The start date and/or time of the event.
+		**<End Time>**: The end date and/or time of the event. If not specified, the start time is used.
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
 		# replace channel mentions with course names
