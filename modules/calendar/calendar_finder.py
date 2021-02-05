@@ -48,7 +48,7 @@ class CalendarFinder:
 		"""Extract campus name and graduation year from input text"""
 		# parse graduation year in input
 		digits = "".join(c for c in input if c.isdigit())
-		if len(digits) == 4:
+		if len(digits) == 4 and digits[:2] == "20":  # TODO: fix in 22nd century
 			grad_year = int(digits)
 		else:
 			raise ClassParseError("Could not parse graduation year")

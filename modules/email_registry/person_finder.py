@@ -100,7 +100,8 @@ class PersonFinder:
 		query = self.sql_fetcher["search_member.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
-				row = cursor.execute(query, {"member_id": id}).fetchone()
+				cursor.execute(query, {"member_id": id})
+				row = cursor.fetchone()
 		return row[0] if row is not None else None
 
 	def __search_kw(self, keyword: str) -> Set[int]:
