@@ -68,8 +68,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		++events.list <query> <max_results>
 		```
 		Arguments:
-		**[query]**: The query to search for within event titles (default: shows any events)
-		**[max_results]**: The maximum number of events to display (default: 10)
+		**<query>**: The query to search for within event titles. This can be a string to search for or a channel mention. (Default: shows any events)
+		**<max_results>**: The maximum number of events to display. (Default: 10)
 		"""
 		# convert channel mentions to full names
 		args = list(map(self.course_mentions.map_channel_mention, args))
@@ -111,6 +111,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
+		++events.add <Title> at <Start Time>
 		++events.add <Title> on <Start Time>
 		++events.add <Title> on <Start Time> to <End Time>
 		++events.add <Title> on <Start Time> to <End Time> in <Class Name>
@@ -122,7 +123,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		++events.add Compilers HW 3 on April 10 at 11:59pm in Lev 2023
 		```
 		Arguments:
-		**<Title>**: The name of the event to add.
+		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
 		**<Start Time>**: The start time of the event.
 		**<End Time>**: The end time of the event. If not specified, the start time is used.
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
