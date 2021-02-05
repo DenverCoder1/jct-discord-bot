@@ -22,7 +22,7 @@ class CourseMentions:
 				cursor.execute(query, {"channel": channel})
 				row = cursor.fetchone()
 		if row is not None:
-			# return full matched category name
+			# return full matched category name from database
 			return row[0]
 		else:
 			# return the channel name instead
@@ -30,12 +30,11 @@ class CourseMentions:
 			return ch.name if ch is not None else None
 
 	def map_channel_mention(self, word: str):
+		"""given a word in a string, return the channel name
+		if it is a channel mention, otherwise return the original word"""
 		mention_type, channel_id = decode_mention(word)
 		# convert mention to full name if word is a mention
 		if mention_type == "channel":
 			return self.get_channel_full_name(channel_id)
 		# not a channel mention
 		return word
-
-	def get_channel_names_from_label(self, label: str) -> Iterable[str]:
-		return []
