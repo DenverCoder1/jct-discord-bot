@@ -114,7 +114,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			[summary, times] = message.split(" on ", 1)
 		elif " at " in message:
 			[summary, times] = message.split(" at ", 1)
-		if not times:
+		if times is None:
 			raise FriendlyError(
 				"Expected 'on' or 'at' to separate title from time.",
 				ctx.channel,
