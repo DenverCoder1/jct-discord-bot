@@ -69,7 +69,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		**<query>**: The query to search for within event titles. This can be a string to search for or a channel mention. (Default: shows any events)
-		**<max_results>**: The maximum number of events to display. (Default: 10)
+		**<max_results>**: The maximum number of events to display. (Default: 5 results or 15 with query)
 		"""
 		# convert channel mentions to full names
 		args = list(map(self.course_mentions.map_channel_mention, args))
@@ -85,7 +85,16 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			else ""
 		)
 		# extract max_results - last argument if it is a number, otherwise, default value
-		max_results = args[-1] if len(args) > 0 and args[-1].isdigit() else 10
+		max_results = (
+			# last argument if it's a number
+			args[-1]
+			if len(args) > 0 and args[-1].isdigit()
+			# check for 5 results by default if there is no query
+			else 5
+			if query == ""
+			# check ahead 15 results by default if there is a query
+			else 15
+		)
 		# get class roles of the author
 		class_roles = self.finder.get_class_roles(ctx.author)
 		for grad_year, campus in class_roles:
