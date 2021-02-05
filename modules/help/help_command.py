@@ -28,7 +28,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 			filtered = await self.filter_commands(commands, sort=True)
 			if filtered:
 				# \u2002 = middle dot
-				value = "\u2002".join(f"`{prefix}{c.name}`" for c in commands)
+				value = "\u2002".join(f"`{prefix}{c.name}`" for c in filtered)
 				if cog and cog.description:
 					value = f"{cog.description}\n{value}"
 				embed.add_field(name=name, value=value, inline=True)
