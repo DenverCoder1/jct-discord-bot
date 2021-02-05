@@ -37,7 +37,7 @@ class Calendar:
 			),
 		}
 
-	def fetch_upcoming(self, calendar_id: str) -> Iterable[dict]:
+	def fetch_upcoming(self, calendar_id: str, max_results: int) -> Iterable[dict]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
 		now = datetime.datetime.utcnow().isoformat() + "Z"
@@ -47,7 +47,7 @@ class Calendar:
 			.list(
 				calendarId=calendar_id,
 				timeMin=now,
-				maxResults=5,
+				maxResults=max_results,
 				singleEvents=True,
 				orderBy="startTime",
 			)

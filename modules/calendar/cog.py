@@ -8,7 +8,7 @@ from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email
+from utils.utils import is_email, build_aliases
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -22,22 +22,19 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 
 	@commands.command(
-		name="calendar.links",
-		aliases=[
-			a + b
-			for a, b in zip(
-				("calendar", "events", "event"), (".links", ".link", "link", "links")
-			)
-			if a + b != "calendar.links"
-		],
+		**build_aliases(
+			name="calendar.links",
+			prefix=("calendar", "events", "event"),
+			suffix=("link", "links"),
+		)
 	)
-	async def calendarlinks(self, ctx):
+	async def calendar_links(self, ctx):
 		"""
-		Command to get the links to add the calendar to a Google Calendar account
+		Get the links to add or view the calendar
 
 		Usage:
 		```
-		++calendarlinks
+		++calendar.links
 		```
 		"""
 		class_roles = self.finder.get_class_roles(ctx.author)
@@ -49,83 +46,96 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			)
 			await ctx.send(embed=embed)
 
-	@commands.command(name="upcoming")
-	async def upcoming(self, ctx):
+	@commands.command(
+		**build_aliases(
+			name="events.list",
+			prefix=("calendar", "events", "event"),
+			suffix=("upcoming", "list", "events"),
+			more_aliases=("upcoming", "events"),
+		)
+	)
+	async def events_list(self, ctx, max_results: int = 5):
 		"""
-		Command to display upcoming events from the Google Calendar
+		Display upcoming events from the Google Calendar
 
 		Usage:
 		```
-		++upcoming
+		++events.list [max_results]
 		```
+		Arguments:
+		**[max_results]**: The maximum number of events to display
 		"""
 		class_roles = self.finder.get_class_roles(ctx.author)
 		for grad_year, campus in class_roles:
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
-			events = self.calendar.fetch_upcoming(calendar_id)
+			events = self.calendar.fetch_upcoming(calendar_id, max_results)
 			embed = self.calendar_embedder.embed_event_list(
 				f"Upcoming Events for {campus} {grad_year}", events
 			)
 			await ctx.send(embed=embed)
 
-	@commands.command(name="addevent")
+	@commands.command(
+		**build_aliases(
+			name="events.add",
+			prefix=("calendar", "events", "event"),
+			suffix=("add", "create", "new"),
+			more_aliases=("addevent", "createevent", "newevent"),
+		)
+	)
 	async def addevent(self, ctx, *args):
 		"""
-		Command to add events to the Google Calendar.
+		Add events to the Google Calendar
 
 		Usage:
 		```
-		++addevent [Subject] on [Start Time]
-		++addevent [Subject] on [Start Time] to <End Time>
-		++addevent [Subject] on [Start Time] to <End Time> in <Class Name>
+		++events.add <Title> on <Start Time>
+		++events.add <Title> on <Start Time> to <End Time>
+		++events.add <Title> on <Start Time> to <End Time> in <Class Name>
 		```
 		Examples:
 		```
-		++addevent Compilers HW 3 on April 10 at 11:59pm
-		++addevent Calculus Moed Alef on February 9, 2021 at 8:30 am to 10:30 am
-		++addevent Compilers HW 3 on April 10 at 11:59pm in Lev 2023
+		++events.add Compilers HW 3 on April 10 at 11:59pm
+		++events.add Calculus Moed Alef on February 9, 2021 at 8:30 am to 10:30 am
+		++events.add Compilers HW 3 on April 10 at 11:59pm in Lev 2023
 		```
 		Arguments:
-		**[Subject]** - the name of the event to add
-		**[Start Time]** - start time of the event
-		**<End Time>** (optional) - end time of the event. \
-			If not specified, start time is used.
-		**<Class Name>** (optional) - calendar to add the event to. \
-			Only necessary if you have more than one class role.
+		**<Title>**: The name of the event to add.
+		**<Start Time>**: The start time of the event.
+		**<End Time>**: The end time of the event. If not specified, the start time is used.
+		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
 		message = " ".join(args)
 		grad_year = None
 		campus = None
 		summary = None
 		times = None
+		# separate summary from rest of message
 		if " on " in message:
-			# separate summary from rest of message
-			[summary, times] = message.split(" on ", 2)
+			[summary, times] = message.split(" on ", 1)
 		elif " at " in message:
-			[summary, times] = message.split(" at ", 2)
+			[summary, times] = message.split(" at ", 1)
 		if not times:
 			raise FriendlyError(
-				"Expected 'on' or 'at' to separate subject from time.",
+				"Expected 'on' or 'at' to separate title from time.",
 				ctx.channel,
 				ctx.author,
 			)
 		# check if calendar specified at the end
 		if " in " in times:
-			[times, calendar] = times.split(" in ")
+			[times, calendar] = times.split(" in ", 1)
 			try:
 				grad_year, campus = self.finder.extract_year_and_campus(calendar)
 				# check that specified calendar is one of the user's roles
-				# TODO: permit admins to add to other calendars
 				class_roles = self.finder.get_class_roles(ctx.author)
 				if (grad_year, campus) not in class_roles:
 					raise ClassRoleError(
-						"You do not have permission to add to that calendar."
+						"You can not add events to the calendar of another class."
 					)
 			except (ClassRoleError, ClassParseError) as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# separate start and end times
 		if " to " in times:
-			[start, end] = times.split(" to ", 2)
+			[start, end] = times.split(" to ", 1)
 		else:
 			start = times
 			end = None
@@ -139,17 +149,23 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		embed = self.calendar_embedder.embed_event("Event created successfully", event)
 		await ctx.send(embed=embed)
 
-	@commands.command(name="addmanager", aliases=["add_manager", "addcalendarmanager"])
+	@commands.command(
+		**build_aliases(
+			name="calendar.grant",
+			prefix=("calendar", "events"),
+			suffix=("grant", "manage", "allow", "invite"),
+		)
+	)
 	async def addmanager(self, ctx, email):
 		"""
-		Command to add a Google account as a manager of your class's calendar
+		Add a Google account as a manager of your class's calendar
 
 		Usage:
 		```
-		++addmanager email
+		++calendar.grant <email>
 		```
 		Arguments:
-		> **email**: Email address to add as a calendar manager
+		> **<email>**: Email address to add as a calendar manager
 		"""
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx.channel, ctx.author)
@@ -167,7 +183,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.has_permissions(manage_roles=True)
 	async def createcalendar(self, ctx, *args):
 		"""
-		Command to create a public calendar on the service account
+		Create a public calendar on the service account
 
 		Usage:
 		```
@@ -189,7 +205,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.has_permissions(manage_roles=True)
 	async def listcalendars(self, ctx):
 		"""
-		Command to get a list of all calendars on the service account
+		Get a list of all calendars on the service account
 
 		Usage:
 		```
