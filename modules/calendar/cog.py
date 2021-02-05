@@ -50,25 +50,43 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**build_aliases(
 			name="events.list",
 			prefix=("calendar", "events", "event"),
-			suffix=("upcoming", "list", "events"),
+			suffix=("upcoming", "list", "events", "search"),
 			more_aliases=("upcoming", "events"),
 		)
 	)
-	async def events_list(self, ctx, max_results: int = 5):
+	async def events_list(self, ctx, *args):
 		"""
 		Display upcoming events from the Google Calendar
 
 		Usage:
 		```
+		++events.list
+		++events.list [query]
 		++events.list [max_results]
+		++events.list [query] [max_results]
 		```
 		Arguments:
-		**[max_results]**: The maximum number of events to display
+		**[query]**: The query to search for within event titles (default: shows all events)
+		**[max_results]**: The maximum number of events to display (default: 10)
 		"""
+		query = (
+			# all arguments are query if last argument is not a number
+			" ".join(args)
+			if len(args) > 0 and not args[-1].isdigit()
+			# all but last argument are query if last argument is a number
+			else " ".join(args[0:-1])
+			if len(args) > 1
+			# no query if no arguments or only 1 argument and it's a number
+			else ""
+		)
+		# last argument if last argument is a number, otherwise use default value
+		max_results = args[-1] if len(args) > 0 and args[-1].isdigit() else 10
+		# get class roles of the author
 		class_roles = self.finder.get_class_roles(ctx.author)
 		for grad_year, campus in class_roles:
+			# display events for each calendar
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
-			events = self.calendar.fetch_upcoming(calendar_id, max_results)
+			events = self.calendar.fetch_upcoming(calendar_id, max_results, query)
 			embed = self.calendar_embedder.embed_event_list(
 				f"Upcoming Events for {campus} {grad_year}", events
 			)

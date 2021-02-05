@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Iterable, Dict
 import discord
 import dateparser
@@ -53,14 +54,27 @@ class CalendarEmbedder:
 		"""Extract dates from event and convert to readable format"""
 		start = event["start"].get("dateTime", event["start"].get("date"))
 		end = event["end"].get("dateTime", event["end"].get("date"))
-		return f"{self.__format_date(start)} - {self.__format_date(end)}"
+		start_date = self.__parse_date(start)
+		end_date = self.__parse_date(end)
+		return (
+			f"{self.__format_date(start_date)} -"
+			f" {self.__format_date(end_date, base=start_date)}"
+		)
 
-	def __format_date(self, date_str: str) -> str:
-		"""Convert dates to format: 'Jan 1 2021 1:23 AM'"""
-		date = dateparser.parse(
+	def __parse_date(self, date_str: str) -> datetime:
+		"""Returns datetime object with default timezone for given date string"""
+		return dateparser.parse(
 			date_str, settings={"TO_TIMEZONE": self.default_time_zone}
 		)
-		return date.strftime("%b %d %Y %I:%M %p").replace(" 0", " ")
+
+	def __format_date(self, date: datetime, base: datetime = None) -> str:
+		"""Convert dates to a specified format"""
+		# if the date is same as base, only return the time
+		if base and date.strftime("%a, %b. %d") == base.strftime("%a, %b. %d"):
+			# return the time (format: '3:45 AM')
+			return date.strftime("%I:%M %p").replace(" 0", " ")
+		# return the date and time (format: 'Tue, Jan. 2 3:45 AM')
+		return date.strftime("%a, %b. %d %I:%M %p").replace(" 0", " ")
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
