@@ -4,4 +4,4 @@ WHERE
 	AND
     category = (SELECT id
 	    FROM categories
-		WHERE channel_id = %(channel_id)s)
+		WHERE channel = %(channel_id)s)
