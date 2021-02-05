@@ -21,7 +21,16 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 
-	@commands.command(name="calendarlinks", aliases=["calendarlink", "links"])
+	@commands.command(
+		name="calendar.links",
+		aliases=[
+			a + b
+			for a, b in zip(
+				("calendar", "events", "event"), (".links", ".link", "link", "links")
+			)
+			if a + b != "calendar.links"
+		],
+	)
 	async def calendarlinks(self, ctx):
 		"""
 		Command to get the links to add the calendar to a Google Calendar account
@@ -155,7 +164,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			await ctx.send(embed=embed)
 
 	@commands.command(name="createcalendar")
-	@commands.has_permissions(manage_server=True)
+	@commands.has_permissions(manage_roles=True)
 	async def createcalendar(self, ctx, *args):
 		"""
 		Command to create a public calendar on the service account
@@ -177,7 +186,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		await ctx.send(embed=embed)
 
 	@commands.command(name="listcalendars")
-	@commands.has_permissions(manage_server=True)
+	@commands.has_permissions(manage_roles=True)
 	async def listcalendars(self, ctx):
 		"""
 		Command to get a list of all calendars on the service account
