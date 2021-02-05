@@ -139,7 +139,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		else:
 			start = times
 			end = None
-		if not grad_year or not campus:
+		if grad_year is None or campus is None:
 			try:
 				grad_year, campus = self.finder.get_class_info_from_role(ctx.author)
 			except ClassRoleError as error:
