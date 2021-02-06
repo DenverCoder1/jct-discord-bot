@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Iterable, Dict
 import discord
 import dateparser
@@ -7,15 +8,19 @@ class CalendarEmbedder:
 	def __init__(self):
 		self.default_time_zone = "Asia/Jerusalem"
 
-	def embed_event_list(self, title: str, events: Iterable[dict]) -> discord.Embed:
+	def embed_event_list(
+		self, title: str, events: Iterable[dict], query: str = ""
+	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list"""
 		embed = discord.Embed(title=title, colour=discord.Colour.green())
+		# set initial description with search query if available
+		embed.description = "" if query == "" else f'Showing results for "{query}"\n\n'
 		if not events:
-			embed.description = "No events found"
+			embed.description += "No events found"
 		else:
 			# add events to embed
 			event_details = map(self.__get_formatted_event_details, events)
-			embed.description = "\n".join(event_details)
+			embed.description += "\n".join(event_details)
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
@@ -53,14 +58,27 @@ class CalendarEmbedder:
 		"""Extract dates from event and convert to readable format"""
 		start = event["start"].get("dateTime", event["start"].get("date"))
 		end = event["end"].get("dateTime", event["end"].get("date"))
-		return f"{self.__format_date(start)} - {self.__format_date(end)}"
+		start_date = self.__parse_date(start)
+		end_date = self.__parse_date(end)
+		return (
+			f"{self.__format_date(start_date)} -"
+			f" {self.__format_date(end_date, base=start_date)}"
+		)
 
-	def __format_date(self, date_str: str) -> str:
-		"""Convert dates to format: 'Jan 1 2021 1:23 AM'"""
-		date = dateparser.parse(
+	def __parse_date(self, date_str: str) -> datetime:
+		"""Returns datetime object with default timezone for given date string"""
+		return dateparser.parse(
 			date_str, settings={"TO_TIMEZONE": self.default_time_zone}
 		)
-		return date.strftime("%b %d %Y %I:%M %p").replace(" 0", " ")
+
+	def __format_date(self, date: datetime, base: datetime = None) -> str:
+		"""Convert dates to a specified format"""
+		# if the date is same as base, only return the time
+		if base and date.strftime("%d %b") == base.strftime("%d %b"):
+			# return the time (format: '3:45 AM')
+			return date.strftime("%I:%M %p").lstrip("0")
+		# return the date and time (format: 'Sun 1 Feb 3:45 AM')
+		return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""

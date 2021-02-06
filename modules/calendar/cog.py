@@ -4,6 +4,7 @@ from discord.ext import commands
 from .calendar import Calendar
 from .calendar_embedder import CalendarEmbedder
 from .calendar_finder import CalendarFinder
+from .course_mentions import CourseMentions
 from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
@@ -20,6 +21,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.calendar_embedder = CalendarEmbedder()
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
+		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
 
 	@commands.command(
 		**build_aliases(
@@ -50,27 +52,57 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**build_aliases(
 			name="events.list",
 			prefix=("calendar", "events", "event"),
-			suffix=("upcoming", "list", "events"),
+			suffix=("upcoming", "list", "events", "search"),
 			more_aliases=("upcoming", "events"),
 		)
 	)
-	async def events_list(self, ctx, max_results: int = 5):
+	async def events_list(self, ctx, *args):
 		"""
 		Display upcoming events from the Google Calendar
 
 		Usage:
 		```
-		++events.list [max_results]
+		++events.list
+		++events.list <query>
+		++events.list <max_results>
+		++events.list <query> <max_results>
 		```
 		Arguments:
-		**[max_results]**: The maximum number of events to display
+		**<query>**: The query to search for within event titles. This can be a string to search for or a channel mention. (Default: shows any events)
+		**<max_results>**: The maximum number of events to display. (Default: 5 results or 15 with query)
 		"""
+		# convert channel mentions to full names
+		args = list(map(self.course_mentions.map_channel_mention, args))
+		# extract query string
+		query = (
+			# all arguments are query if last argument is not a number
+			" ".join(args)
+			if len(args) > 0 and not args[-1].isdigit()
+			# all but last argument are query if last argument is a number
+			else " ".join(args[0:-1])
+			if len(args) > 1
+			# no query if no arguments or only 1 argument and it's a number
+			else ""
+		)
+		# extract max_results - last argument if it is a number, otherwise, default value
+		max_results = (
+			# last argument if it's a number
+			args[-1]
+			if len(args) > 0 and args[-1].isdigit()
+			# check for 5 results by default if there is no query
+			else 5
+			if query == ""
+			# check ahead 15 results by default if there is a query
+			else 15
+		)
+		# get class roles of the author
 		class_roles = self.finder.get_class_roles(ctx.author)
 		for grad_year, campus in class_roles:
+			# display events for each calendar
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
-			events = self.calendar.fetch_upcoming(calendar_id, max_results)
+			events = self.calendar.fetch_upcoming(calendar_id, max_results, query)
 			embed = self.calendar_embedder.embed_event_list(
-				f"Upcoming Events for {campus} {grad_year}", events
+				f"Upcoming Events for {campus} {grad_year}", events, query
 			)
 			await ctx.send(embed=embed)
 
@@ -88,9 +120,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
-		++events.add <Title> on <Start Time>
-		++events.add <Title> on <Start Time> to <End Time>
-		++events.add <Title> on <Start Time> to <End Time> in <Class Name>
+		++events.add <Title> at <Start>
+		++events.add <Title> on <Start>
+		++events.add <Title> on <Start> to <End>
+		++events.add <Title> on <Start> to <End> in <Class Name>
 		```
 		Examples:
 		```
@@ -99,12 +132,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		++events.add Compilers HW 3 on April 10 at 11:59pm in Lev 2023
 		```
 		Arguments:
-		**<Title>**: The name of the event to add.
-		**<Start Time>**: The start time of the event.
-		**<End Time>**: The end time of the event. If not specified, the start time is used.
+		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
+		**<Start>**: The start date and/or time of the event.
+		**<End>**: The end date and/or time of the event. If not specified, the start time is used.
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
-		message = " ".join(args)
+		# replace channel mentions with course names
+		message = " ".join(map(self.course_mentions.map_channel_mention, args))
 		grad_year = None
 		campus = None
 		summary = None
