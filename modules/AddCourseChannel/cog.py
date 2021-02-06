@@ -32,13 +32,18 @@ class AddCourseChannelCog(commands.Cog):
         names = " ".join(args)
         split_names = names.split(",")
 
-        course_name = split_names[
-            0
-        ]  # "-".join(args)  # does this correctly input name?
-        course_name.lower()
-        category_name = split_names[1]  # " ".join(args)
-        category_name.upper()
-        await add_course.create_channel(ctx, course_name, category_name)
+        course_name = split_names[0]
+        update_course_name = "-".join(course_name)  # does this correctly input name?
+        update_course_name.lower()
+        category_name = split_names[1]
+        if not category_name:
+            await ctx.send("Please try again with a category name.")
+        else:
+            update_category_name = " ".join(category_name)
+            update_category_name.upper()
+            await add_course.create_channel(
+                ctx, update_course_name, update_category_name
+            )
         # log in console that a ping was received
 
 
