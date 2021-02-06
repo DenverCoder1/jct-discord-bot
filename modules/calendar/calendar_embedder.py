@@ -74,10 +74,10 @@ class CalendarEmbedder:
 	def __format_date(self, date: datetime, base: datetime = None) -> str:
 		"""Convert dates to a specified format"""
 		# if the date is same as base, only return the time
-		if base and date.strftime("%B %d") == base.strftime("%B %d"):
+		if base and date.strftime("%d %b") == base.strftime("%d %b"):
 			# return the time (format: '3:45 AM')
 			return date.strftime("%I:%M %p").lstrip("0")
-		# return the date and time (format: 'Tue 2 Jan 3:45 AM')
+		# return the date and time (format: 'Sun 1 Feb 3:45 AM')
 		return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
 
 	def __get_footer_text(self):
