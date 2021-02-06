@@ -74,11 +74,11 @@ class CalendarEmbedder:
 	def __format_date(self, date: datetime, base: datetime = None) -> str:
 		"""Convert dates to a specified format"""
 		# if the date is same as base, only return the time
-		if base and date.strftime("%a, %b. %d") == base.strftime("%a, %b. %d"):
+		if base and date.strftime("%B %d") == base.strftime("%B %d"):
 			# return the time (format: '3:45 AM')
-			return date.strftime("%I:%M %p").replace(" 0", " ")
-		# return the date and time (format: 'Tue, Jan. 2 3:45 AM')
-		return date.strftime("%a, %b. %d %I:%M %p").replace(" 0", " ")
+			return date.strftime("%I:%M %p").lstrip("0")
+		# return the date and time (format: 'Tue 2 Jan 3:45 AM')
+		return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""

@@ -27,7 +27,7 @@ class NewHelpCommand(commands.MinimalHelpCommand):
 			name = "No Category" if cog is None else cog.qualified_name
 			filtered = await self.filter_commands(commands, sort=True)
 			if filtered:
-				# \u2002 = middle dot
+				# \u2002 = en space
 				value = "\u2002".join(f"`{prefix}{c.name}`" for c in filtered)
 				if cog and cog.description:
 					value = f"{cog.description}\n{value}"
