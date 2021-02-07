@@ -42,6 +42,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		class_roles = self.finder.get_class_roles(ctx.author)
 		for grad_year, campus in class_roles:
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
+			if calendar_id is None:
+				raise FriendlyError(
+					f"No calendar found for {campus} {grad_year}",
+					ctx.channel,
+					ctx.author,
+				)
 			links = self.calendar.get_links(calendar_id)
 			embed = self.calendar_embedder.embed_link(
 				f"Calendar Links for {campus} {grad_year}", links
