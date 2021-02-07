@@ -76,14 +76,14 @@ class Calendar:
 		# parse start date
 		start_date = dateparser.parse(start, settings=self.dateparser_settings)
 		# parse end date
-		if end is None:
-			end_date = start_date
-		if start_date is None:
-			raise ValueError(f'Start date "{start}" could not be parsed.')
-		else:
+		if end is not None and start_date is not None:
 			end_date = dateparser.parse(
 				end, settings={**self.dateparser_settings, "RELATIVE_BASE": start_date}
 			)
+		elif start_date is None:
+			raise ValueError(f'Start date "{start}" could not be parsed.')
+		else:
+			end_date = start_date
 		# check if dates did not parse as None
 		if end_date is None:
 			raise ValueError(f'End date "{end}" could not be parsed.')
