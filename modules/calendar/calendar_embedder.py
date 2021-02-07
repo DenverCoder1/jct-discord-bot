@@ -77,8 +77,14 @@ class CalendarEmbedder:
 		if base and date.strftime("%d %b") == base.strftime("%d %b"):
 			# return the time (format: '3:45 AM')
 			return date.strftime("%I:%M %p").lstrip("0")
-		# return the date and time (format: 'Sun 1 Feb 3:45 AM')
-		return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
+		# date is in the current year
+		if date.year == datetime.now().year:
+			# return the date, month, and time (format: 'Sun 1 Feb 3:45 AM')
+			return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
+		# date is in a different year
+		else:
+			# return the date, month, year, and time (format: 'Sun 1 Feb 2020 3:45 AM')
+			return date.strftime("%a %d %b %Y %I:%M %p").replace(" 0", " ")
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
