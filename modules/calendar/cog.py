@@ -147,13 +147,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		message = " ".join(map(self.course_mentions.map_channel_mention, args))
 		grad_year = None
 		campus = None
-		summary = None
+		title = None
 		times = None
-		# separate summary from rest of message
-		if " on " in message:
-			[summary, times] = message.split(" on ", 1)
-		elif " at " in message:
-			[summary, times] = message.split(" at ", 1)
+		# separate title from rest of message
+		title_times_separators = [" on ", " at "]
+		for sep in title_times_separators:
+			if sep in message:
+				[title, times] = message.split(sep, 1)
+				break
+		# did not find a way to separate title from rest of message
 		if times is None:
 			raise FriendlyError(
 				"Expected 'on' or 'at' to separate title from time.",
@@ -173,19 +175,27 @@ class CalendarCog(commands.Cog, name="Calendar"):
 					)
 			except (ClassRoleError, ClassParseError) as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		# default values if no separator found
+		start = times
+		end = None
 		# separate start and end times
-		if " to " in times:
-			[start, end] = times.split(" to ", 1)
-		else:
-			start = times
-			end = None
+		start_end_separators = [" to ", " until ", " for ", "-"]
+		for sep in start_end_separators:
+			if sep in times:
+				[start, end] = times.split(sep, 1)
+				break
 		if grad_year is None or campus is None:
 			try:
 				grad_year, campus = self.finder.get_class_info_from_role(ctx.author)
 			except ClassRoleError as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		if " from " in start:
+			start = start.replace(" from ", " at ")
 		calendar_id = self.finder.get_calendar_id(grad_year, campus)
-		event = self.calendar.add_event(calendar_id, summary, start, end)
+		try:
+			event = self.calendar.add_event(calendar_id, title, start, end)
+		except ValueError as error:
+			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event("Event created successfully", event)
 		await ctx.send(embed=embed)
 
@@ -232,9 +242,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Arguments:
 		> **JCT CompSci Lev 2020**: name of the calendar to create
 		"""
-		summary = " ".join(args)
+		name = " ".join(args)
 		# create calendar
-		new_calendar = self.calendar.create_calendar(summary)
+		new_calendar = self.calendar.create_calendar(name)
 		embed = self.calendar_embedder.embed_success(
 			f"Successfully created '{new_calendar['summary']}' calendar.",
 			f"Calendar ID: {new_calendar['id']}",
