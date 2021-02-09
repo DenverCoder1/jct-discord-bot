@@ -79,7 +79,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<max_results>**: The maximum number of events to display. (Default: 5 results or 15 with query)
 		"""
 		# convert channel mentions to full names
-		args = list(map(self.course_mentions.map_channel_mention, args))
+		args = self.course_mentions.replace_channel_mentions(" ".join(args))
 		# extract query string
 		query = (
 			# all arguments are query if last argument is not a number
@@ -145,7 +145,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
 		# replace channel mentions with course names
-		message = " ".join(map(self.course_mentions.map_channel_mention, args))
+		message = self.course_mentions.replace_channel_mentions(" ".join(args))
 		grad_year = None
 		campus = None
 		title = None
@@ -239,7 +239,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		allowed_params = "|".join(("title", "start", "end", "location", "description"))
 		# check for correct pattern in message
 		match = re.search(
-			r'^\s*\S+\s[\'"]?(?P<query>[^"]*?)[\'"]?,?(?P<params>(?:\s+(?:%s)=[\'"]?[^"]*?[\'"]?,?)*)(?P<calendar>\sin\s\w+\s\d{4})?\s*$'
+			r'^\s*\S+\s[\'"]?(?P<query>[^"]*?)[\'"]?,?(?P<params>(?:\s*(?:%s)=\s*"[^"]*?",?)*)(?P<calendar>\sin\s\w+\s\d{4})?\s*$'
 			% allowed_params,
 			ctx.message.content,
 		)
@@ -254,7 +254,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# extract query, params list, and calendar from the command
 		[query, params, calendar] = match.groups()
 		# replace channel mentions with course names
-		query = " ".join(map(self.course_mentions.map_channel_mention, query.split()))
+		query = self.course_mentions.replace_channel_mentions(query)
 		grad_year = None
 		campus = None
 		if calendar is not None:
@@ -288,10 +288,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# Extract params into kwargs
 		param_args = dict(
 			re.findall(
-				r'(?P<key>%s)\s*=\s*[\'"]?(?P<value>[^"]*?)[\'"]?' % allowed_params,
-				params,
+				r'(?P<key>%s)\s*=\s*"(?P<value>[^"]*?)"' % allowed_params, params,
 			)
 		)
+		# Replace channel mentions with full names
+		for key, value in param_args.items():
+			param_args[key] = self.course_mentions.replace_channel_mentions(value)
 		event = self.calendar.udpate_event(calendar_id, events[0], **param_args)
 		embed = self.calendar_embedder.embed_event("Event updated successfully", event)
 		await ctx.send(embed=embed)
