@@ -145,16 +145,14 @@ class Calendar:
 		new_desc = kwargs.get("description", None)
 		# get the event's current start and end dates for relative bases
 		curr_start_date = parse_date(
-			event["start"].get("dateTime", event["start"].get("date")), tz=self.timezone
-		)
+			event["start"].get("dateTime", event["start"].get("date"))
+		).replace(tzinfo=None)
 		curr_end_date = parse_date(
-			event["end"].get("dateTime", event["end"].get("date")), tz=self.timezone
-		)
+			event["end"].get("dateTime", event["end"].get("date"))
+		).replace(tzinfo=None)
 		# parse new start date if provided
 		start = kwargs.get("start", None)
-		start_date = parse_date(
-			start, tz=self.timezone, future=True, base=curr_start_date
-		)
+		start_date = parse_date(start, tz=self.timezone, base=curr_start_date)
 		new_start_str = start_date.strftime("%Y-%m-%dT%H:%M:%S") if start_date else None
 		# parse new end date if provided
 		end = kwargs.get("end", None)
@@ -169,7 +167,7 @@ class Calendar:
 			**({"location": new_location} if type(new_location) == str else {}),
 			**({"description": new_desc} if type(new_desc) == str else {}),
 			"start": {
-				**{"timeZone": event["start"].get("timeZone")},
+				"timeZone": self.timezone,
 				**(
 					{"dateTime": new_start_str}
 					if type(new_start_str) == str
@@ -179,7 +177,7 @@ class Calendar:
 				),
 			},
 			"end": {
-				**{"timeZone": event["end"].get("timeZone")},
+				"timeZone": self.timezone,
 				**(
 					{"dateTime": new_end_str}
 					if type(new_end_str) == str
@@ -189,6 +187,15 @@ class Calendar:
 				),
 			},
 		}
+		# check that new time range is valid
+		new_start_date = parse_date(
+			event_details["start"].get("dateTime", event_details["start"].get("date"))
+		).replace(tzinfo=None)
+		new_end_date = parse_date(
+			event_details["end"].get("dateTime", event_details["end"].get("date"))
+		).replace(tzinfo=None)
+		if new_end_date < new_start_date:
+			raise ValueError("The start time must come before the end time.")
 		# update the event
 		updated_event = (
 			self.service.events()
