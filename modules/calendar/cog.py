@@ -208,7 +208,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			more_aliases=("updateevent", "editevent", "changeevent"),
 		)
 	)
-	async def update_event(self, ctx, *args):
+	async def update_event(self, ctx, *, args=None):
 		"""
 		Add events to the Google Calendar
 
@@ -237,22 +237,22 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		"""
 		# check command syntax
 		allowed_params = "|".join(("title", "start", "end", "location", "description"))
-		try:
-			# extract query, params list, and calendar from command
-			[query, params, calendar] = re.search(
-				r"^\s*\S+\s\"(?P<query>[^\"]*?)\",?(?P<params>(?:\s+(?:%s)=\"?[^\"]*?\"?,?)*)(?P<calendar>\sin\s\w+\s\d{4})?\s*$"
-				% allowed_params,
-				ctx.message.content,
-			).groups()
-		except ValueError as error:
+		# check for correct pattern in message
+		match = re.search(
+			r'^\s*\S+\s[\'"]?(?P<query>[^"]*?)[\'"]?,?(?P<params>(?:\s+(?:%s)=[\'"]?[^"]*?[\'"]?,?)*)(?P<calendar>\sin\s\w+\s\d{4})?\s*$'
+			% allowed_params,
+			ctx.message.content,
+		)
+		if match is None:
 			# did not fit pattern required for update command
 			raise FriendlyError(
 				"Could not figure out command syntax. Check the examples with"
 				f" `{ctx.prefix}help {ctx.invoked_with}`",
 				ctx.channel,
 				ctx.author,
-				error,
 			)
+		# extract query, params list, and calendar from the command
+		[query, params, calendar] = match.groups()
 		# replace channel mentions with course names
 		query = " ".join(map(self.course_mentions.map_channel_mention, query.split()))
 		grad_year = None
@@ -285,10 +285,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				f"Multiple events were found.", events, query
 			)
 			return await ctx.send(embed=embed)
-		# TODO: Extract params into kwargs
-		params = {"params": params}
-		event = self.calendar.udpate_event(calendar_id, events[0], **params)
-		embed = self.calendar_embedder.embed_event("Event created successfully", event)
+		# Extract params into kwargs
+		param_args = dict(
+			re.findall(
+				r'(?P<key>%s)\s*=\s*[\'"]?(?P<value>[^"]*?)[\'"]?' % allowed_params,
+				params,
+			)
+		)
+		event = self.calendar.udpate_event(calendar_id, events[0], **param_args)
+		embed = self.calendar_embedder.embed_event("Event updated successfully", event)
 		await ctx.send(embed=embed)
 
 	@commands.command(
