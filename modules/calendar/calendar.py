@@ -69,6 +69,7 @@ class Calendar:
 	) -> Dict[str, str]:
 		"""Add an event to the calendar given the id, summary, start time,
 		and optionally, the end time, location and description."""
+		all_day = False
 		# parse start date
 		start_date = parse_date(start, tz=self.timezone, future=True)
 		# check start date
@@ -78,8 +79,14 @@ class Calendar:
 		if end is not None:
 			end_date = parse_date(end, tz=self.timezone, future=True, base=start_date)
 		else:
-			# no end date was specified
+			# if no end date was specified, use the start time
 			end_date = start_date
+			# if words suggest no time was specified, make it an all day event
+			time_words = (" at ", " from ", "am ", " midnight ", ":")
+			if start_date.strftime("%H:%M") == "00:00" and not any(
+				word in f" {start} " for word in time_words
+			):
+				all_day = True
 		# check end date
 		if end_date is None:
 			raise ValueError(f'End date "{end}" could not be parsed.')
@@ -92,11 +99,19 @@ class Calendar:
 			"location": location,
 			"description": description,
 			"start": {
-				"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
+				**(
+					{"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S")}
+					if not all_day
+					else {"date": start_date.strftime("%Y-%m-%d")}
+				),
 				"timeZone": self.timezone,
 			},
 			"end": {
-				"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
+				**(
+					{"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S")}
+					if not all_day
+					else {"date": end_date.strftime("%Y-%m-%d")}
+				),
 				"timeZone": self.timezone,
 			},
 		}

@@ -296,7 +296,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		for key, value in param_args.items():
 			param_args[key] = self.course_mentions.replace_channel_mentions(value)
 		try:
-			event = self.calendar.udpate_event(calendar_id, events[0], **param_args)
+			event = self.calendar.update_event(calendar_id, events[0], **param_args)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event("Event updated successfully", event)

@@ -60,23 +60,37 @@ class CalendarEmbedder:
 		end = event["end"].get("dateTime", event["end"].get("date"))
 		start_date = parse_date(start, tz=self.timezone)
 		end_date = parse_date(end, tz=self.timezone)
+		# all day event
+		if "date" in event["start"]:
+			return f"{self.__format_date(start_date, all_day=True)} - All day"
+		# start and end time
 		return (
 			f"{self.__format_date(start_date)} -"
 			f" {self.__format_date(end_date, base=start_date)}"
 		)
 
-	def __format_date(self, date: datetime, base: datetime = None) -> str:
+	def __format_date(
+		self, date: datetime, base: datetime = None, all_day: bool = False
+	) -> str:
 		"""Convert dates to a specified format"""
-		# if the date is same as base, only return the time
+		# if the date is same as the base, only return the time
 		if base and date.strftime("%d %b") == base.strftime("%d %b"):
 			# return the time (format: '3:45 AM')
 			return date.strftime("%I:%M %p").lstrip("0")
-		# date is in the current year
+		# if the date is in the current year
 		if date.year == datetime.now().year:
+			# if all day, return the date without the time
+			if all_day:
+				# return the date, month (format: 'Sun 1 Feb')
+				return date.strftime("%a %d %b").replace(" 0", " ")
 			# return the date, month, and time (format: 'Sun 1 Feb 3:45 AM')
 			return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
-		# date is in a different year
+		# the date is in a different year
 		else:
+			# if all day, return the date without the time
+			if all_day:
+				# return the date, month, year (format: 'Sun 1 Feb 2020')
+				return date.strftime("%a %d %b %Y").replace(" 0", " ")
 			# return the date, month, year, and time (format: 'Sun 1 Feb 2020 3:45 AM')
 			return date.strftime("%a %d %b %Y %I:%M %p").replace(" 0", " ")
 
