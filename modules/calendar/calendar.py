@@ -58,6 +58,56 @@ class Calendar:
 		filtered = filter(lambda item: query in item.get("summary").lower(), events)
 		return list(filtered)
 
+	def add_event(
+		self,
+		calendar_id: str,
+		summary: str,
+		start: str,
+		end: str,
+		location: str = "",
+		description: str = "",
+	) -> Dict[str, str]:
+		"""Add an event to the calendar given the id, summary, start time,
+		and optionally, the end time, location and description."""
+		# parse start date
+		start_date = parse_date(start, tz=self.timezone, future=True)
+		# check start date
+		if start_date is None:
+			raise ValueError(f'Start date "{start}" could not be parsed.')
+		# parse end date
+		if end is not None:
+			end_date = parse_date(end, tz=self.timezone, future=True, base=start_date)
+		else:
+			# no end date was specified
+			end_date = start_date
+		# check end date
+		if end_date is None:
+			raise ValueError(f'End date "{end}" could not be parsed.')
+		# if the end date is before the start date, update the date to starting date
+		if end_date < start_date:
+			raise ValueError("End date must be before start date.")
+		# create request body
+		event_details = {
+			"summary": summary,
+			"location": location,
+			"description": description,
+			"start": {
+				"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
+				"timeZone": self.timezone,
+			},
+			"end": {
+				"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
+				"timeZone": self.timezone,
+			},
+		}
+		# Add event to the calendar
+		event = (
+			self.service.events()
+			.insert(calendarId=calendar_id, body=event_details)
+			.execute()
+		)
+		return event
+
 	def quick_add_event(self, calendar_id: str, text: str) -> Dict[str, str]:
 		"""Add an event to the calendar given the quick add description"""
 		event = (
@@ -71,7 +121,7 @@ class Calendar:
 			# if no words suggest a time range was used, change the end time to the start time
 			time_range_words = (" to ", "-", " until ", " for ", " hour ")
 			if not any(word in f" {text} " for word in time_range_words):
-				event = self.udpate_event(
+				event = self.update_event(
 					calendar_id, event, end=start_date.strftime("%Y-%m-%dT%H:%M:%S")
 				)
 		return event
@@ -86,7 +136,7 @@ class Calendar:
 		)
 		return event
 
-	def udpate_event(
+	def update_event(
 		self, calendar_id: str, event: Dict[str, str], **kwargs
 	) -> Dict[str, str]:
 		"""Update an event from a calendar given the calendar id, event id, and parameters to update"""
@@ -105,12 +155,17 @@ class Calendar:
 		curr_end_date = self.__get_event_datetime(event, "end")
 		# parse new start date if provided
 		start = kwargs.get("start", None)
-		start_date = parse_date(start, tz=self.timezone, base=curr_start_date)
+		start_date = parse_date(
+			start, tz=self.timezone, future=True, base=curr_start_date
+		)
 		new_start_str = start_date.strftime("%Y-%m-%dT%H:%M:%S") if start_date else None
 		# parse new end date if provided
 		end = kwargs.get("end", None)
 		end_date = parse_date(
-			end, tz=self.timezone, base=(start_date if start_date else curr_end_date)
+			end,
+			tz=self.timezone,
+			future=True,
+			base=(start_date if start_date else curr_end_date),
 		)
 		new_end_str = end_date.strftime("%Y-%m-%dT%H:%M:%S") if end_date else None
 		# create request body

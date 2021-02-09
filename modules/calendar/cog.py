@@ -148,8 +148,24 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		message = self.course_mentions.replace_channel_mentions(" ".join(args))
 		grad_year = None
 		campus = None
-		if " in " in message:
-			[message, calendar] = message.split(" in ", 1)
+		title = None
+		times = None
+		# separate title from rest of message
+		title_times_separators = (" on ", " at ", " from ")
+		for sep in title_times_separators:
+			if sep in message:
+				[title, times] = message.split(sep, 1)
+				break
+		# did not find a way to separate title from rest of message
+		if times is None:
+			raise FriendlyError(
+				"Expected 'on' or 'at' or 'from' to separate title from time.",
+				ctx.channel,
+				ctx.author,
+			)
+		# check if calendar specified at the end
+		if " in " in times:
+			[times, calendar] = times.split(" in ", 1)
 			try:
 				grad_year, campus = self.finder.extract_year_and_campus(calendar)
 				# check that specified calendar is one of the user's roles
@@ -160,13 +176,28 @@ class CalendarCog(commands.Cog, name="Calendar"):
 					)
 			except (ClassRoleError, ClassParseError) as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		# default values if no separator found
+		start = times
+		end = None
+		# separate start and end times
+		start_end_separators = (" to ", " until ", " for ", "-")
+		for sep in start_end_separators:
+			if sep in times:
+				[start, end] = times.split(sep, 1)
+				break
 		if grad_year is None or campus is None:
 			try:
 				grad_year, campus = self.finder.get_class_info_from_role(ctx.author)
 			except ClassRoleError as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		calendar_id = self.finder.get_calendar_id(grad_year, campus)
-		event = self.calendar.quick_add_event(calendar_id, message)
+		if " from " in start:
+			start = start.replace(" from ", " at ")
+		calendar_id = self.finder.get_calendar_id(grad_year, campus)
+		try:
+			event = self.calendar.add_event(calendar_id, title, start, end)
+		except ValueError as error:
+			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event("Event created successfully", event)
 		await ctx.send(embed=embed)
 
