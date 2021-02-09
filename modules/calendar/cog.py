@@ -238,8 +238,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# check command syntax
 		allowed_params = "|".join(("title", "start", "end", "location", "description"))
 		try:
+			# extract query, params list, and calendar from command
 			[query, params, calendar] = re.search(
-				r"^\s*\S+\s\"([^\"]*?)\",?((?:\s+(?:%s)=\"?[^\"]*?\"?,?)*)(\sin\s\w+\s\d{4})?\s*$"
+				r"^\s*\S+\s\"(?P<query>[^\"]*?)\",?(?P<params>(?:\s+(?:%s)=\"?[^\"]*?\"?,?)*)(?P<calendar>\sin\s\w+\s\d{4})?\s*$"
 				% allowed_params,
 				ctx.message.content,
 			).groups()
