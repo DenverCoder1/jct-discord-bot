@@ -1,4 +1,5 @@
 import os
+import re
 import config
 from discord.ext import commands
 from .calendar import Calendar
@@ -120,7 +121,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			more_aliases=("addevent", "createevent", "newevent"),
 		)
 	)
-	async def addevent(self, ctx, *args):
+	async def add_event(self, ctx, *args):
 		"""
 		Add events to the Google Calendar
 
@@ -139,8 +140,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
-		**<Start>**: The start date and/or time of the event.
-		**<End>**: The end date and/or time of the event. If not specified, the start time is used.
+		**<Start>**: The start date and/or time of the event (Israel time).
+		**<End>**: The end date and/or time of the event (Israel time). If not specified, the start time is used.
 		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
 		"""
 		# replace channel mentions with course names
@@ -196,6 +197,96 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			event = self.calendar.add_event(calendar_id, title, start, end)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
+		embed = self.calendar_embedder.embed_event("Event created successfully", event)
+		await ctx.send(embed=embed)
+
+	@commands.command(
+		**build_aliases(
+			name="events.update",
+			prefix=("calendar", "events", "event"),
+			suffix=("update", "change", "edit"),
+			more_aliases=("updateevent", "editevent", "changeevent"),
+		)
+	)
+	async def update_event(self, ctx, *args):
+		"""
+		Add events to the Google Calendar
+
+		Usage:
+		```
+		++events.update "<query>" [params to set]
+		++events.update "<query>" [params to set] in <Class Name>
+		```
+		Examples:
+		```
+		++events.update "calc moed b" title="Moed B #calculus-1"
+		++events.update "#calculus-1 review class" start="July 7, 3pm" end="July 7, 5pm"
+		++events.update "#digital-systems HW 2" description="Submission box: https://moodle.jct.ac.il/mod/assign/view.php?id=420690"
+		++events.update "calc moed b" title="Moed B #calculus-1" in Lev 2023
+		```
+		Arguments:
+		**<query>**: The query to search for within event titles. This can be a string to search or include a channel mention.
+		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
+
+		Set parameters (all are optional):
+		**title**: The new title of the event.
+		**start**: The new start date and time of the event (Israel time).
+		**end**: The new end date and time of the event (Israel time).
+		**location**: The new location of the event.
+		**description**: The new description of the event.
+		"""
+		# check command syntax
+		allowed_params = "|".join(("title", "start", "end", "location", "description"))
+		try:
+			[query, params, calendar] = re.search(
+				r"^\s*\S+\s\"([^\"]*?)\",?((?:\s+(?:%s)=\"?[^\"]*?\"?,?)*)(\sin\s\w+\s\d{4})?\s*$"
+				% allowed_params,
+				ctx.message.content,
+			).groups()
+		except ValueError as error:
+			# did not fit pattern required for update command
+			raise FriendlyError(
+				"Could not figure out command syntax. Check the examples with"
+				f" `{ctx.prefix}help {ctx.invoked_with}`",
+				ctx.channel,
+				ctx.author,
+				error,
+			)
+		# replace channel mentions with course names
+		query = " ".join(map(self.course_mentions.map_channel_mention, query.split()))
+		grad_year = None
+		campus = None
+		if calendar is not None:
+			try:
+				grad_year, campus = self.finder.extract_year_and_campus(calendar)
+				# check that specified calendar is one of the user's roles
+				class_roles = self.finder.get_class_roles(ctx.author)
+				if (grad_year, campus) not in class_roles:
+					raise ClassRoleError(
+						"You can not add events to the calendar of another class."
+					)
+			except (ClassRoleError, ClassParseError) as error:
+				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		if grad_year is None or campus is None:
+			try:
+				grad_year, campus = self.finder.get_class_info_from_role(ctx.author)
+			except ClassRoleError as error:
+				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		calendar_id = self.finder.get_calendar_id(grad_year, campus)
+		events = self.calendar.fetch_upcoming(calendar_id, 50, query)
+		if len(events) == 0:
+			raise FriendlyError(
+				f"No events were found for '{query}'.", ctx.channel, ctx.author
+			)
+		if len(events) > 1:
+			# TODO: Allow user to choose an event
+			embed = self.calendar_embedder.embed_event_list(
+				f"Multiple events were found.", events, query
+			)
+			return await ctx.send(embed=embed)
+		# TODO: Extract params into kwargs
+		params = {"params": params}
+		event = self.calendar.udpate_event(calendar_id, events[0], **params)
 		embed = self.calendar_embedder.embed_event("Event created successfully", event)
 		await ctx.send(embed=embed)
 
