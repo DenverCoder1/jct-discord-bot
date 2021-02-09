@@ -1,8 +1,7 @@
 from typing import Iterable, Dict
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
-import datetime
-import dateparser
+from datetime import datetime, timedelta
 import config
 from utils.utils import parse_date
 
@@ -39,7 +38,7 @@ class Calendar:
 	) -> Iterable[dict]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
-		now = datetime.datetime.utcnow().isoformat() + "Z"
+		now = datetime.utcnow().isoformat() + "Z"
 		# fetch results from the calendar API
 		events_result = (
 			self.service.events()
@@ -59,64 +58,22 @@ class Calendar:
 		filtered = filter(lambda item: query in item.get("summary").lower(), events)
 		return list(filtered)
 
-	def add_event(
-		self,
-		calendar_id: str,
-		summary: str,
-		start: str,
-		end: str,
-		location: str = "",
-		description: str = "",
-	) -> Dict[str, str]:
-		"""Add an event to the calendar given the id, summary, start time,
-		and optionally, the end time, location and description."""
-		# parse start date
-		start_date = parse_date(start, tz=self.timezone, future=True)
-		# check start date
-		if start_date is None:
-			raise ValueError(f'Start date "{start}" could not be parsed.')
-		# parse end date
-		if end is not None:
-			end_date = parse_date(end, tz=self.timezone, base=start_date)
-		else:
-			# no end date was specified
-			end_date = start_date
-		# check end date
-		if end_date is None:
-			raise ValueError(f'End date "{end}" could not be parsed.')
-		# if the end date is before the start date, update the date to starting date
-		if end_date < start_date:
-			raise ValueError("End date must be before start date.")
-
-		# create request body
-		event_details = {
-			"summary": summary,
-			"location": location,
-			"description": description,
-			"start": {
-				"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
-				"timeZone": self.timezone,
-			},
-			"end": {
-				"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
-				"timeZone": self.timezone,
-			},
-		}
-
-		# Add event to the calendar
-		event = (
-			self.service.events()
-			.insert(calendarId=calendar_id, body=event_details)
-			.execute()
-		)
-
-		return event
-
 	def quick_add_event(self, calendar_id: str, text: str) -> Dict[str, str]:
 		"""Add an event to the calendar given the quick add description"""
 		event = (
 			self.service.events().quickAdd(calendarId=calendar_id, text=text).execute()
 		)
+		# change events to 0 minutes by default instead of 60 minutes
+		start_date = self.__get_event_datetime(event, "start")
+		end_date = self.__get_event_datetime(event, "end")
+		# check if event was created for 1 hour
+		if end_date - start_date == timedelta(minutes=60):
+			# if no words suggest a time range was used, change the end time to the start time
+			time_range_words = (" to ", "-", " until ", " for ", " hour ")
+			if not any(word in f" {text} " for word in time_range_words):
+				event = self.udpate_event(
+					calendar_id, event, end=start_date.strftime("%Y-%m-%dT%H:%M:%S")
+				)
 		return event
 
 	def delete_event(self, calendar_id: str, event: Dict[str, str]) -> Dict[str, str]:
@@ -144,12 +101,8 @@ class Calendar:
 		# get new description if provided
 		new_desc = kwargs.get("description", None)
 		# get the event's current start and end dates for relative bases
-		curr_start_date = parse_date(
-			event["start"].get("dateTime", event["start"].get("date"))
-		).replace(tzinfo=None)
-		curr_end_date = parse_date(
-			event["end"].get("dateTime", event["end"].get("date"))
-		).replace(tzinfo=None)
+		curr_start_date = self.__get_event_datetime(event, "start")
+		curr_end_date = self.__get_event_datetime(event, "end")
 		# parse new start date if provided
 		start = kwargs.get("start", None)
 		start_date = parse_date(start, tz=self.timezone, base=curr_start_date)
@@ -188,12 +141,8 @@ class Calendar:
 			},
 		}
 		# check that new time range is valid
-		new_start_date = parse_date(
-			event_details["start"].get("dateTime", event_details["start"].get("date"))
-		).replace(tzinfo=None)
-		new_end_date = parse_date(
-			event_details["end"].get("dateTime", event_details["end"].get("date"))
-		).replace(tzinfo=None)
+		new_start_date = self.__get_event_datetime(event_details, "start")
+		new_end_date = self.__get_event_datetime(event_details, "end")
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# update the event
@@ -237,3 +186,14 @@ class Calendar:
 			self.service.acl().insert(calendarId=calendar_id, body=rule).execute()
 		)
 		return created_rule
+
+	def __get_event_datetime(self, event: Dict[str, str], endpoint: str) -> datetime:
+		"""Returns a datetime for a given event
+		Arguments:
+		<event>: the event to get the datetime from
+		<endpoint>: 'start' to get the start time, 'end' to get the end time"""
+		if endpoint not in ("start", "end"):
+			raise ValueError("Expected 'start' or 'end' in get_event_datetime.")
+		return parse_date(
+			event[endpoint].get("dateTime", event[endpoint].get("date"))
+		).replace(tzinfo=None)
