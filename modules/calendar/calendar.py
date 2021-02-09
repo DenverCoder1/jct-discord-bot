@@ -143,13 +143,24 @@ class Calendar:
 		new_location = kwargs.get("location", None)
 		# get new description if provided
 		new_desc = kwargs.get("description", None)
+		# get the event's current start and end dates for relative bases
+		curr_start_date = parse_date(
+			event["start"].get("dateTime", event["start"].get("date")), tz=self.timezone
+		)
+		curr_end_date = parse_date(
+			event["end"].get("dateTime", event["end"].get("date")), tz=self.timezone
+		)
 		# parse new start date if provided
 		start = kwargs.get("start", None)
-		start_date = parse_date(start, tz=self.timezone, future=True)
+		start_date = parse_date(
+			start, tz=self.timezone, future=True, base=curr_start_date
+		)
 		new_start_str = start_date.strftime("%Y-%m-%dT%H:%M:%S") if start_date else None
 		# parse new end date if provided
 		end = kwargs.get("end", None)
-		end_date = parse_date(end, tz=self.timezone, base=start_date)
+		end_date = parse_date(
+			end, tz=self.timezone, base=(start_date if start_date else curr_end_date)
+		)
 		new_end_str = end_date.strftime("%Y-%m-%dT%H:%M:%S") if end_date else None
 		# create request body
 		event_details = {
@@ -158,12 +169,26 @@ class Calendar:
 			**({"location": new_location} if type(new_location) == str else {}),
 			**({"description": new_desc} if type(new_desc) == str else {}),
 			"start": {
-				**event["start"],
-				**({"dateTime": new_start_str} if type(new_start_str) == str else {}),
+				**{"timeZone": event["start"].get("timeZone")},
+				**(
+					{"dateTime": new_start_str}
+					if type(new_start_str) == str
+					else {"dateTime": event["start"].get("dateTime")}
+					if "dateTime" in event["start"]
+					else {"dateTime": curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")}
+				),
 			},
 			"end": {
-				**event["end"],
-				**({"dateTime": new_end_str} if type(new_end_str) == str else {}),
+				**{"timeZone": event["end"].get("timeZone")},
+				**(
+					{"dateTime": new_end_str}
+					if type(new_end_str) == str
+					else {"dateTime": event["end"].get("dateTime")}
+					if "dateTime" in event["end"]
+					else {"dateTime": curr_end_date.strftime("%Y-%m-%dT%H:%M:%S")}
+					if curr_end_date > curr_start_date
+					else {"dateTime": curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")}
+				),
 			},
 		}
 		# update the event
