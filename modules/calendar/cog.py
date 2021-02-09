@@ -63,7 +63,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			more_aliases=("upcoming", "events"),
 		)
 	)
-	async def events_list(self, ctx, *args):
+	async def events_list(self, ctx: commands.Context, *args):
 		"""
 		Display upcoming events from the Google Calendar
 
@@ -121,7 +121,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			more_aliases=("addevent", "createevent", "newevent"),
 		)
 	)
-	async def add_event(self, ctx, *args):
+	async def add_event(self, ctx: commands.Context, *args):
 		"""
 		Add events to the Google Calendar
 
@@ -209,30 +209,36 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			more_aliases=("updateevent", "editevent", "changeevent"),
 		)
 	)
-	async def update_event(self, ctx, *, args=None):
+	async def update_event(self, ctx: commands.Context, *, args=None):
 		"""
 		Add events to the Google Calendar
 
 		Usage:
 		```
-		++events.update "<query>" [params to set]
-		++events.update "<query>" [params to set] in <Class Name>
+		++events.update <query> [parameters to set]
 		```
 		Examples:
 		```
-		++events.update "calc moed b" title="Moed B #calculus-1"
+		++events.update "#calculus-1 moed b" title="Moed B #calculus-1" end="12:00 PM"
+		```
+		```
 		++events.update "#calculus-1 review class" start="July 7, 3pm" end="July 7, 5pm"
+		```
+		```
 		++events.update "#digital-systems HW 2" description="Submission box: https://moodle.jct.ac.il/mod/assign/view.php?id=420690"
-		++events.update "calc moed b" title="Moed B #calculus-1" in Lev 2023
+		```
+		```
+		++events.update "#calculus-1 moed bet" title="Moed B #calculus-1" in Lev 2023
 		```
 		Arguments:
-		**<query>**: The query to search for within event titles. This can be a string to search or include a channel mention.
-		**<Class Name>**: The calendar to add the event to. Only necessary if you have more than one class role.
+		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
+		**[parameters to set]**: List of parameters in the form `title="new title"`. See below for the list of parameters.
+		**<Class Name>**: The calendar to add the event to (ex. "...in Lev 2023"). Only necessary if you have more than one class role.
 
-		Set parameters (all are optional):
+		Allowed parameters (all are optional):
 		**title**: The new title of the event.
-		**start**: The new start date and time of the event (Israel time).
-		**end**: The new end date and time of the event (Israel time).
+		**start**: The new start date/time of the event (Israel time).
+		**end**: The new end date/time of the event (Israel time).
 		**location**: The new location of the event.
 		**description**: The new description of the event.
 		"""
@@ -309,7 +315,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			suffix=("grant", "manage", "allow", "invite"),
 		)
 	)
-	async def addmanager(self, ctx, email):
+	async def addmanager(self, ctx: commands.Context, email: str):
 		"""
 		Add a Google account as a manager of your class's calendar
 
@@ -334,7 +340,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 	@commands.command(name="createcalendar")
 	@commands.has_permissions(manage_roles=True)
-	async def createcalendar(self, ctx, *args):
+	async def createcalendar(self, ctx: commands.Context, *args):
 		"""
 		Create a public calendar on the service account
 
