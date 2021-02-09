@@ -1,7 +1,9 @@
 import csv
+from datetime import datetime
 from itertools import product
 import os
-from typing import Iterable, List, Mapping, Optional, Tuple
+from typing import Dict, Iterable, List, Mapping, Optional, Tuple
+import dateparser
 import discord
 import re
 
@@ -66,3 +68,28 @@ def build_aliases(
 		"aliases": list(more_aliases)
 		+ [a + b + c for a, b, c in product(prefix, dots, suffix) if a + b + c != name],
 	}
+
+
+def parse_date(
+	date_str: str,
+	tz: str = None,
+	future: bool = None,
+	base: datetime = None,
+	settings: Dict[str, str] = {},
+) -> datetime:
+	"""Returns datetime object for given date string
+	Arguments:
+	[tz]: string representing the timezone (ex. "Asia/Jerusalem")
+	[future]: set to true to prefer dates from the future when parsing
+	[base]: datetime representing where dates should be parsed relative to
+	[settings]: dict of additional settings for dateparser.parse()
+	"""
+	if date_str is None:
+		return None
+	settings = {
+		**settings,
+		**({"TO_TIMEZONE": tz} if tz else {}),
+		**({"PREFER_DATES_FROM": "future"} if future else {}),
+		**({"RELATIVE_BASE": base} if base else {}),
+	}
+	return dateparser.parse(date_str, settings=settings)

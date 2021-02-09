@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Iterable, Dict
 import discord
-import dateparser
+from utils.utils import parse_date
 
 
 class CalendarEmbedder:
 	def __init__(self):
-		self.default_time_zone = "Asia/Jerusalem"
+		self.timezone = "Asia/Jerusalem"
 
 	def embed_event_list(
 		self, title: str, events: Iterable[dict], query: str = ""
@@ -58,17 +58,11 @@ class CalendarEmbedder:
 		"""Extract dates from event and convert to readable format"""
 		start = event["start"].get("dateTime", event["start"].get("date"))
 		end = event["end"].get("dateTime", event["end"].get("date"))
-		start_date = self.__parse_date(start)
-		end_date = self.__parse_date(end)
+		start_date = parse_date(start, tz=self.timezone)
+		end_date = parse_date(end, tz=self.timezone)
 		return (
 			f"{self.__format_date(start_date)} -"
 			f" {self.__format_date(end_date, base=start_date)}"
-		)
-
-	def __parse_date(self, date_str: str) -> datetime:
-		"""Returns datetime object with default timezone for given date string"""
-		return dateparser.parse(
-			date_str, settings={"TO_TIMEZONE": self.default_time_zone}
 		)
 
 	def __format_date(self, date: datetime, base: datetime = None) -> str:
@@ -88,4 +82,4 @@ class CalendarEmbedder:
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
-		return f"Times are shown for {self.default_time_zone}"
+		return f"Times are shown for {self.timezone}"

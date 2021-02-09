@@ -4,6 +4,7 @@ from google.oauth2 import service_account
 import datetime
 import dateparser
 import config
+from utils.utils import parse_date
 
 
 class Calendar:
@@ -13,11 +14,7 @@ class Calendar:
 			config.google_config, scopes=SCOPES
 		)
 		self.service = build("calendar", "v3", credentials=self.creds)
-		self.default_time_zone = "Asia/Jerusalem"
-		self.dateparser_settings = {
-			"TIMEZONE": self.default_time_zone,
-			"PREFER_DATES_FROM": "future",
-		}
+		self.timezone = "Asia/Jerusalem"
 
 	def get_links(self, calendar_id: str) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
@@ -56,11 +53,11 @@ class Calendar:
 			.execute()
 		)
 		# return list of events
-		items = events_result.get("items", [])
+		events = events_result.get("items", [])
 		# filter by search term
 		query = query.lower()
-		events = filter(lambda item: query in item.get("summary").lower(), items)
-		return list(events)
+		filtered = filter(lambda item: query in item.get("summary").lower(), events)
+		return list(filtered)
 
 	def add_event(
 		self,
@@ -74,15 +71,13 @@ class Calendar:
 		"""Add an event to the calendar given the id, summary, start time,
 		and optionally, the end time, location and description."""
 		# parse start date
-		start_date = dateparser.parse(start, settings=self.dateparser_settings)
+		start_date = parse_date(start, tz=self.timezone, future=True)
 		# check start date
 		if start_date is None:
 			raise ValueError(f'Start date "{start}" could not be parsed.')
 		# parse end date
 		if end is not None:
-			end_date = dateparser.parse(
-				end, settings={**self.dateparser_settings, "RELATIVE_BASE": start_date}
-			)
+			end_date = parse_date(end, tz=self.timezone, base=start_date)
 		else:
 			# no end date was specified
 			end_date = start_date
@@ -100,11 +95,11 @@ class Calendar:
 			"description": description,
 			"start": {
 				"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
-				"timeZone": self.default_time_zone,
+				"timeZone": self.timezone,
 			},
 			"end": {
 				"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
-				"timeZone": self.default_time_zone,
+				"timeZone": self.timezone,
 			},
 		}
 
@@ -117,15 +112,72 @@ class Calendar:
 
 		return event
 
-	def delete_event(self, calendar_id: str, event_id: str) -> None:
+	def quick_add_event(self, calendar_id: str, text: str) -> Dict[str, str]:
+		"""Add an event to the calendar given the quick add description"""
+		event = (
+			self.service.events().quickAdd(calendarId=calendar_id, text=text).execute()
+		)
+		return event
+
+	def delete_event(self, calendar_id: str, event: Dict[str, str]) -> Dict[str, str]:
 		"""Delete an event from a calendar given the calendar id and event id"""
 		# delete event
-		self.service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
+		event = (
+			self.service.events()
+			.delete(calendarId=calendar_id, eventId=event["id"])
+			.execute()
+		)
+		return event
+
+	def udpate_event(
+		self, calendar_id: str, event: Dict[str, str], **kwargs
+	) -> Dict[str, str]:
+		"""Update an event from a calendar given the calendar id, event id, and parameters to update"""
+		# parse new event title if provided
+		new_summary = (
+			kwargs.get("title", None)
+			or kwargs.get("summary", None)
+			or kwargs.get("name", None)
+		)
+		# get new location if provided
+		new_location = kwargs.get("location", None)
+		# get new description if provided
+		new_desc = kwargs.get("description", None)
+		# parse new start date if provided
+		start = kwargs.get("start", None)
+		start_date = parse_date(start, tz=self.timezone, future=True)
+		new_start_str = start_date.strftime("%Y-%m-%dT%H:%M:%S") if start_date else None
+		# parse new end date if provided
+		end = kwargs.get("end", None)
+		end_date = parse_date(end, tz=self.timezone, base=start_date)
+		new_end_str = end_date.strftime("%Y-%m-%dT%H:%M:%S") if end_date else None
+		# create request body
+		event_details = {
+			**event,
+			**({"summary": new_summary} if type(new_summary) == str else {}),
+			**({"location": new_location} if type(new_location) == str else {}),
+			**({"description": new_desc} if type(new_desc) == str else {}),
+			"start": {
+				**event["start"],
+				**({"dateTime": new_start_str} if type(new_start_str) == str else {}),
+			},
+			"end": {
+				**event["end"],
+				**({"dateTime": new_end_str} if type(new_end_str) == str else {}),
+			},
+		}
+		# update the event
+		updated_event = (
+			self.service.events()
+			.update(calendarId=calendar_id, eventId=event["id"], body=event_details)
+			.execute()
+		)
+		return updated_event
 
 	def create_calendar(self, summary: str) -> Dict[str, str]:
 		"""Creates a new public calendar on the service account given the name"""
 		# create the calendar
-		calendar = {"summary": summary, "timeZone": self.default_time_zone}
+		calendar = {"summary": summary, "timeZone": self.timezone}
 		created_calendar = self.service.calendars().insert(body=calendar).execute()
 		# make calendar public
 		rule = {"scope": {"type": "default"}, "role": "reader"}
