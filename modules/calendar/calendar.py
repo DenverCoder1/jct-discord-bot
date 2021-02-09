@@ -186,8 +186,6 @@ class Calendar:
 					else {"dateTime": event["end"].get("dateTime")}
 					if "dateTime" in event["end"]
 					else {"dateTime": curr_end_date.strftime("%Y-%m-%dT%H:%M:%S")}
-					if curr_end_date > curr_start_date
-					else {"dateTime": curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")}
 				),
 			},
 		}
