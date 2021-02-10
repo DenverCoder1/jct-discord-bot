@@ -89,7 +89,7 @@ class CalendarEmbedder:
 		)
 
 	def __format_date(
-		self, date: datetime, base: datetime = None, all_day: bool = False
+		self, date: datetime, base: datetime = datetime.now(), all_day: bool = False
 	) -> str:
 		"""Convert dates to a specified format"""
 		# if the date is same as the base, only return the time
