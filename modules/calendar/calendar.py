@@ -193,12 +193,10 @@ class Calendar:
 			**({"description": new_desc} if type(new_desc) == str else {}),
 			"start": {
 				"timeZone": self.timezone,
-				**(
-					{"dateTime": new_start_str}
+				"dateTime": (
+					new_start_str 
 					if type(new_start_str) == str
-					else {"dateTime": event["start"].get("dateTime")}
-					if "dateTime" in event["start"]
-					else {"dateTime": curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")}
+					else event["start"].get("dateTime", curr_start_date.strftime("%Y-%m-%dT%H:%M:%S"))
 				),
 			},
 			"end": {
