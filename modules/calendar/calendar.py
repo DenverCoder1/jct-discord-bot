@@ -176,19 +176,21 @@ class Calendar:
 			"start": {
 				"timeZone": self.timezone,
 				"dateTime": (
-					new_start_str 
+					new_start_str
 					if type(new_start_str) == str
-					else event["start"].get("dateTime", curr_start_date.strftime("%Y-%m-%dT%H:%M:%S"))
+					else event["start"].get(
+						"dateTime", curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")
+					)
 				),
 			},
 			"end": {
 				"timeZone": self.timezone,
-				**(
-					{"dateTime": new_end_str}
+				"dateTime": (
+					new_end_str
 					if type(new_end_str) == str
-					else {"dateTime": event["end"].get("dateTime")}
-					if "dateTime" in event["end"]
-					else {"dateTime": curr_end_date.strftime("%Y-%m-%dT%H:%M:%S")}
+					else event["end"].get(
+						"dateTime", curr_end_date.strftime("%Y-%m-%dT%H:%M:%S")
+					)
 				),
 			},
 		}
