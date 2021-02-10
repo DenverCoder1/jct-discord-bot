@@ -83,35 +83,27 @@ class CalendarEmbedder:
 		if "date" in event["start"]:
 			return f"{self.__format_date(start_date, all_day=True)} - All day"
 		# start and end time
-		return (
-			f"{self.__format_date(start_date)} -"
-			f" {self.__format_date(end_date, base=start_date)}"
+		formatted_start_date = self.__format_date(start_date)
+		formatted_end_date = self.__format_date(end_date, base=start_date)
+		return formatted_start_date + (
+			f" - {formatted_end_date}" if formatted_end_date else ""
 		)
 
 	def __format_date(
 		self, date: datetime, base: datetime = datetime.now(), all_day: bool = False
 	) -> str:
 		"""Convert dates to a specified format"""
-		# if the date is same as the base, only return the time
-		if base and date.strftime("%d %b") == base.strftime("%d %b"):
-			# return the time (format: '3:45 AM')
-			return date.strftime("%I:%M %p").lstrip("0")
-		# if the date is in the current year
-		if date.year == base.year:
-			# if all day, return the date without the time
-			if all_day:
-				# return the date, month (format: 'Sun 1 Feb')
-				return date.strftime("%a %d %b").replace(" 0", " ")
-			# return the date, month, and time (format: 'Sun 1 Feb 3:45 AM')
-			return date.strftime("%a %d %b %I:%M %p").replace(" 0", " ")
-		# the date is in a different year
-		else:
-			# if all day, return the date without the time
-			if all_day:
-				# return the date, month, year (format: 'Sun 1 Feb 2020')
-				return date.strftime("%a %d %b %Y").replace(" 0", " ")
-			# return the date, month, year, and time (format: 'Sun 1 Feb 2020 3:45 AM')
-			return date.strftime("%a %d %b %Y %I:%M %p").replace(" 0", " ")
+		format = ""
+		# if the date is same as the base, don't include the date
+		if date.strftime("%d %b") != base.strftime("%d %b"):
+			format = "%a %d %b"
+			# if the date is not in the same year as base
+			if date.year != base.year:
+				format += " %Y"
+		# if all day, and the time is not the same as the base, return the time
+		if not all_day and date.strftime("%d%b%I:%M%p") != base.strftime("%d%b%I:%M%p"):
+			format += " %I:%M %p"
+		return date.strftime(format).replace(" 0", " ").strip()
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
