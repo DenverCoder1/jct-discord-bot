@@ -111,7 +111,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
 			events = self.calendar.fetch_upcoming(calendar_id, max_results, query)
 			embed = self.calendar_embedder.embed_event_list(
-				f"📅 Upcoming Events for {campus} {grad_year}", events, query
+				title=f"📅 Upcoming Events for {campus} {grad_year}",
+				events=events,
+				description=f'Showing results for "{query}"' if query else "",
 			)
 			await ctx.send(embed=embed)
 
@@ -293,10 +295,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if len(events) > 1:
 			# TODO: Allow user to choose an event
 			embed = self.calendar_embedder.embed_event_list(
-				f"⚠ Multiple events were found.",
-				events,
-				f"Please be more specific.\n{query}",
-				discord.Colour.gold(),
+				title=f"⚠ Multiple events were found.",
+				events=events,
+				description=(
+					"No events were updated. Please specify which event you would like"
+					f' to update.\n\nShowing results for "{query}"'
+				),
+				colour=discord.Colour.gold(),
 			)
 			return await ctx.send(embed=embed)
 		# Extract params into kwargs
@@ -374,7 +379,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if len(events) > 1:
 			# TODO: Allow user to choose an event
 			embed = self.calendar_embedder.embed_event_list(
-				f"⚠ Multiple events were found.", events, query, discord.Colour.gold()
+				title=f"⚠ Multiple events were found.",
+				events=events,
+				description=(
+					"No events were deleted. Please specify which event you would like"
+					f' to delete.\n\nShowing results for "{query}"'
+				),
+				colour=discord.Colour.gold(),
 			)
 			return await ctx.send(embed=embed)
 		try:

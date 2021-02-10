@@ -12,13 +12,13 @@ class CalendarEmbedder:
 		self,
 		title: str,
 		events: Iterable[dict],
-		query: str = "",
+		description: str = "",
 		colour: discord.Colour = discord.Colour.green(),
 	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list"""
 		embed = discord.Embed(title=title, colour=colour)
-		# set initial description with search query if available
-		embed.description = "" if query == "" else f'Showing results for "{query}"\n\n'
+		# set initial description if available
+		embed.description = "" if description == "" else f"{description}\n\n"
 		if not events:
 			embed.description += "No events found"
 		else:
