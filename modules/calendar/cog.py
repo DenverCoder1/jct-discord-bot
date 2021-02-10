@@ -80,8 +80,6 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<query>**: The query to search for within event titles. This can be a string to search for or a channel mention. (Default: shows any events)
 		**<max_results>**: The maximum number of events to display. (Default: 5 results or 15 with query)
 		"""
-		# convert channel mentions to full names
-		args = self.course_mentions.replace_channel_mentions(" ".join(args))
 		# extract query string
 		query = (
 			# all arguments are query if last argument is not a number
@@ -93,6 +91,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			# no query if no arguments or only 1 argument and it's a number
 			else ""
 		)
+		# convert channel mentions to full names
+		query = self.course_mentions.replace_channel_mentions(query)
 		# extract max_results - last argument if it is a number, otherwise, default value
 		max_results = (
 			# last argument if it's a number
@@ -293,7 +293,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if len(events) > 1:
 			# TODO: Allow user to choose an event
 			embed = self.calendar_embedder.embed_event_list(
-				f"⚠ Multiple events were found.", events, query, discord.Colour.gold()
+				f"⚠ Multiple events were found.",
+				events,
+				f"Please be more specific.\n{query}",
+				discord.Colour.gold(),
 			)
 			return await ctx.send(embed=embed)
 		# Extract params into kwargs
@@ -344,7 +347,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		query = self.course_mentions.replace_channel_mentions(" ".join(args))
 		grad_year = None
 		campus = None
-		match = re.search(r"^\s*(.*)\s*(in \w+ \d{4})?\s*$", query)
+		match = re.search(r"^\s*(.*?)\s*(in \w+ \d{4})?\s*$", query)
 		[query, calendar] = match.groups() if match is not None else [None, None]
 		if calendar is not None:
 			try:
