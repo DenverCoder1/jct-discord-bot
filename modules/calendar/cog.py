@@ -1,5 +1,7 @@
 import os
 import re
+
+import discord
 import config
 from discord.ext import commands
 from .calendar import Calendar
@@ -51,7 +53,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				)
 			links = self.calendar.get_links(calendar_id)
 			embed = self.calendar_embedder.embed_link(
-				f"Calendar Links for {campus} {grad_year}", links
+				f"🔗 Calendar Links for {campus} {grad_year}", links
 			)
 			await ctx.send(embed=embed)
 
@@ -109,7 +111,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
 			events = self.calendar.fetch_upcoming(calendar_id, max_results, query)
 			embed = self.calendar_embedder.embed_event_list(
-				f"Upcoming Events for {campus} {grad_year}", events, query
+				f"📅 Upcoming Events for {campus} {grad_year}", events, query
 			)
 			await ctx.send(embed=embed)
 
@@ -151,7 +153,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		title = None
 		times = None
 		# separate title from rest of message
-		title_times_separators = (" on ", " at ", " from ")
+		title_times_separators = (" on ", " at ", " from ", " in ")
 		for sep in title_times_separators:
 			if sep in message:
 				[title, times] = message.split(sep, 1)
@@ -159,7 +161,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# did not find a way to separate title from rest of message
 		if times is None:
 			raise FriendlyError(
-				"Expected 'on' or 'at' or 'from' to separate title from time.",
+				"Expected 'on', 'at', 'from', or 'in' to separate title from time.",
 				ctx.channel,
 				ctx.author,
 			)
@@ -198,7 +200,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			event = self.calendar.add_event(calendar_id, title, start, end)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
-		embed = self.calendar_embedder.embed_event("Event created successfully", event)
+		embed = self.calendar_embedder.embed_event(
+			":white_check_mark: Event created successfully", event
+		)
 		await ctx.send(embed=embed)
 
 	@commands.command(
@@ -289,7 +293,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if len(events) > 1:
 			# TODO: Allow user to choose an event
 			embed = self.calendar_embedder.embed_event_list(
-				f"Multiple events were found.", events, query
+				f"⚠ Multiple events were found.", events, query, discord.Colour.gold()
 			)
 			return await ctx.send(embed=embed)
 		# Extract params into kwargs
@@ -305,7 +309,78 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			event = self.calendar.update_event(calendar_id, events[0], **param_args)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
-		embed = self.calendar_embedder.embed_event("Event updated successfully", event)
+		embed = self.calendar_embedder.embed_event(
+			":white_check_mark: Event updated successfully", event
+		)
+		await ctx.send(embed=embed)
+
+	@commands.command(
+		**build_aliases(
+			name="events.delete",
+			prefix=("calendar", "events", "event"),
+			suffix=("delete", "remove"),
+			more_aliases=("deleteevent", "removeevent"),
+		)
+	)
+	async def delete_event(self, ctx: commands.Context, *args):
+		"""
+		Add events to the Google Calendar
+
+		Usage:
+		```
+		++events.delete <query>
+		++events.delete <query> in <Class Name>
+		```
+		Example:
+		```
+		++events.delete #calculus-1 Moed Bet
+		++events.delete #digital-systems HW 10 in Lev 2023
+		```
+		Arguments:
+		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
+		**<Class Name>**: The calendar to add the event to (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		"""
+		# replace channel mentions with course names
+		query = self.course_mentions.replace_channel_mentions(" ".join(args))
+		grad_year = None
+		campus = None
+		match = re.search(r"^\s*(.*)\s*(in \w+ \d{4})?\s*$", query)
+		[query, calendar] = match.groups() if match is not None else [None, None]
+		if calendar is not None:
+			try:
+				grad_year, campus = self.finder.extract_year_and_campus(calendar)
+				# check that specified calendar is one of the user's roles
+				class_roles = self.finder.get_class_roles(ctx.author)
+				if (grad_year, campus) not in class_roles:
+					raise ClassRoleError(
+						"You can not add events to the calendar of another class."
+					)
+			except (ClassRoleError, ClassParseError) as error:
+				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		if grad_year is None or campus is None:
+			try:
+				grad_year, campus = self.finder.get_class_info_from_role(ctx.author)
+			except ClassRoleError as error:
+				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		calendar_id = self.finder.get_calendar_id(grad_year, campus)
+		events = self.calendar.fetch_upcoming(calendar_id, 50, query)
+		if len(events) == 0:
+			raise FriendlyError(
+				f"No events were found for '{query}'.", ctx.channel, ctx.author
+			)
+		if len(events) > 1:
+			# TODO: Allow user to choose an event
+			embed = self.calendar_embedder.embed_event_list(
+				f"⚠ Multiple events were found.", events, query, discord.Colour.gold()
+			)
+			return await ctx.send(embed=embed)
+		try:
+			self.calendar.delete_event(calendar_id, events[0])
+		except ConnectionError as error:
+			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
+		embed = self.calendar_embedder.embed_event(
+			"🗑 Event deleted successfully", events[0]
+		)
 		await ctx.send(embed=embed)
 
 	@commands.command(
@@ -334,7 +409,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			# add manager to calendar
 			self.calendar.add_manager(calendar_id, email)
 			embed = self.calendar_embedder.embed_success(
-				f"Successfully added manager to {campus} {grad_year} calendar."
+				f":office_worker: Successfully added manager to {campus} {grad_year}"
+				" calendar."
 			)
 			await ctx.send(embed=embed)
 
@@ -355,7 +431,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# create calendar
 		new_calendar = self.calendar.create_calendar(name)
 		embed = self.calendar_embedder.embed_success(
-			f"Successfully created '{new_calendar['summary']}' calendar.",
+			f"📆 Successfully created '{new_calendar['summary']}' calendar.",
 			f"Calendar ID: {new_calendar['id']}",
 		)
 		await ctx.send(embed=embed)

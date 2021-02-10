@@ -9,10 +9,14 @@ class CalendarEmbedder:
 		self.timezone = "Asia/Jerusalem"
 
 	def embed_event_list(
-		self, title: str, events: Iterable[dict], query: str = ""
+		self,
+		title: str,
+		events: Iterable[dict],
+		query: str = "",
+		colour: discord.Colour = discord.Colour.green(),
 	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list"""
-		embed = discord.Embed(title=title, colour=discord.Colour.green())
+		embed = discord.Embed(title=title, colour=colour)
 		# set initial description with search query if available
 		embed.description = "" if query == "" else f'Showing results for "{query}"\n\n'
 		if not events:
@@ -24,25 +28,40 @@ class CalendarEmbedder:
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
-	def embed_link(self, title: str, links: Dict[str, str]) -> discord.Embed:
+	def embed_link(
+		self,
+		title: str,
+		links: Dict[str, str],
+		colour: discord.Colour = discord.Colour.green(),
+	) -> discord.Embed:
 		"""Embed a list of links given a mapping of link text to urls"""
-		embed = discord.Embed(title=title, colour=discord.Colour.green())
+		embed = discord.Embed(title=title, colour=colour)
 		# add links to embed
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
 		embed.description = "\n".join(description)
 		return embed
 
-	def embed_event(self, title: str, event: Dict[str, str]) -> discord.Embed:
+	def embed_event(
+		self,
+		title: str,
+		event: Dict[str, str],
+		colour: discord.Colour = discord.Colour.green(),
+	) -> discord.Embed:
 		"""Embed an event with the summary, link, and dates"""
-		embed = discord.Embed(title=title, colour=discord.Colour.green())
+		embed = discord.Embed(title=title, colour=colour)
 		# add overview of event to the embed
 		embed.description = self.__get_formatted_event_details(event)
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
-	def embed_success(self, title: str, description: str = None) -> discord.Embed:
+	def embed_success(
+		self,
+		title: str,
+		description: str = None,
+		colour: discord.Colour = discord.Colour.green(),
+	) -> discord.Embed:
 		"""Embed a success message and an optional description"""
-		embed = discord.Embed(title=title, colour=discord.Colour.green())
+		embed = discord.Embed(title=title, colour=colour)
 		if description:
 			embed.description = description
 		return embed

@@ -141,15 +141,17 @@ class Calendar:
 				)
 		return event
 
-	def delete_event(self, calendar_id: str, event: Dict[str, str]) -> Dict[str, str]:
+	def delete_event(self, calendar_id: str, event: Dict[str, str]) -> None:
 		"""Delete an event from a calendar given the calendar id and event id"""
 		# delete event
-		event = (
+		response = (
 			self.service.events()
 			.delete(calendarId=calendar_id, eventId=event["id"])
 			.execute()
 		)
-		return event
+		# response should be empty if successful
+		if response != "":
+			raise ConnectionError("Couldn't delete event.", response)
 
 	def update_event(
 		self, calendar_id: str, event: Dict[str, str], **kwargs
