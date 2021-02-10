@@ -138,7 +138,7 @@ class Calendar:
 	def update_event(
 		self, calendar_id: str, event: Dict[str, str], **kwargs
 	) -> Dict[str, str]:
-		"""Update an event from a calendar given the calendar id, event id, and parameters to update"""
+		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new event title if provided
 		new_summary = (
 			kwargs.get("title", None)
@@ -175,12 +175,10 @@ class Calendar:
 			**({"description": new_desc} if type(new_desc) == str else {}),
 			"start": {
 				"timeZone": self.timezone,
-				**(
-					{"dateTime": new_start_str}
+				"dateTime": (
+					new_start_str 
 					if type(new_start_str) == str
-					else {"dateTime": event["start"].get("dateTime")}
-					if "dateTime" in event["start"]
-					else {"dateTime": curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")}
+					else event["start"].get("dateTime", curr_start_date.strftime("%Y-%m-%dT%H:%M:%S"))
 				),
 			},
 			"end": {
