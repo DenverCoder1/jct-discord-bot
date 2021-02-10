@@ -82,15 +82,16 @@ class CalendarEmbedder:
 	) -> str:
 		"""Convert dates to a specified format"""
 		format = ""
-		# if the date is same as the base, don't include the date
+		# include the date if the date is different from the base
 		if date.strftime("%d %b") != base.strftime("%d %b"):
 			format = "%a %d %b"
-			# if the date is not in the same year as base
+			# include the year if the date is in a different year
 			if date.year != base.year:
 				format += " %Y"
-		# if all day, and the time is not the same as the base, return the time
+		# include the time if it is not an all day event and the time is different from the base
 		if not all_day and date.strftime("%d%b%I:%M%p") != base.strftime("%d%b%I:%M%p"):
 			format += " %I:%M %p"
+		# format the date and remove leading zeros and trailing spaces
 		return date.strftime(format).replace(" 0", " ").strip()
 
 	def __get_footer_text(self):
