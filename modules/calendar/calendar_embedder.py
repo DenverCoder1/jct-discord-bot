@@ -54,18 +54,6 @@ class CalendarEmbedder:
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
-	def embed_success(
-		self,
-		title: str,
-		description: str = None,
-		colour: discord.Colour = discord.Colour.green(),
-	) -> discord.Embed:
-		"""Embed a success message and an optional description"""
-		embed = discord.Embed(title=title, colour=colour)
-		if description:
-			embed.description = description
-		return embed
-
 	def __get_formatted_event_details(self, event: Dict[str, str]) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
 		return (

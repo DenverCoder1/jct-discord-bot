@@ -11,7 +11,7 @@ from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email, build_aliases
+from utils.utils import is_email, build_aliases, embed_success
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -421,7 +421,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
 			# add manager to calendar
 			self.calendar.add_manager(calendar_id, email)
-			embed = self.calendar_embedder.embed_success(
+			embed = embed_success(
 				f":office_worker: Successfully added manager to {campus} {grad_year}"
 				" calendar."
 			)
@@ -443,7 +443,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		name = " ".join(args)
 		# create calendar
 		new_calendar = self.calendar.create_calendar(name)
-		embed = self.calendar_embedder.embed_success(
+		embed = embed_success(
 			f"📆 Successfully created '{new_calendar['summary']}' calendar.",
 			f"Calendar ID: {new_calendar['id']}",
 		)

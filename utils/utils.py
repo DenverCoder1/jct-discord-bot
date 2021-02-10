@@ -37,6 +37,18 @@ def blockquote(string: str) -> str:
 	return re.sub(r"(^|\n)", r"\1> ", string)
 
 
+def embed_success(
+	title: str,
+	description: str = None,
+	colour: discord.Colour = discord.Colour.green(),
+) -> discord.Embed:
+	"""Embed a success message and an optional description"""
+	embed = discord.Embed(title=title, colour=colour)
+	if description:
+		embed.description = description
+	return embed
+
+
 def ordinal(n: int):
 	return "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4])
 
