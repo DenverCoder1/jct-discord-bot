@@ -123,24 +123,6 @@ class Calendar:
 		)
 		return event
 
-	def quick_add_event(self, calendar_id: str, text: str) -> Dict[str, str]:
-		"""Add an event to the calendar given the quick add description"""
-		event = (
-			self.service.events().quickAdd(calendarId=calendar_id, text=text).execute()
-		)
-		# change events to 0 minutes by default instead of 60 minutes
-		start_date = self.__get_event_datetime(event, "start")
-		end_date = self.__get_event_datetime(event, "end")
-		# check if event was created for 1 hour
-		if end_date - start_date == timedelta(minutes=60):
-			# if no words suggest a time range was used, change the end time to the start time
-			time_range_words = (" to ", "-", " until ", " for ", " hour ")
-			if not any(word in f" {text} " for word in time_range_words):
-				event = self.update_event(
-					calendar_id, event, end=start_date.strftime("%Y-%m-%dT%H:%M:%S")
-				)
-		return event
-
 	def delete_event(self, calendar_id: str, event: Dict[str, str]) -> None:
 		"""Delete an event from a calendar given the calendar id and event id"""
 		# delete event
