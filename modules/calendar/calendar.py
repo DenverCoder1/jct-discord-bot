@@ -156,7 +156,7 @@ class Calendar:
 	def update_event(
 		self, calendar_id: str, event: Dict[str, str], **kwargs
 	) -> Dict[str, str]:
-		"""Update an event from a calendar given the calendar id, event id, and parameters to update"""
+		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new event title if provided
 		new_summary = (
 			kwargs.get("title", None)
