@@ -56,9 +56,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# fetch links for calendar
-		links = self.calendar_service.get_links(calendar.id())
+		links = self.calendar_service.get_links(calendar.id)
 		embed = self.calendar_embedder.embed_link(
-			f"🔗 Calendar Links for {calendar.name()}", links
+			f"🔗 Calendar Links for {calendar.name}", links
 		)
 		await ctx.send(embed=embed)
 
@@ -129,10 +129,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		)
 		# fetch events
 		events = self.calendar_service.fetch_upcoming(
-			calendar.id(), max_results, full_query
+			calendar.id, max_results, full_query
 		)
 		embed = self.calendar_embedder.embed_event_list(
-			title=f"📅 Upcoming Events for {calendar.name()}",
+			title=f"📅 Upcoming Events for {calendar.name}",
 			events=events,
 			description=f'Showing results for "{full_query}"' if full_query else "",
 		)
@@ -210,7 +210,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if " from " in start:
 			start = start.replace(" from ", " at ")
 		try:
-			event = self.calendar_service.add_event(calendar.id(), title, start, end)
+			event = self.calendar_service.add_event(calendar.id, title, start, end)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
@@ -284,7 +284,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
-		events = self.calendar_service.fetch_upcoming(calendar.id(), 50, query)
+		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
 		if len(events) == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
@@ -312,7 +312,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			param_args[key] = self.course_mentions.replace_channel_mentions(value)
 		try:
 			event = self.calendar_service.update_event(
-				calendar.id(), events[0], **param_args
+				calendar.id, events[0], **param_args
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
@@ -358,7 +358,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# fetch upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id(), 50, query)
+		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
 		if len(events) == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
@@ -377,7 +377,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			return await ctx.send(embed=embed)
 		# delete event
 		try:
-			self.calendar_service.delete_event(calendar.id(), events[0])
+			self.calendar_service.delete_event(calendar.id, events[0])
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
@@ -421,9 +421,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx.channel, ctx.author)
 		# add manager to calendar
-		if self.calendar_service.add_manager(calendar.id(), email):
+		if self.calendar_service.add_manager(calendar.id, email):
 			embed = embed_success(
-				f":office_worker: Successfully added manager to {calendar.name()}."
+				f":office_worker: Successfully added manager to {calendar.name}."
 			)
 			await ctx.send(embed=embed)
 		else:
@@ -448,8 +448,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# create calendar
 		new_calendar = self.calendar_service.create_calendar(name)
 		embed = embed_success(
-			f"📆 Successfully created '{new_calendar.name()}' calendar.",
-			f"Calendar ID: {new_calendar.id()}",
+			f"📆 Successfully created '{new_calendar.name}' calendar.",
+			f"Calendar ID: {new_calendar.id}",
 		)
 		await ctx.send(embed=embed)
 
