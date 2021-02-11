@@ -47,11 +47,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Arguments:
 		**<Class Name>**: The calendar to get links for (ex. "Lev 2023").
 		"""
-		# check if calendar was specified
-		calendar_match = re.search(r"\b(\w{3} \d{4})", " ".join(args))
-		# get calendar
 		try:
-			calendar_name = calendar_match.groups()[0] if calendar_match else None
+			calendar_name = " ".join(args) if args else None
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
