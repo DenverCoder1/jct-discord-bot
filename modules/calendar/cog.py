@@ -153,15 +153,18 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Usage:
 		```
 		++events.add <Title> at <Start>
-		++events.add <Title> on <Start>
 		++events.add <Title> on <Start> to <End>
 		++events.add <Title> on <Start> to <End> in <Class Name>
 		```
 		Examples:
 		```
 		++events.add #compilers HW 3 on April 10 at 11:59pm
-		++events.add Moed Alef #calculus-1 on February 9, 2021 at 8:30 am to 10:30 am
-		++events.add #digital-systems HW 3 on April 15 at 11pm in Lev 2023
+		```
+		```
+		++events.add Moed A #calculus-1 on February 9 from 9am-11am
+		```
+		```
+		++events.add #digital-systems HW 3 on Apr 15 at 11pm in Lev 2023
 		```
 		Arguments:
 		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
