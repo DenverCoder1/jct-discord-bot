@@ -83,15 +83,11 @@ class CalendarFinder:
 
 	def __get_class_roles(self, member: discord.Member) -> Iterable[tuple]:
 		"""Returns a list of (grad_year, campus) pairs found in a member's roles"""
-		roles = member.roles
-		class_roles = []
-		for role in roles:
-			try:
-				grad_year, campus = self.__extract_year_and_campus(role.name)
-				class_roles += [(grad_year, campus)]
-			except ClassParseError:
-				continue
-		return class_roles
+		query = self.sql_fetcher["get_class_roles.sql"]
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"roles": tuple(member.roles)})
+				return cursor.fetchall()
 
 	def __extract_year_and_campus(self, text: str):
 		"""Extract campus name and graduation year from input text"""
