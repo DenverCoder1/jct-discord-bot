@@ -47,10 +47,7 @@ class CalendarFinder:
 		except ClassParseError as error:
 			pass
 		# get calendar from user's roles
-		try:
-			return self.__calendar_from_role(member)
-		except (ClassRoleError, ClassParseError) as error:
-			raise error
+		return self.__calendar_from_role(member)
 
 	def __calendar_from_str(self, member: discord.Member, text: str) -> Calendar:
 		try:
