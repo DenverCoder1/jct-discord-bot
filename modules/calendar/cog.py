@@ -159,9 +159,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Examples:
 		```
-		++events.add Compilers HW 3 on April 10 at 11:59pm
-		++events.add Calculus Moed Alef on February 9, 2021 at 8:30 am to 10:30 am
-		++events.add Compilers HW 3 on April 10 at 11:59pm in Lev 2023
+		++events.add #compilers HW 3 on April 10 at 11:59pm
+		++events.add Moed Alef #calculus-1 on February 9, 2021 at 8:30 am to 10:30 am
+		++events.add #digital-systems HW 3 on April 15 at 11pm in Lev 2023
 		```
 		Arguments:
 		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
