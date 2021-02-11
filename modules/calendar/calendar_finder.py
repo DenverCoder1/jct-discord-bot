@@ -25,6 +25,18 @@ class CalendarFinder:
 		else:
 			raise ClassRoleError(f"Could not find a calendar for {campus} {grad_year}.")
 
+	def get_campus(self, text: str) -> str:
+		"""Searches the database the campus matching the user's string"""
+		query = self.sql_fetcher["search_campus.sql"]
+		with self.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"text": text})
+				row = cursor.fetchall()
+		if row is not None and len(row) == 1:
+			return row[0]
+		else:
+			raise ClassRoleError(f"Could not find a matching campus name.")
+
 	def get_calendar(self, member: discord.Member, text: str = None) -> Calendar:
 		# get calendar specified in arguments
 		try:
@@ -89,12 +101,7 @@ class CalendarFinder:
 		except AttributeError:
 			raise ClassParseError("Could not parse graduation year")
 		# parse campus name in text
-		if "lev" in text.lower():
-			campus = "Lev"
-		elif "tal" in text.lower():
-			campus = "Tal"
-		else:
-			raise ClassParseError("Could not parse campus name")
+		campus = self.get_campus(text)
 		return grad_year, campus
 
 	def __get_year_campus_from_role(self, member: discord.Member) -> tuple:
