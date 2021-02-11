@@ -98,22 +98,22 @@ class Calendar:
 			"summary": summary,
 			"location": location,
 			"description": description,
-			"start": {
-				**(
-					{"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S")}
-					if not all_day
-					else {"date": start_date.strftime("%Y-%m-%d")}
-				),
-				"timeZone": self.timezone,
-			},
-			"end": {
-				**(
-					{"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S")}
-					if not all_day
-					else {"date": end_date.strftime("%Y-%m-%d")}
-				),
-				"timeZone": self.timezone,
-			},
+			"start": (
+				{
+					"dateTime": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
+					"timeZone": self.timezone,
+				}
+				if not all_day
+				else {"date": start_date.strftime("%Y-%m-%d")}
+			),
+			"end": (
+				{
+					"dateTime": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
+					"timeZone": self.timezone,
+				}
+				if not all_day
+				else {"date": end_date.strftime("%Y-%m-%d")}
+			),
 		}
 		# Add event to the calendar
 		event = (
