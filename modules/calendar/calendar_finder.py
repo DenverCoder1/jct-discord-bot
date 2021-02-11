@@ -40,7 +40,7 @@ class CalendarFinder:
 	def get_calendar(self, member: discord.Member, text: str = None) -> Calendar:
 		# get calendar specified in arguments
 		try:
-			if text is not None:
+			if text:
 				return self.__calendar_from_str(member, text)
 		except ClassRoleError as error:
 			raise error
