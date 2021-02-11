@@ -1,3 +1,4 @@
+from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
 from typing import Iterable, Dict
@@ -196,7 +197,7 @@ class CalendarService:
 		)
 		return Event(updated_event)
 
-	def create_calendar(self, summary: str) -> str:
+	def create_calendar(self, summary: str) -> Calendar:
 		"""Creates a new public calendar on the service account given the name
 		Returns the id of the new calendar"""
 		# create the calendar
@@ -207,9 +208,9 @@ class CalendarService:
 		self.service.acl().insert(
 			calendarId=created_calendar["id"], body=rule
 		).execute()
-		return created_calendar["id"]
+		return Calendar(created_calendar)
 
-	def get_calendar_list(self) -> Iterable[dict]:
+	def get_calendar_list(self) -> Iterable[Calendar]:
 		"""Returns a complete list of calendars on the service account"""
 		page_token = None
 		calendars = []
@@ -217,7 +218,7 @@ class CalendarService:
 			calendar_list = (
 				self.service.calendarList().list(pageToken=page_token).execute()
 			)
-			calendars += calendar_list["items"]
+			calendars += map(lambda item: Calendar(item), calendar_list["items"])
 			page_token = calendar_list.get("nextPageToken")
 			if not page_token:
 				break

@@ -450,10 +450,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		"""
 		name = " ".join(args)
 		# create calendar
-		new_calendar_id = self.calendar_service.create_calendar(name)
+		new_calendar = self.calendar_service.create_calendar(name)
 		embed = embed_success(
-			f"📆 Successfully created '{name}' calendar.",
-			f"Calendar ID: {new_calendar_id}",
+			f"📆 Successfully created '{new_calendar.name()}' calendar.",
+			f"Calendar ID: {new_calendar.id()}",
 		)
 		await ctx.send(embed=embed)
 
