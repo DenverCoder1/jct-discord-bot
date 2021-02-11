@@ -48,7 +48,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<Class Name>**: The calendar to get links for (ex. "Lev 2023").
 		"""
 		# check if calendar was specified
-		calendar_match = re.search(r"\b(\w+ \d{4})", " ".join(args))
+		calendar_match = re.search(r"\b(\w{3} \d{4})", " ".join(args))
 		# get calendar
 		try:
 			calendar_name = calendar_match.groups()[0] if calendar_match else None
@@ -77,10 +77,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Usage:
 		```
 		++events.list
-		++events.list <query>
+		++events.list "<query>"
 		++events.list <max_results>
-		++events.list <query> <max_results>
-		++events.list <query> <max_results> in <Class Name>
+		++events.list "<query>" <max_results>
+		++events.list "<query>" <max_results> in <Class Name>
 		```
 		Arguments:
 		**<query>**: The query to search for within event titles. This can be a string to search for or a channel mention. (Default: shows any events)
@@ -88,7 +88,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<Class Name>**: The calendar to get events from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# check if calendar was specified
-		calendar_match = re.search(r"(?:^|in )(\w+ \d{4})$", " ".join(args))
+		calendar_match = re.search(r"(?:^|in )(\w{3} \d{4})$", " ".join(args))
 		# get calendar
 		try:
 			calendar_name = calendar_match.groups()[0] if calendar_match else None
@@ -247,7 +247,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Arguments:
 		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
 		**[parameters to set]**: List of parameters in the form `title="new title"`. See below for the list of parameters.
-		**<Class Name>**: The calendar to add the event to (ex. "in Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to update the event in (ex. "in Lev 2023"). Only necessary if you have more than one class role.
 
 		Allowed parameters (all are optional):
 		**title**: The new title of the event.
@@ -260,7 +260,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		allowed_params = "|".join(("title", "start", "end", "location", "description"))
 		# check for correct pattern in message
 		match = re.search(
-			r'^\s*\S+\s[\'"]?(?P<query>[^"]*?)[\'"]?,?(?P<params>(?:\s*(?:%s)=\s*"[^"]*?",?)*)(?P<calendar>\sin\s\w+\s\d{4})?\s*$'
+			r'^\s*\S+\s[\'"]?(?P<query>[^"]*?)[\'"]?,?(?P<params>(?:\s*(?:%s)=\s*"[^"]*?",?)*)(?P<calendar> in \w{3} \d{4})?\s*$'
 			% allowed_params,
 			ctx.message.content,
 		)
@@ -342,11 +342,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
-		**<Class Name>**: The calendar to add the event to (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to delete the event from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(" ".join(args))
-		match = re.search(r"^\s*(.*?)\s*(in \w+ \d{4})?\s*$", query)
+		match = re.search(r"^\s*(.*?)\s*(in \w{3} \d{4})?\s*$", query)
 		[query, calendar_name] = match.groups() if match is not None else [None, None]
 
 		# get calendar
@@ -403,10 +403,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		````
 		Arguments:
 		**<email>**: Email address to add as a calendar manager
-		**<Class Name>**: The calendar name (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to grant access to (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# check if calendar was specified
-		calendar_match = re.search(r"\b(\w+ \d{4})", " ".join(args))
+		calendar_match = re.search(r"\b(\w{3} \d{4})", " ".join(args))
 		# get calendar
 		try:
 			calendar_name = calendar_match.groups()[0] if calendar_match else None
@@ -436,7 +436,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
-		++createcalendar JCT CompSci Lev 2020
+		++createcalendar "JCT CompSci Lev 2020"
 		```
 		Arguments:
 		> **JCT CompSci Lev 2020**: name of the calendar to create
