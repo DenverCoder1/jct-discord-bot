@@ -223,7 +223,11 @@ class Calendar:
 				break
 		return calendars
 
-	def add_manager(self, calendar_id: str, email: str) -> None:
+	def add_manager(self, calendar_id: str, email: str) -> bool:
 		"""Gives write access to a user for a calendar given an email address"""
 		rule = {"scope": {"type": "user", "value": email,}, "role": "writer"}
-		self.service.acl().insert(calendarId=calendar_id, body=rule).execute()
+		created_rule = (
+			self.service.acl().insert(calendarId=calendar_id, body=rule).execute()
+		)
+		# returns True if the rule was applied successfully
+		return created_rule["id"] == f"user:{email}"
