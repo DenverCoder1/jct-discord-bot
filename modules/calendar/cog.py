@@ -88,33 +88,25 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			last_occurence = max(loc for loc, val in enumerate(args) if val == "in") if "in" in args else len(args)
 			calendar_name = " ".join(args[last_occurence+1:])
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
-			args = [:last_occurence]
+			args = args[:last_occurence]
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
-		# extract query string
-		query = (
-			# all arguments are query if last argument is not a number
-			" ".join(args)
-			if len(args) > 0 and not args[-1].isdigit()
-			# all but last argument are query if last argument is a number
-			else " ".join(args[0:-1])
-			if len(args) > 1
-			# no query if no arguments or only 1 argument and it's a number
-			else ""
-		)
+		# all arguments are query if last argument is not a number
+		if len(args) > 0 and not args[-1].isdigit():
+			query = " ".join(args)
+		# all but last argument are query if last argument is a number
+		else:
+			query = " ".join(args[0:-1]) if len(args) > 1 else ""
 		# convert channel mentions to full names
 		full_query = self.course_mentions.replace_channel_mentions(query)
 		# extract max_results - last argument if it is a number, otherwise, default value
-		max_results = (
-			# last argument if it's a number
-			args[-1]
-			if len(args) > 0 and args[-1].isdigit()
-			# check for 5 results by default if there is no query
-			else 5
-			if query == ""
-			# check ahead 15 results by default if there is a query
-			else 15
-		)
+		max_results = 5 # default value if no query
+		# last argument if it's a number
+		if len(args) > 0 and args[-1].isdigit():
+			max_results = int(args[-1])
+		# check ahead 15 results by default if there is a query
+		elif query:
+			max_results = 15
 		# fetch events
 		events = self.calendar_service.fetch_upcoming(
 			calendar.id, max_results, full_query
