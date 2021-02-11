@@ -119,7 +119,7 @@ def format_date(
 	"""
 	format = ""
 	# include the date if the date is different from the base
-	if date.strftime("%d %b") != base.strftime("%d %b"):
+	if date.strftime("%d %b %Y") != base.strftime("%d %b %Y"):
 		format = "%a %d %b"
 		# include the year if the date is in a different year
 		if date.year != base.year:
