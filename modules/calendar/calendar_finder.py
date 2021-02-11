@@ -73,7 +73,9 @@ class CalendarFinder:
 		query = self.sql_fetcher["get_class_roles.sql"]
 		with self.conn as conn:
 			with conn.cursor() as cursor:
-				cursor.execute(query, {"roles": tuple(member.roles)})
+				cursor.execute(
+					query, {"roles": tuple(role.id for role in member.roles)}
+				)
 				return cursor.fetchall()
 
 	def __extract_year_and_campus(self, text: str):

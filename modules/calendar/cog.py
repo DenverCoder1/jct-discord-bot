@@ -276,7 +276,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				events=events,
 				description=(
 					"No events were updated. Please specify which event you would like"
-					f' to update.\n\nShowing results for "{query}"'
+					" to update. To resolve the issue manually, you can edit directly on Google calendar"
+					f' (use `++calendar.grant` to get access).\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
 			)
@@ -350,7 +351,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				events=events,
 				description=(
 					"No events were deleted. Please specify which event you would like"
-					f' to delete.\n\nShowing results for "{query}"'
+					" to update. To resolve the issue manually, you can edit directly on Google calendar"
+					f' (use `++calendar.grant` to get access).\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
 			)
