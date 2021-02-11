@@ -420,12 +420,16 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		for grad_year, campus in class_roles:
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
 			# add manager to calendar
-			self.calendar.add_manager(calendar_id, email)
-			embed = embed_success(
-				f":office_worker: Successfully added manager to {campus} {grad_year}"
-				" calendar."
-			)
-			await ctx.send(embed=embed)
+			if self.calendar.add_manager(calendar_id, email):
+				embed = embed_success(
+					f":office_worker: Successfully added manager to {campus}"
+					f" {grad_year} calendar."
+				)
+				await ctx.send(embed=embed)
+			else:
+				raise FriendlyError(
+					"An error occurred while applying changes.", ctx.channel, ctx.author
+				)
 
 	@commands.command(name="createcalendar")
 	@commands.has_permissions(manage_roles=True)
