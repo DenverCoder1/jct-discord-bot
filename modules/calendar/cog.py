@@ -84,20 +84,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<max_results>**: The maximum number of events to display. (Default: 5 results or 15 with query)
 		**<Class Name>**: The calendar to get events from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
-		# check if calendar was specified
-		calendar_match = re.search(r"(?:^|in )(\w{3} \d{4})$", " ".join(args))
-		# get calendar
 		try:
-			calendar_name = calendar_match.groups()[0] if calendar_match else None
+			last_occurence = max(loc for loc, val in enumerate(args) if val == "in") if "in" in args else len(args)
+			calendar_name = " ".join(args[last_occurence+1:])
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
-			if calendar_name is not None:
-				# remove words after the last "in" from args
-				if "in" in args:
-					last_occurence = len(args) - args[::-1].index("in") - 1
-					args = args[:last_occurence]
-				# class name was a full match of args
-				else:
-					args = []
+			args = [:last_occurence]
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# extract query string
