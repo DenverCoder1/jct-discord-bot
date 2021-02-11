@@ -1,9 +1,10 @@
+from .event import Event
+from utils.utils import parse_date
 from typing import Iterable, Dict
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
-from datetime import datetime, timedelta
+from datetime import datetime
 import config
-from utils.utils import parse_date
 
 
 class Calendar:
@@ -35,7 +36,7 @@ class Calendar:
 
 	def fetch_upcoming(
 		self, calendar_id: str, max_results: int, query: str = ""
-	) -> Iterable[dict]:
+	) -> Iterable[Event]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
 		now = datetime.utcnow().isoformat() + "Z"
@@ -56,7 +57,8 @@ class Calendar:
 		# filter by search term
 		query = query.lower()
 		filtered = filter(lambda item: query in item.get("summary").lower(), events)
-		return list(filtered)
+		# convert dicts to Event objects
+		return tuple(map(lambda item: Event(item, self.timezone), filtered))
 
 	def add_event(
 		self,
@@ -66,7 +68,7 @@ class Calendar:
 		end: str,
 		location: str = "",
 		description: str = "",
-	) -> Dict[str, str]:
+	) -> Event:
 		"""Add an event to the calendar given the id, summary, start time,
 		and optionally, the end time, location and description."""
 		all_day = False
@@ -121,23 +123,21 @@ class Calendar:
 			.insert(calendarId=calendar_id, body=event_details)
 			.execute()
 		)
-		return event
+		return Event(event, self.timezone)
 
-	def delete_event(self, calendar_id: str, event: Dict[str, str]) -> None:
-		"""Delete an event from a calendar given the calendar id and event id"""
+	def delete_event(self, calendar_id: str, event: Event) -> None:
+		"""Delete an event from a calendar given the calendar id and event object"""
 		# delete event
 		response = (
 			self.service.events()
-			.delete(calendarId=calendar_id, eventId=event["id"])
+			.delete(calendarId=calendar_id, eventId=event.id())
 			.execute()
 		)
 		# response should be empty if successful
 		if response != "":
 			raise ConnectionError("Couldn't delete event.", response)
 
-	def update_event(
-		self, calendar_id: str, event: Dict[str, str], **kwargs
-	) -> Dict[str, str]:
+	def update_event(self, calendar_id: str, event: Event, **kwargs) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new event title if provided
 		new_summary = (
@@ -149,66 +149,58 @@ class Calendar:
 		new_location = kwargs.get("location", None)
 		# get new description if provided
 		new_desc = kwargs.get("description", None)
-		# get the event's current start and end dates for relative bases
-		curr_start_date = self.__get_event_datetime(event, "start")
-		curr_end_date = self.__get_event_datetime(event, "end")
 		# parse new start date if provided
-		start = kwargs.get("start", None)
-		start_date = parse_date(
-			start, tz=self.timezone, future=True, base=curr_start_date
-		)
-		new_start_str = start_date.strftime("%Y-%m-%dT%H:%M:%S") if start_date else None
-		# parse new end date if provided
-		end = kwargs.get("end", None)
-		end_date = parse_date(
-			end,
+		new_start_date = parse_date(
+			kwargs.get("start", None),
 			tz=self.timezone,
 			future=True,
-			base=(start_date if start_date else curr_end_date),
+			base=event.start().replace(tzinfo=None),
 		)
-		new_end_str = end_date.strftime("%Y-%m-%dT%H:%M:%S") if end_date else None
+		# parse new end date if provided
+		new_end_date = parse_date(
+			kwargs.get("end", None),
+			tz=self.timezone,
+			future=True,
+			base=(
+				new_start_date if new_start_date else event.end().replace(tzinfo=None)
+			),
+		)
 		# create request body
 		event_details = {
-			**event,
+			**event.details,
 			**({"summary": new_summary} if type(new_summary) == str else {}),
 			**({"location": new_location} if type(new_location) == str else {}),
 			**({"description": new_desc} if type(new_desc) == str else {}),
 			"start": {
 				"timeZone": self.timezone,
 				"dateTime": (
-					new_start_str
-					if type(new_start_str) == str
-					else event["start"].get(
-						"dateTime", curr_start_date.strftime("%Y-%m-%dT%H:%M:%S")
-					)
-				),
+					new_start_date if new_start_date is not None else event.start()
+				).strftime("%Y-%m-%dT%H:%M:%S"),
 			},
 			"end": {
 				"timeZone": self.timezone,
 				"dateTime": (
-					new_end_str
-					if type(new_end_str) == str
-					else event["end"].get(
-						"dateTime", curr_end_date.strftime("%Y-%m-%dT%H:%M:%S")
-					)
-				),
+					new_end_date if new_end_date is not None else event.end()
+				).strftime("%Y-%m-%dT%H:%M:%S"),
 			},
 		}
 		# check that new time range is valid
-		new_start_date = self.__get_event_datetime(event_details, "start")
-		new_end_date = self.__get_event_datetime(event_details, "end")
+		new_event = Event(event_details)
+		new_start_date = new_event.start().replace(tzinfo=None)
+		new_end_date = new_event.end().replace(tzinfo=None)
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# update the event
 		updated_event = (
 			self.service.events()
-			.update(calendarId=calendar_id, eventId=event["id"], body=event_details)
+			.update(calendarId=calendar_id, eventId=event.id(), body=event_details)
 			.execute()
 		)
-		return updated_event
+		return Event(updated_event)
 
-	def create_calendar(self, summary: str) -> Dict[str, str]:
-		"""Creates a new public calendar on the service account given the name"""
+	def create_calendar(self, summary: str) -> str:
+		"""Creates a new public calendar on the service account given the name
+		Returns the id of the new calendar"""
 		# create the calendar
 		calendar = {"summary": summary, "timeZone": self.timezone}
 		created_calendar = self.service.calendars().insert(body=calendar).execute()
@@ -217,7 +209,7 @@ class Calendar:
 		self.service.acl().insert(
 			calendarId=created_calendar["id"], body=rule
 		).execute()
-		return created_calendar
+		return created_calendar["id"]
 
 	def get_calendar_list(self) -> Iterable[dict]:
 		"""Returns a complete list of calendars on the service account"""
@@ -233,21 +225,7 @@ class Calendar:
 				break
 		return calendars
 
-	def add_manager(self, calendar_id: str, email: str) -> Dict[str, str]:
+	def add_manager(self, calendar_id: str, email: str) -> None:
 		"""Gives write access to a user for a calendar given an email address"""
 		rule = {"scope": {"type": "user", "value": email,}, "role": "writer"}
-		created_rule = (
-			self.service.acl().insert(calendarId=calendar_id, body=rule).execute()
-		)
-		return created_rule
-
-	def __get_event_datetime(self, event: Dict[str, str], endpoint: str) -> datetime:
-		"""Returns a datetime for a given event
-		Arguments:
-		<event>: the event to get the datetime from
-		<endpoint>: 'start' to get the start time, 'end' to get the end time"""
-		if endpoint not in ("start", "end"):
-			raise ValueError("Expected 'start' or 'end' in get_event_datetime.")
-		return parse_date(
-			event[endpoint].get("dateTime", event[endpoint].get("date"))
-		).replace(tzinfo=None)
+		self.service.acl().insert(calendarId=calendar_id, body=rule).execute()

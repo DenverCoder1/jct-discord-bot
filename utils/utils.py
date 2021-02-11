@@ -105,3 +105,27 @@ def parse_date(
 		**({"RELATIVE_BASE": base} if base else {}),
 	}
 	return dateparser.parse(date_str, settings=settings)
+
+
+def format_date(
+	date: datetime, base: datetime = datetime.now(), all_day: bool = False
+) -> str:
+	"""Convert dates to a specified format
+	Arguments:
+	<date>: The date to format
+	[base]: When the date or time matches the info from base, it will be skipped. \
+		This helps avoid repeated info when formatting time ranges.
+	[all_day]: If set to true, the time of the day will not be included
+	"""
+	format = ""
+	# include the date if the date is different from the base
+	if date.strftime("%d %b") != base.strftime("%d %b"):
+		format = "%a %d %b"
+		# include the year if the date is in a different year
+		if date.year != base.year:
+			format += " %Y"
+	# include the time if it is not an all day event and the time is different from the base
+	if not all_day and date.strftime("%d%b%I:%M%p") != base.strftime("%d%b%I:%M%p"):
+		format += " %I:%M %p"
+	# format the date and remove leading zeros and trailing spaces
+	return date.strftime(format).replace(" 0", " ").strip()

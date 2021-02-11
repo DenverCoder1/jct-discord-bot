@@ -1,7 +1,6 @@
-from datetime import datetime
+from .event import Event
 from typing import Iterable, Dict
 import discord
-from utils.utils import parse_date
 
 
 class CalendarEmbedder:
@@ -11,7 +10,7 @@ class CalendarEmbedder:
 	def embed_event_list(
 		self,
 		title: str,
-		events: Iterable[dict],
+		events: Iterable[Event],
 		description: str = "",
 		colour: discord.Colour = discord.Colour.green(),
 	) -> discord.Embed:
@@ -42,10 +41,7 @@ class CalendarEmbedder:
 		return embed
 
 	def embed_event(
-		self,
-		title: str,
-		event: Dict[str, str],
-		colour: discord.Colour = discord.Colour.green(),
+		self, title: str, event: Event, colour: discord.Colour = discord.Colour.green(),
 	) -> discord.Embed:
 		"""Embed an event with the summary, link, and dates"""
 		embed = discord.Embed(title=title, colour=colour)
@@ -54,45 +50,9 @@ class CalendarEmbedder:
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
-	def __get_formatted_event_details(self, event: Dict[str, str]) -> str:
+	def __get_formatted_event_details(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
-		return (
-			f"**[{event.get('summary')}]({event.get('htmlLink')})**\n"
-			f"{self.__get_formatted_date_range(event)}\n"
-		)
-
-	def __get_formatted_date_range(self, event: Dict[str, str]) -> str:
-		"""Extract dates from event and convert to readable format"""
-		start = event["start"].get("dateTime", event["start"].get("date"))
-		end = event["end"].get("dateTime", event["end"].get("date"))
-		start_date = parse_date(start, tz=self.timezone)
-		end_date = parse_date(end, tz=self.timezone)
-		# all day event
-		if "date" in event["start"]:
-			return f"{self.__format_date(start_date, all_day=True)} - All day"
-		# start and end time
-		formatted_start_date = self.__format_date(start_date)
-		formatted_end_date = self.__format_date(end_date, base=start_date)
-		return formatted_start_date + (
-			f" - {formatted_end_date}" if formatted_end_date else ""
-		)
-
-	def __format_date(
-		self, date: datetime, base: datetime = datetime.now(), all_day: bool = False
-	) -> str:
-		"""Convert dates to a specified format"""
-		format = ""
-		# include the date if the date is different from the base
-		if date.strftime("%d %b") != base.strftime("%d %b"):
-			format = "%a %d %b"
-			# include the year if the date is in a different year
-			if date.year != base.year:
-				format += " %Y"
-		# include the time if it is not an all day event and the time is different from the base
-		if not all_day and date.strftime("%d%b%I:%M%p") != base.strftime("%d%b%I:%M%p"):
-			format += " %I:%M %p"
-		# format the date and remove leading zeros and trailing spaces
-		return date.strftime(format).replace(" 0", " ").strip()
+		return f"**[{event.title()}]({event.link()})**\n{event.date_range_str()}\n"
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
