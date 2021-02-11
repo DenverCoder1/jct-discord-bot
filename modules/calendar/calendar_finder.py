@@ -42,41 +42,31 @@ class CalendarFinder:
 		try:
 			if text:
 				return self.__calendar_from_str(member, text)
-		except ClassRoleError as error:
-			raise error
-		except ClassParseError as error:
+		except ClassParseError:
 			pass
 		# get calendar from user's roles
 		return self.__calendar_from_role(member)
 
 	def __calendar_from_str(self, member: discord.Member, text: str) -> Calendar:
-		try:
-			# parse text for grad_year and campus
-			grad_year, campus = self.__extract_year_and_campus(text)
-			# check that specified calendar is one of the user's roles
-			if (grad_year, campus) not in self.__get_class_roles(member):
-				raise ClassRoleError(
-					"You don't have the required role to access the requested calendar."
-				)
-			# get and return calendar info
-			return Calendar(
-				id=self.get_calendar_id(grad_year, campus),
-				name=f"{campus} {grad_year}",
+		# parse text for grad_year and campus
+		grad_year, campus = self.__extract_year_and_campus(text)
+		# check that specified calendar is one of the user's roles
+		if (grad_year, campus) not in self.__get_class_roles(member):
+			raise ClassRoleError(
+				"You don't have the required role to access the requested calendar."
 			)
-		except (ClassRoleError, ClassParseError) as error:
-			raise error
+		# get and return calendar info
+		return Calendar(
+			id=self.get_calendar_id(grad_year, campus), name=f"{campus} {grad_year}",
+		)
 
 	def __calendar_from_role(self, member: discord.Member) -> Calendar:
-		try:
-			# get grad_year and campus for member
-			grad_year, campus = self.__get_year_campus_from_role(member)
-			# get and return calendar info
-			return Calendar(
-				id=self.get_calendar_id(grad_year, campus),
-				name=f"{campus} {grad_year}",
-			)
-		except (ClassRoleError, ClassParseError) as error:
-			raise error
+		# get grad_year and campus for member
+		grad_year, campus = self.__get_year_campus_from_role(member)
+		# get and return calendar info
+		return Calendar(
+			id=self.get_calendar_id(grad_year, campus), name=f"{campus} {grad_year}",
+		)
 
 	def __get_class_roles(self, member: discord.Member) -> Iterable[tuple]:
 		"""Returns a list of (grad_year, campus) pairs found in a member's roles"""
