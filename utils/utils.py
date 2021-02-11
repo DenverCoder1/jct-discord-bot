@@ -88,7 +88,7 @@ def parse_date(
 	future: bool = None,
 	base: datetime = None,
 	settings: Dict[str, str] = {},
-) -> datetime:
+) -> Optional[datetime]:
 	"""Returns datetime object for given date string
 	Arguments:
 	[tz]: string representing the timezone (ex. "Asia/Jerusalem")
@@ -117,15 +117,15 @@ def format_date(
 		This helps avoid repeated info when formatting time ranges.
 	[all_day]: If set to true, the time of the day will not be included
 	"""
-	format = ""
+	date_format = ""
 	# include the date if the date is different from the base
 	if date.strftime("%d %b %Y") != base.strftime("%d %b %Y"):
-		format = "%a %d %b"
+		date_format = "%a %d %b"
 		# include the year if the date is in a different year
 		if date.year != base.year:
-			format += " %Y"
+			date_format += " %Y"
 	# include the time if it is not an all day event and the time is different from the base
 	if not all_day and date.strftime("%d%b%I:%M%p") != base.strftime("%d%b%I:%M%p"):
-		format += " %I:%M %p"
+		date_format += " %I:%M %p"
 	# format the date and remove leading zeros and trailing spaces
-	return date.strftime(format).replace(" 0", " ").strip()
+	return date.strftime(date_format).replace(" 0", " ").strip()

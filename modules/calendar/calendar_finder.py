@@ -33,7 +33,7 @@ class CalendarFinder:
 				cursor.execute(query, {"text": text})
 				row = cursor.fetchall()
 		if row is not None and len(row) == 1:
-			return row[0]
+			return row[0][0]
 		else:
 			raise ClassRoleError(f"Could not find a matching campus name.")
 

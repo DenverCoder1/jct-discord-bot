@@ -277,7 +277,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				description=(
 					"No events were updated. Please specify which event you would like"
 					" to update. To resolve the issue manually, you can edit directly on Google calendar"
-					f' (use `++calendar.grant` to get access).\n\nShowing results for "{query}"'
+					f' (use `++calendar.grant <email>` to get access).\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
 			)
@@ -352,7 +352,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				description=(
 					"No events were deleted. Please specify which event you would like"
 					" to update. To resolve the issue manually, you can edit directly on Google calendar"
-					f' (use `++calendar.grant` to get access).\n\nShowing results for "{query}"'
+					f' (use `++calendar.grant <email>` to get access).\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
 			)
@@ -385,9 +385,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		If you have more than one class role:
 		```
 		++calendar.grant <email> <Class Name>
-		````
+		```
 		Arguments:
-		**<email>**: Email address to add as a calendar manager
+		**<email>**: Email address to add as a calendar manager.
 		**<Class Name>**: The calendar to grant access to (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# check if calendar was specified

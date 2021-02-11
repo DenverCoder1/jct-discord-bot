@@ -154,16 +154,12 @@ class CalendarService:
 		new_desc = kwargs.get("description", None)
 		# parse new start date if provided
 		new_start_date = parse_date(
-			kwargs.get("start", None),
-			tz=self.timezone,
-			future=True,
-			base=event.start(),
+			kwargs.get("start", None), tz=self.timezone, base=event.start(),
 		)
 		# parse new end date if provided
 		new_end_date = parse_date(
 			kwargs.get("end", None),
 			tz=self.timezone,
-			future=True,
 			base=(new_start_date if new_start_date else event.end()),
 		)
 		# create request body
