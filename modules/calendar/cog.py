@@ -3,7 +3,7 @@ import re
 import discord
 import config
 from discord.ext import commands
-from .calendar import Calendar
+from .calendar_service import CalendarService
 from .calendar_embedder import CalendarEmbedder
 from .calendar_finder import CalendarFinder
 from .course_mentions import CourseMentions
@@ -19,7 +19,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.calendar = Calendar()
+		self.calendar_service = CalendarService()
 		self.calendar_embedder = CalendarEmbedder()
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
@@ -50,7 +50,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 					ctx.channel,
 					ctx.author,
 				)
-			links = self.calendar.get_links(calendar_id)
+			links = self.calendar_service.get_links(calendar_id)
 			embed = self.calendar_embedder.embed_link(
 				f"🔗 Calendar Links for {campus} {grad_year}", links
 			)
@@ -108,7 +108,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		for grad_year, campus in class_roles:
 			# display events for each calendar
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
-			events = self.calendar.fetch_upcoming(calendar_id, max_results, query)
+			events = self.calendar_service.fetch_upcoming(
+				calendar_id, max_results, query
+			)
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"📅 Upcoming Events for {campus} {grad_year}",
 				events=events,
@@ -198,7 +200,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			start = start.replace(" from ", " at ")
 		calendar_id = self.finder.get_calendar_id(grad_year, campus)
 		try:
-			event = self.calendar.add_event(calendar_id, title, start, end)
+			event = self.calendar_service.add_event(calendar_id, title, start, end)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
@@ -286,7 +288,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			except ClassRoleError as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		calendar_id = self.finder.get_calendar_id(grad_year, campus)
-		events = self.calendar.fetch_upcoming(calendar_id, 50, query)
+		events = self.calendar_service.fetch_upcoming(calendar_id, 50, query)
 		if len(events) == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
@@ -313,7 +315,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		for key, value in param_args.items():
 			param_args[key] = self.course_mentions.replace_channel_mentions(value)
 		try:
-			event = self.calendar.update_event(calendar_id, events[0], **param_args)
+			event = self.calendar_service.update_event(
+				calendar_id, events[0], **param_args
+			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
@@ -370,7 +374,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			except ClassRoleError as error:
 				raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		calendar_id = self.finder.get_calendar_id(grad_year, campus)
-		events = self.calendar.fetch_upcoming(calendar_id, 50, query)
+		events = self.calendar_service.fetch_upcoming(calendar_id, 50, query)
 		if len(events) == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
@@ -388,7 +392,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			)
 			return await ctx.send(embed=embed)
 		try:
-			self.calendar.delete_event(calendar_id, events[0])
+			self.calendar_service.delete_event(calendar_id, events[0])
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
@@ -420,7 +424,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		for grad_year, campus in class_roles:
 			calendar_id = self.finder.get_calendar_id(grad_year, campus)
 			# add manager to calendar
-			if self.calendar.add_manager(calendar_id, email):
+			if self.calendar_service.add_manager(calendar_id, email):
 				embed = embed_success(
 					f":office_worker: Successfully added manager to {campus}"
 					f" {grad_year} calendar."
@@ -446,7 +450,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		"""
 		name = " ".join(args)
 		# create calendar
-		new_calendar_id = self.calendar.create_calendar(name)
+		new_calendar_id = self.calendar_service.create_calendar(name)
 		embed = embed_success(
 			f"📆 Successfully created '{name}' calendar.",
 			f"Calendar ID: {new_calendar_id}",
@@ -465,7 +469,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		"""
 		# get calendar list
-		calendars = self.calendar.get_calendar_list()
+		calendars = self.calendar_service.get_calendar_list()
 		details = (f"{calendar['summary']}: {calendar['id']}" for calendar in calendars)
 		await ctx.send("\n".join(details))
 

@@ -7,7 +7,7 @@ from datetime import datetime
 import config
 
 
-class Calendar:
+class CalendarService:
 	def __init__(self):
 		SCOPES = ["https://www.googleapis.com/auth/calendar"]
 		self.creds = service_account.Credentials.from_service_account_info(
