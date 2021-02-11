@@ -51,13 +51,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar_match = re.search(r"\b(\w+ \d{4})", " ".join(args))
 		# get calendar
 		try:
-			if calendar_match is not None:
-				calendar_name = calendar_match.groups()[0]
-				# get calendar specified in arguments
-				calendar = self.finder.calendar_from_str(ctx.author, calendar_name)
-			else:
-				# get calendar from user's roles
-				calendar = self.finder.calendar_from_role(ctx.author)
+			calendar_name = calendar_match.groups()[0] if calendar_match else None
+			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# fetch links for calendar
@@ -93,19 +88,19 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<Class Name>**: The calendar to get events from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# check if calendar was specified
-		calendar_match = re.search(r"in (\w+ \d{4})", " ".join(args))
+		calendar_match = re.search(r"(?:^|in )(\w+ \d{4})$", " ".join(args))
 		# get calendar
 		try:
-			if calendar_match is not None:
-				calendar_name = calendar_match.groups()[0]
-				# get calendar specified in arguments
-				calendar = self.finder.calendar_from_str(ctx.author, calendar_name)
+			calendar_name = calendar_match.groups()[0] if calendar_match else None
+			calendar = self.finder.get_calendar(ctx.author, calendar_name)
+			if calendar_name is not None:
 				# remove words after the last "in" from args
-				last_occurence = len(args) - args[::-1].index("in") - 1
-				args = args[:last_occurence]
-			else:
-				# get calendar from user's roles
-				calendar = self.finder.calendar_from_role(ctx.author)
+				if "in" in args:
+					last_occurence = len(args) - args[::-1].index("in") - 1
+					args = args[:last_occurence]
+				# class name was a full match of args
+				else:
+					args = []
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# extract query string
@@ -193,13 +188,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			)
 		# get calendar
 		try:
+			calendar_name = None
 			if " in " in times:
 				[times, calendar_name] = times.split(" in ", 1)
-				# get calendar specified in arguments
-				calendar = self.finder.calendar_from_str(ctx.author, calendar_name)
-			else:
-				# get calendar from user's roles
-				calendar = self.finder.calendar_from_role(ctx.author)
+			# get calendar specified in arguments
+			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# default values if no separator found
@@ -285,12 +278,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar
 		try:
-			if calendar_name is not None:
-				# get calendar specified in arguments
-				calendar = self.finder.calendar_from_str(ctx.author, calendar_name)
-			else:
-				# get calendar from user's roles
-				calendar = self.finder.calendar_from_role(ctx.author)
+			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		events = self.calendar_service.fetch_upcoming(calendar.id(), 50, query)
@@ -363,12 +351,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		# get calendar
 		try:
-			if calendar_name is not None:
-				# get calendar specified in arguments
-				calendar = self.finder.calendar_from_str(ctx.author, calendar_name)
-			else:
-				# get calendar from user's roles
-				calendar = self.finder.calendar_from_role(ctx.author)
+			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# fetch upcoming events
@@ -426,13 +409,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar_match = re.search(r"\b(\w+ \d{4})", " ".join(args))
 		# get calendar
 		try:
-			if calendar_match is not None:
-				calendar_name = calendar_match.groups()[0]
-				# get calendar specified in arguments
-				calendar = self.finder.calendar_from_str(ctx.author, calendar_name)
-			else:
-				# get calendar from user's roles
-				calendar = self.finder.calendar_from_role(ctx.author)
+			calendar_name = calendar_match.groups()[0] if calendar_match else None
+			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# validate email address

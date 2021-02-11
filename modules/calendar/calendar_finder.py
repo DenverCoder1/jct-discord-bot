@@ -24,7 +24,22 @@ class CalendarFinder:
 		else:
 			raise ClassRoleError(f"Could not find a calendar for {campus} {grad_year}.")
 
-	def calendar_from_str(self, member: discord.Member, text: str) -> Calendar:
+	def get_calendar(self, member: discord.Member, text: str = None) -> Calendar:
+		# get calendar specified in arguments
+		try:
+			if text is not None:
+				return self.__calendar_from_str(member, text)
+		except ClassRoleError as error:
+			raise error
+		except ClassParseError as error:
+			pass
+		# get calendar from user's roles
+		try:
+			return self.__calendar_from_role(member)
+		except (ClassRoleError, ClassParseError) as error:
+			raise error
+
+	def __calendar_from_str(self, member: discord.Member, text: str) -> Calendar:
 		try:
 			# parse text for grad_year and campus
 			grad_year, campus = self.__extract_year_and_campus(text)
@@ -41,7 +56,7 @@ class CalendarFinder:
 		except (ClassRoleError, ClassParseError) as error:
 			raise error
 
-	def calendar_from_role(self, member: discord.Member) -> Calendar:
+	def __calendar_from_role(self, member: discord.Member) -> Calendar:
 		try:
 			# get grad_year and campus for member
 			grad_year, campus = self.__get_year_campus_from_role(member)
