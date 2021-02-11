@@ -154,16 +154,14 @@ class Calendar:
 			kwargs.get("start", None),
 			tz=self.timezone,
 			future=True,
-			base=event.start().replace(tzinfo=None),
+			base=event.start(),
 		)
 		# parse new end date if provided
 		new_end_date = parse_date(
 			kwargs.get("end", None),
 			tz=self.timezone,
 			future=True,
-			base=(
-				new_start_date if new_start_date else event.end().replace(tzinfo=None)
-			),
+			base=(new_start_date if new_start_date else event.end()),
 		)
 		# create request body
 		event_details = {
@@ -186,8 +184,8 @@ class Calendar:
 		}
 		# check that new time range is valid
 		new_event = Event(event_details)
-		new_start_date = new_event.start().replace(tzinfo=None)
-		new_end_date = new_event.end().replace(tzinfo=None)
+		new_start_date = new_event.start()
+		new_end_date = new_event.end()
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# update the event

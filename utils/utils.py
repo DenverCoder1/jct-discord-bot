@@ -102,7 +102,7 @@ def parse_date(
 		**settings,
 		**({"TO_TIMEZONE": tz} if tz else {}),
 		**({"PREFER_DATES_FROM": "future"} if future else {}),
-		**({"RELATIVE_BASE": base} if base else {}),
+		**({"RELATIVE_BASE": base.replace(tzinfo=None)} if base else {}),
 	}
 	return dateparser.parse(date_str, settings=settings)
 
