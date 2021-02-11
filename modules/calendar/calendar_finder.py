@@ -5,6 +5,7 @@ from typing import Iterable
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from utils.sql_fetcher import SqlFetcher
+import re
 
 
 class CalendarFinder:
@@ -82,11 +83,10 @@ class CalendarFinder:
 
 	def __extract_year_and_campus(self, text: str):
 		"""Extract campus name and graduation year from input text"""
-		# parse graduation year in text
-		digits = "".join(c for c in text if c.isdigit())
-		if len(digits) == 4 and digits[:2] == "20":  # TODO: fix in 22nd century
-			grad_year = int(digits)
-		else:
+		try:
+			# TODO: fix in 22nd century
+			grad_year = int(re.search(r"20\d\d", text).group(0))
+		except AttributeError:
 			raise ClassParseError("Could not parse graduation year")
 		# parse campus name in text
 		if "lev" in text.lower():
