@@ -56,6 +56,14 @@ class Event:
 			If neither are present, returns None."""
 		return self.tz
 
+	def location(self) -> str:
+		"""Returns the location of the event"""
+		return self.details.get('location')
+
+	def description(self) -> str:
+		"""Returns the description of the event"""
+		return self.details.get('description')
+
 	def __get_endpoint(self, endpoint: str) -> datetime:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
 		return parse_date(

@@ -1,3 +1,4 @@
+import re
 from .event import Event
 from typing import Iterable, Dict
 import discord
@@ -50,9 +51,33 @@ class CalendarEmbedder:
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
+	def __trim_text_links_preserved(self, text: str, max: int = 30) -> str:
+		"""Trims a string of text to a maximum number of characters,
+		but preserves links using markdown if they get cut off"""
+		trimmed = text[:max] + "..." if len(text) > max else text
+		# if link got trimmed, hyperlink it to the full version
+		if re.search(r"\s*(https?:\S*$)", trimmed):
+			# get the part before the link is cut off
+			link_fragment_match = re.search(r"\S*$", text[:max])
+			link_fragment = link_fragment_match.group(0)
+			before = link_fragment_match.start()
+			# get the full word at the cut-off
+			full_link = link_fragment + re.search(r"^\S*", text[max:]).group(0)
+			# replace link fragment with markdown link
+			trimmed = text[:before] + f'[{link_fragment}...]({full_link} "{full_link}")'
+		return trimmed
+
 	def __get_formatted_event_details(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
-		return f"**[{event.title()}]({event.link()})**\n{event.date_range_str()}\n"
+		info = f"**[{event.title()}]({event.link()})**\n"
+		info += f"{event.date_range_str()}\n"
+		if event.description():
+			# trim to max 30 chars
+			info += f"{self.__trim_text_links_preserved(event.description())}\n"
+		if event.location():
+			# trim to max 30 chars
+			info += f":round_pushpin: {self.__trim_text_links_preserved(event.location())}\n"
+		return info
 
 	def __get_footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
