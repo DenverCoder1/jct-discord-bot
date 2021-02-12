@@ -72,8 +72,8 @@ class CalendarEmbedder:
 		info = f"**[{event.title()}]({event.link()})**\n"
 		info += f"{event.date_range_str()}\n"
 		if event.description():
-			# trim to max 30 chars
-			info += f"{self.__trim_text_links_preserved(event.description())}\n"
+			# trim to max 35 chars
+			info += f"{self.__trim_text_links_preserved(event.description(), max=35)}\n"
 		if event.location():
 			# trim to max 30 chars
 			info += f":round_pushpin: {self.__trim_text_links_preserved(event.location())}\n"
