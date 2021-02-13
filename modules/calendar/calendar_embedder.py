@@ -54,17 +54,21 @@ class CalendarEmbedder:
 	def __trim_text_links_preserved(self, text: str, max: int = 30) -> str:
 		"""Trims a string of text to a maximum number of characters,
 		but preserves links using markdown if they get cut off"""
-		trimmed = text[:max] + "..." if len(text) > max else text
-		# if link got trimmed, hyperlink it to the full version
-		if re.search(r"\s*(https?:\S*$)", trimmed):
-			# get the part before the link is cut off
-			link_fragment_match = re.search(r"\S*$", text[:max])
-			link_fragment = link_fragment_match.group(0)
-			before = link_fragment_match.start()
+		# trims the text normally
+		trimmed = text[:max].strip() + "..." if len(text) > max else text
+		# get the part before and after the text is cut off
+		before_match = re.search(r"\S+$", text[:max])
+		after_match = re.search(r"^\S+", text[max:])
+		if before_match and after_match:
 			# get the full word at the cut-off
-			full_link = link_fragment + re.search(r"^\S*", text[max:]).group(0)
-			# replace link fragment with markdown link
-			trimmed = text[:before] + f'[{link_fragment}...]({full_link} "{full_link}")'
+			before = before_match.group(0)
+			after = after_match.group(0)
+			full = before + after
+			# check if the word that got cut off is a link
+			if re.match(r"^https?:\S*$", full):
+				# replace link fragment with markdown link
+				start = before_match.start()
+				trimmed = text[:start] + f'[{before}...]({full} "{full}")'
 		return trimmed
 
 	def __get_formatted_event_details(self, event: Event) -> str:
