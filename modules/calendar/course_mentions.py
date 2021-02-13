@@ -38,3 +38,11 @@ class CourseMentions:
 			return self.get_channel_full_name(channel_id)
 		# not a channel mention
 		return word
+
+	def replace_channel_mentions(self, text: str):
+		return " ".join(
+			map(
+				self.map_channel_mention,
+				text.replace("<", " <").replace(">", "> ").split(),
+			)
+		)
