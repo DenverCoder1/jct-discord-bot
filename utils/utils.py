@@ -84,6 +84,7 @@ def build_aliases(
 
 def parse_date(
 	date_str: str,
+	from_tz: str = "Asia/Jerusalem",
 	tz: str = None,
 	future: bool = None,
 	base: datetime = None,
@@ -100,6 +101,7 @@ def parse_date(
 		return None
 	settings = {
 		**settings,
+		"TIMEZONE": from_tz,
 		**({"TO_TIMEZONE": tz} if tz else {}),
 		**({"PREFER_DATES_FROM": "future"} if future else {}),
 		**({"RELATIVE_BASE": base.replace(tzinfo=None)} if base else {}),
