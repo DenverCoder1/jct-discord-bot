@@ -84,15 +84,17 @@ def build_aliases(
 
 def parse_date(
 	date_str: str,
-	from_tz: str = "Asia/Jerusalem",
-	tz: str = None,
+	from_tz: str = None,
+	to_tz: str = None,
 	future: bool = None,
 	base: datetime = None,
 	settings: Dict[str, str] = {},
 ) -> Optional[datetime]:
 	"""Returns datetime object for given date string
 	Arguments:
-	[tz]: string representing the timezone (ex. "Asia/Jerusalem")
+	<date_str>: date string to parse
+	[from_tz]: string representing the timezone to interpret the date as (ex. "Asia/Jerusalem")
+	[to_tz]: string representing the timezone to return the date in (ex. "Asia/Jerusalem")
 	[future]: set to true to prefer dates from the future when parsing
 	[base]: datetime representing where dates should be parsed relative to
 	[settings]: dict of additional settings for dateparser.parse()
@@ -101,8 +103,8 @@ def parse_date(
 		return None
 	settings = {
 		**settings,
-		"TIMEZONE": from_tz,
-		**({"TO_TIMEZONE": tz} if tz else {}),
+		**({"TIMEZONE": from_tz} if from_tz else {}),
+		**({"TO_TIMEZONE": to_tz} if to_tz else {}),
 		**({"PREFER_DATES_FROM": "future"} if future else {}),
 		**({"RELATIVE_BASE": base.replace(tzinfo=None)} if base else {}),
 	}

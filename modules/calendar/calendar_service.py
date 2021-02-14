@@ -76,13 +76,21 @@ class CalendarService:
 		and optionally, the end time, location and description."""
 		all_day = False
 		# parse start date
-		start_date = parse_date(start, tz=self.timezone, future=True)
+		start_date = parse_date(
+			start, from_tz=self.timezone, to_tz=self.timezone, future=True
+		)
 		# check start date
 		if start_date is None:
 			raise ValueError(f'Start date "{start}" could not be parsed.')
 		# parse end date
 		if end is not None:
-			end_date = parse_date(end, tz=self.timezone, future=True, base=start_date)
+			end_date = parse_date(
+				end,
+				from_tz=self.timezone,
+				to_tz=self.timezone,
+				future=True,
+				base=start_date,
+			)
 		else:
 			# if no end date was specified, use the start time
 			end_date = start_date
@@ -154,12 +162,16 @@ class CalendarService:
 		new_desc = kwargs.get("description", None)
 		# parse new start date if provided
 		new_start_date = parse_date(
-			kwargs.get("start", None), tz=self.timezone, base=event.start(),
+			kwargs.get("start", None),
+			from_tz=self.timezone,
+			to_tz=self.timezone,
+			base=event.start(),
 		)
 		# parse new end date if provided
 		new_end_date = parse_date(
 			kwargs.get("end", None),
-			tz=self.timezone,
+			from_tz=self.timezone,
+			to_tz=self.timezone,
 			base=(new_start_date if new_start_date else event.end()),
 		)
 		# create request body

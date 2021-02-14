@@ -68,5 +68,6 @@ class Event:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
 		return parse_date(
 			self.details[endpoint].get("dateTime", self.details[endpoint].get("date")),
-			tz=self.timezone(),
+			from_tz=self.timezone(),
+			to_tz=self.timezone()
 		)
