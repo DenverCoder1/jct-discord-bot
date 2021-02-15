@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict
 from utils.utils import format_date, parse_date
 
@@ -38,14 +38,18 @@ class Event:
 
 	def end_str(self, base=datetime.now()) -> str:
 		"""Returns a formatted string of the end date"""
-		return format_date(self.end(), all_day=self.all_day(), base=base)
+		end_date = self.end()
+		# use previous day if end of multi-day, all-day event
+		if self.all_day() and not self.__one_day():
+			end_date -= timedelta(days=1)
+		return format_date(end_date, all_day=self.all_day(), base=base)
 
 	def date_range_str(self) -> str:
 		"""Returns a formatted string of the start to end date range"""
 		start_str = self.start_str()
 		end_str = self.end_str(base=self.start())
 		# all day event
-		if self.all_day():
+		if self.__one_day():
 			return f"{start_str} - All day"
 		# include end time if it is not the same as the start time
 		return f"{start_str} - {end_str}" if end_str else start_str
@@ -71,3 +75,7 @@ class Event:
 			from_tz=self.timezone(),
 			to_tz=self.timezone()
 		)
+
+	def __one_day(self) -> bool:
+		"""Returns whether or not the event is a one day event"""
+		return self.all_day() and self.end() - self.start() == timedelta(days=1)
