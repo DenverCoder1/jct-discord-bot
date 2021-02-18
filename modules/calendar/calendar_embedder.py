@@ -7,6 +7,7 @@ import discord
 class CalendarEmbedder:
 	def __init__(self):
 		self.timezone = "Asia/Jerusalem"
+		self.max_length = 2048
 
 	def embed_event_list(
 		self,
@@ -24,7 +25,11 @@ class CalendarEmbedder:
 		else:
 			# add events to embed
 			event_details = map(self.__get_formatted_event_details, events)
-			embed.description += "\n".join(event_details)
+			for details in event_details:
+				# make sure embed doesn't exceed max size
+				if len(embed.description + "\n" + details) > self.max_length:
+					break
+				embed.description += "\n" + details
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
