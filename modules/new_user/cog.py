@@ -1,43 +1,26 @@
-from modules.new_user.join_parser import JoinParseError, JoinParser
-import config
+from modules.new_user.greeter import Greeter
 import discord
+import utils.utils as utils
 from discord.ext import commands
-import modules.new_user.utils as utils
 
 
-class NewUserCog(commands.Cog):
-	def __init__(self, bot):
+class NewUserCog(commands.Cog, name="New User"):
+	"""Ask members who join to use the join command"""
+
+	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.attempts = {}
-
-	@commands.command(name="join")
-	async def join(self, ctx: commands.Context):
-		"""Join command to get new users information and place them in the right roles"""
-		try:
-			parser = JoinParser(ctx.message.content)
-			await utils.assign(ctx.author, parser.name, parser.campus, parser.year)
-		except JoinParseError as err:
-			if ctx.author not in self.attempts:
-				self.attempts[ctx.author] = 0
-			await ctx.send(f"{ctx.author.mention} {err}")
-			if self.attempts[ctx.author] > 1:
-				await ctx.send(
-					f"{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
-					f" Help! {ctx.author.mention} doesn't seem to be able to read"
-					" instructions."
-				)
-			self.attempts[ctx.author] += 1
+		self.greeter = Greeter(bot)
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member: discord.Member):
-		"""Welcome members who join."""
+		"""Ask members who join to use the join command."""
 		print(f"{member.name} joined the server.")
 
-		await utils.give_initial_role(member)
+		await self.greeter.give_initial_role(member)
 
 		if not member.bot:
-			await utils.server_greet(member)
-			await utils.private_greet(member)
+			await self.greeter.server_greet(member)
+			await self.greeter.private_greet(member)
 
 
 # setup functions for bot

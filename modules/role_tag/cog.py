@@ -4,23 +4,24 @@ from discord.ext import commands
 import discord
 
 
-class RoleTagsCog(commands.Cog):
-	def __init__(self, bot):
+class RoleTagsCog(commands.Cog, name="Role Tags"):
+	"""Changes nicknames to include tags represented by the user's roles"""
+
+	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before: discord.Member, after: discord.Member):
-		if before.roles != after.roles:
-			before = Member(before)
-			after = Member(after)
-			if before.tags() != after.tags():
-				await after.apply_tags()
-				print(
-					"Renamed",
-					before.inner_member.display_name,
-					"to",
-					after.inner_member.display_name,
-				)
+		before = Member(before)
+		after = Member(after)
+		if after.current_tags() != after.tags():
+			await after.apply_tags()
+			print(
+				"Renamed",
+				before.inner_member.display_name,
+				"to",
+				after.inner_member.display_name,
+			)
 
 	@commands.Cog.listener()
 	async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
@@ -32,5 +33,5 @@ class RoleTagsCog(commands.Cog):
 				await Member(member).apply_tags()
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
 	bot.add_cog(RoleTagsCog(bot))
