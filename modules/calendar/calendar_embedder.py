@@ -1,6 +1,7 @@
 import re
 from .event import Event
 from typing import Iterable, Dict
+from functools import reduce
 import discord
 
 
@@ -59,6 +60,9 @@ class CalendarEmbedder:
 	def __trim_text_links_preserved(self, text: str, max: int = 30) -> str:
 		"""Trims a string of text to a maximum number of characters,
 		but preserves links using markdown if they get cut off"""
+		# check for server emoji tags and increase max by the sum of the characters in the emoji tags
+		emoji_list = re.findall("<:[\w-]+:\d+>", text[:max])
+		max += reduce(lambda x, y: x + len(y) - 1, emoji_list, 0)
 		# trims the text normally
 		trimmed = text[:max].strip() + "..." if len(text) > max else text
 		# get the part before and after the text is cut off
