@@ -34,7 +34,7 @@ class Event:
 
 	def start_str(self) -> str:
 		"""Returns a formatted string of the start date"""
-		return format_date(self.start(), all_day=self.all_day())
+		return format_date(self.start(), all_day=self.all_day()) or "Today"
 
 	def end_str(self, base=datetime.now()) -> str:
 		"""Returns a formatted string of the end date"""
