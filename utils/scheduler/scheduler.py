@@ -18,10 +18,13 @@ class Scheduler:
 	def schedule(dependency_index: int = 0):
 		"""
 		Use the decorator @Scheduler.schedule() to make your function run at certain events.
-		If you require your function to run after any other which is also scheduled for the same event, pass an use @Scheduler.schedule(n) where n is greater than the number passed to the scheduler (default is 0)
+		If you require your function to run after any other which is also scheduled for the same event, pass an use @Scheduler.schedule(n) where n is greater than the number passed to the scheduler for the function which yours depends on (default is 0).
+
 		Available events are:
 		- on_new_academic_year
 		- on_winter_semester_start
+
+		Note: You must name the function the same as the event name.
 		"""
 
 		def decorator(func):
