@@ -116,7 +116,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			name, surname, ctx.message.channel_mentions, self.categoriser, member_id
 		)
 		person = self.finder.get_people([person_id])
-		await ctx.send(self.embedder.gen_embed(person))
+		await ctx.send(embed=self.embedder.gen_embed(person))
 
 	@commands.command(name="link")
 	@commands.has_guild_permissions(manage_roles=True)
