@@ -1,3 +1,4 @@
+import asyncio
 import os
 import re
 import discord
@@ -11,7 +12,7 @@ from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email, build_aliases, embed_success
+from utils.utils import is_email, build_aliases, embed_success, wait_for_reaction
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -28,8 +29,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="calendar.links",
-			prefix=("calendar", "events", "event"),
-			suffix=("link", "links"),
+			prefix=["calendar", "events", "event"],
+			suffix=["link", "links"],
 		)
 	)
 	async def calendar_links(self, ctx, *args):
@@ -62,9 +63,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.list",
-			prefix=("calendar", "events", "event"),
-			suffix=("upcoming", "list", "events", "search"),
-			more_aliases=("upcoming", "events"),
+			prefix=["events", "event"],
+			suffix=["upcoming", "list", "events", "search"],
+			more_aliases=["upcoming", "events"],
 		)
 	)
 	async def events_list(self, ctx: commands.Context, *args):
@@ -121,9 +122,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.add",
-			prefix=("calendar", "events", "event"),
-			suffix=("add", "create", "new"),
-			more_aliases=("addevent", "createevent", "newevent"),
+			prefix=["events", "event"],
+			suffix=["add", "create", "new"],
+			more_aliases=["addevent", "createevent", "newevent"],
 		)
 	)
 	async def add_event(self, ctx: commands.Context, *args):
@@ -201,9 +202,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.update",
-			prefix=("calendar", "events", "event"),
-			suffix=("update", "change", "edit"),
-			more_aliases=("updateevent", "editevent", "changeevent"),
+			prefix=["calendar", "events", "event"],
+			suffix=["update", "change", "edit"],
+			more_aliases=["updateevent", "editevent", "changeevent"],
 		)
 	)
 	async def update_event(self, ctx: commands.Context, *, args=None):
@@ -305,9 +306,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.delete",
-			prefix=("calendar", "events", "event"),
-			suffix=("delete", "remove"),
-			more_aliases=("deleteevent", "removeevent"),
+			prefix=["calendar", "events", "event"],
+			suffix=["delete", "remove"],
+			more_aliases=["deleteevent", "removeevent"],
 		)
 	)
 	async def delete_event(self, ctx: commands.Context, *args):
@@ -370,8 +371,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="calendar.grant",
-			prefix=("calendar", "events"),
-			suffix=("grant", "manage", "allow", "invite"),
+			prefix=["calendar", "events"],
+			suffix=["grant", "manage", "allow", "invite"],
 		)
 	)
 	async def addmanager(self, ctx: commands.Context, *args):
@@ -413,7 +414,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				"An error occurred while applying changes.", ctx.channel, ctx.author
 			)
 
-	@commands.command(name="createcalendar")
+	@commands.command(
+		**build_aliases(
+			name="calendars.create",
+			prefix=["calendar", "calendars"],
+			suffix=["create"],
+			more_aliases=["createcalendar"],
+		)
+	)
 	@commands.has_permissions(manage_roles=True)
 	async def createcalendar(self, ctx: commands.Context, *args):
 		"""
@@ -425,6 +433,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		> **JCT CompSci Lev 2020**: name of the calendar to create
+
+		**Note:** to use this command, the user must have permission to manage roles.
 		"""
 		name = " ".join(args)
 		# create calendar
@@ -435,7 +445,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		)
 		await ctx.send(embed=embed)
 
-	@commands.command(name="listcalendars")
+	@commands.command(
+		**build_aliases(
+			name="calendars.list",
+			prefix=["calendar", "calendars"],
+			suffix=["list"],
+		)
+	)
 	@commands.has_permissions(manage_roles=True)
 	async def listcalendars(self, ctx):
 		"""
@@ -445,11 +461,42 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		++listcalendars
 		```
+		**Note:** to use this command, the user must have permission to manage roles.
 		"""
 		# get calendar list
 		calendars = self.calendar_service.get_calendar_list()
 		details = (f"{calendar['summary']}: {calendar['id']}" for calendar in calendars)
 		await ctx.send("\n".join(details))
+
+	@commands.command(
+		**build_aliases(
+			name="calendar.reaction",
+			prefix=["calendar", "events", "event"],
+			suffix=["reaction"],
+			more_aliases=["reaction"]
+		)
+	)
+	async def reaction(self, ctx):
+		message = await ctx.send("React to this message")
+		try:
+			timeout = 60
+			reaction, user = await wait_for_reaction(
+				bot=self.bot,
+				message=message,
+				emoji_list=["1️⃣", "2️⃣", "3️⃣"],
+				allowed_users=[ctx.author],
+				timeout=timeout
+			)
+		except asyncio.TimeoutError as error:
+			# clear reactions
+			await message.clear_reactions()
+			# raise timeout error as friendly error
+			raise FriendlyError(f"No one reacted within {timeout} seconds", ctx.channel, ctx.author, error)
+		else:
+			# clear reactions
+			await message.clear_reactions()
+			# update selected message
+			await message.edit(content=f"{user.mention} reacted with the {str(reaction.emoji)} emoji")
 
 
 # setup functions for bot

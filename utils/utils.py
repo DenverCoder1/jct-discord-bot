@@ -1,11 +1,12 @@
+import os
+import re
 import csv
 from datetime import datetime
 from itertools import product
-import os
-from typing import Dict, Iterable, List, Mapping, Optional, Tuple
+from typing import Dict, Iterable, Mapping, Optional, Tuple
 import dateparser
 import discord
-import re
+from discord.ext import commands
 
 
 class IdNotFoundError(Exception):
@@ -129,7 +130,39 @@ def format_date(
 		if date.year != base.year:
 			date_format += " %Y"
 	# include the time if it is not an all day event and the time is different from the base
-	if not all_day and date.strftime("%d%b%I:%M:%S%p") != base.strftime("%d%b%I:%M:%S%p"):
+	if not all_day and date.strftime("%d%b%I%M%S%p") != base.strftime("%d%b%I%M%S%p"):
 		date_format += " %I:%M %p"
 	# format the date and remove leading zeros and trailing spaces
 	return date.strftime(date_format).replace(" 0", " ").strip()
+
+
+async def wait_for_reaction(
+	bot: commands.Bot,
+	message: discord.Message,
+	emoji_list: Iterable[str],
+	allowed_users: Iterable[discord.Member] = (),
+	timeout: int = 60,
+):
+	"""Add reactions to message and wait for user to react with one
+	
+	Arguments:
+	<bot>: str - the bot user
+	<message>: str - the message to apply reactions to
+	<emoji_list>: Iterable[str] - list of emojis as strings to add as reactions
+	[allowed_users]: Iterable[discord.Member] - if specified, only reactions from these users are accepted
+	[timeout]: int - number of seconds to wait before timing out
+	"""
+
+	def validate_reaction(reaction, user):
+		"""Validate that reaction is one of the options, not a reaction by the bot, and user is allowed"""
+		return (
+			str(reaction.emoji) in emoji_list
+			and user != bot.user
+			and (len(allowed_users) == 0 or user in allowed_users)
+		)
+
+	# add reactions to the message
+	for emoji in emoji_list:
+		await message.add_reaction(emoji)
+	# wait for reaction and return the reaction and user
+	return await bot.wait_for("reaction_add", check=validate_reaction, timeout=timeout)
