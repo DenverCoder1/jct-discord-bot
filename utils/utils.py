@@ -1,3 +1,4 @@
+import asyncio
 import os
 import re
 import csv
@@ -7,7 +8,7 @@ from typing import Dict, Iterable, Mapping, Optional, Tuple
 import dateparser
 import discord
 from discord.ext import commands
-
+from modules.error.friendly_error import FriendlyError
 
 class IdNotFoundError(Exception):
 	def __init__(self, *args: object) -> None:
@@ -140,10 +141,11 @@ async def wait_for_reaction(
 	bot: commands.Bot,
 	message: discord.Message,
 	emoji_list: Iterable[str],
-	allowed_users: Iterable[discord.Member] = (),
+	allowed_users: Iterable[discord.Member] = None,
 	timeout: int = 60,
-):
-	"""Add reactions to message and wait for user to react with one
+) -> int:
+	"""Add reactions to message and wait for user to react with one.
+	Returns the index of the selected emoji (integer in range 0 to len(emoji_list) - 1)
 	
 	Arguments:
 	<bot>: str - the bot user
@@ -158,11 +160,28 @@ async def wait_for_reaction(
 		return (
 			str(reaction.emoji) in emoji_list
 			and user != bot.user
-			and (len(allowed_users) == 0 or user in allowed_users)
+			and (allowed_users is None or user in allowed_users)
 		)
 
 	# add reactions to the message
 	for emoji in emoji_list:
 		await message.add_reaction(emoji)
-	# wait for reaction and return the reaction and user
-	return await bot.wait_for("reaction_add", check=validate_reaction, timeout=timeout)
+
+	try:
+		# wait for reaction (returns reaction and user)
+		reaction, _ = await bot.wait_for("reaction_add", check=validate_reaction, timeout=timeout)
+	except asyncio.TimeoutError as error:
+		# clear reactions
+		await message.clear_reactions()
+		# raise timeout error as friendly error
+		raise FriendlyError(
+			f"You did not react within {timeout} seconds",
+			message.channel,
+			allowed_users[0] if len(allowed_users) == 1 else None,
+			error,
+		)
+	else:
+		# clear reactions
+		await message.clear_reactions()
+		# return the index of the emoji selection
+		return emoji_list.index(str(reaction.emoji))

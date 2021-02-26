@@ -20,7 +20,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	def __init__(self, bot):
 		self.bot = bot
 		self.calendar_service = CalendarService()
-		self.calendar_embedder = CalendarEmbedder(bot)
+		self.calendar_embedder = CalendarEmbedder()
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
@@ -268,13 +268,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# get a list of upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		num_events = len(events)
 		# no events found
-		if len(events) == 0:
+		if num_events == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
 		# multiple events found
-		elif len(events) > 1:
+		elif num_events > 1:
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"⚠ Multiple events were found.",
 				events=events,
@@ -287,11 +288,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			)
 			await response.edit(embed=embed)
 			# ask user to pick an event with emojis
-			selection_index = await self.calendar_embedder.wait_for_selection(
-				ctx=ctx,
+			selection_index = await wait_for_reaction(
+				bot=self.bot,
 				message=response,
-				enumeration=self.number_emoji,
-				num_events=len(events),
+				emoji_list=self.number_emoji[:num_events],
+				allowed_users=[ctx.author]
 			)
 			# get the event selected by the user
 			event_to_update = events[selection_index]
@@ -358,13 +359,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# fetch upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		num_events = len(events)
 		# no events found
-		if len(events) == 0:
+		if num_events == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
 		# multiple events found
-		elif len(events) > 1:
+		elif num_events > 1:
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"⚠ Multiple events were found.",
 				events=events,
@@ -377,11 +379,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			)
 			await response.edit(embed=embed)
 			# ask user to pick an event with emojis
-			selection_index = await self.calendar_embedder.wait_for_selection(
-				ctx=ctx,
+			selection_index = await wait_for_reaction(
+				bot=self.bot,
 				message=response,
-				enumeration=self.number_emoji,
-				num_events=len(events),
+				emoji_list=self.number_emoji[:num_events],
+				allowed_users=[ctx.author]
 			)
 			# get the event selected by the user
 			event_to_delete = events[selection_index]
