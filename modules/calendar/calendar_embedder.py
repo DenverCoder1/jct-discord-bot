@@ -34,20 +34,19 @@ class CalendarEmbedder:
 			embed.description += "No events found"
 		else:
 			# add events to embed
-			event_details = map(self.__get_formatted_event_details, events)
-			for i, details in enumerate(event_details):
+			for i, event in enumerate(events):
 				# add enumeration emoji if available, otherwise, just the details
 				event_description = (
-					f"\n{enumeration[i]} {details}"
+					f"\n{enumeration[i]} {self.__format_event(event)}"
 					if i < len(enumeration)
-					else f"\n{details}"
+					else f"\n{self.__format_event(event)}"
 				)
 				# make sure embed doesn't exceed max size
 				if len(embed.description + event_description) > self.max_length:
 					break
 				# add event to embed
 				embed.description += event_description
-		embed.set_footer(text=self.__get_footer_text())
+		embed.set_footer(text=self.__footer_text())
 		return embed
 
 	def embed_link(
@@ -69,8 +68,8 @@ class CalendarEmbedder:
 		"""Embed an event with the summary, link, and dates"""
 		embed = discord.Embed(title=title, colour=colour)
 		# add overview of event to the embed
-		embed.description = self.__get_formatted_event_details(event)
-		embed.set_footer(text=self.__get_footer_text())
+		embed.description = self.__format_event(event)
+		embed.set_footer(text=self.__footer_text())
 		return embed
 
 	def __trim_text_links_preserved(self, text: str, max: int = 30) -> str:
@@ -96,7 +95,7 @@ class CalendarEmbedder:
 				trimmed = text[:start] + f'[{before}...]({full} "{full}")'
 		return trimmed
 
-	def __get_formatted_event_details(self, event: Event) -> str:
+	def __format_event(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
 		info = f"**[{event.title()}]({event.link()})**\n"
 		info += f"{event.date_range_str()}\n"
@@ -108,6 +107,6 @@ class CalendarEmbedder:
 			info += f":round_pushpin: {self.__trim_text_links_preserved(event.location())}\n"
 		return info
 
-	def __get_footer_text(self):
+	def __footer_text(self):
 		"""Return text about timezone to display at end of embeds with dates"""
 		return f"Times are shown for {self.timezone}"
