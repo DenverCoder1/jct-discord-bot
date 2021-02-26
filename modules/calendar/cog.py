@@ -25,6 +25,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
+		self.number_emoji = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
 
 	@commands.command(
 		**build_aliases(
@@ -240,6 +241,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**location**: The new location of the event.
 		**description**: The new description of the event.
 		"""
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# check command syntax
 		allowed_params = "|".join(("title", "start", "end", "location", "description"))
 		# check for correct pattern in message
@@ -265,24 +267,57 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		# get a list of upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		# no events found
 		if len(events) == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
-		if len(events) > 1:
-			# TODO: Allow user to choose an event
+		# multiple events found
+		elif len(events) > 1:
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"⚠ Multiple events were found.",
 				events=events,
 				description=(
-					"No events were updated. Please specify which event you would like"
-					" to update. To resolve the issue manually, you can edit directly on Google calendar"
-					f' (use `++calendar.grant <email>` to get access).\n\nShowing results for "{query}"'
+					"Please specify which event you would like to update."
+					f'\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
+				enumeration=self.number_emoji,
 			)
-			return await ctx.send(embed=embed)
+			await response.edit(embed=embed)
+			try:
+				timeout = 60
+				# get reaction and user
+				reaction, _ = await wait_for_reaction(
+					bot=self.bot,
+					message=response,
+					emoji_list=self.number_emoji[:len(events)],
+					allowed_users=[ctx.author],
+					timeout=timeout
+				)
+			except asyncio.TimeoutError as error:
+				# clear reactions
+				await response.clear_reactions()
+				# raise timeout error as friendly error
+				raise FriendlyError (
+					f"You did not react within {timeout} seconds",
+					ctx.channel,
+					ctx.author,
+					error,
+				)
+			else:
+				# clear reactions
+				await response.clear_reactions()
+				# get emoji selection index
+				emoji_index = self.number_emoji.index(str(reaction.emoji))
+				# get the event to update based on selection
+				event_to_update = events[emoji_index]
+		# only 1 event found
+		else:
+			# get the event at index 0
+			event_to_update = events[0]
 		# Extract params into kwargs
 		param_args = dict(
 			re.findall(
@@ -294,14 +329,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			param_args[key] = self.course_mentions.replace_channel_mentions(value)
 		try:
 			event = self.calendar_service.update_event(
-				calendar.id, events[0], **param_args
+				calendar.id, event_to_update, **param_args
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
 			":white_check_mark: Event updated successfully", event
 		)
-		await ctx.send(embed=embed)
+		await response.edit(embed=embed)
 
 	@commands.command(
 		**build_aliases(
@@ -329,6 +364,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
 		**<Class Name>**: The calendar to delete the event from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(" ".join(args))
 		match = re.search(r"^\s*(.*?)\s*(in \w{3} \d{4})?\s*$", query)
@@ -341,32 +377,64 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# fetch upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		# no events found
 		if len(events) == 0:
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
-		if len(events) > 1:
-			# TODO: Allow user to choose an event
+		# multiple events found
+		elif len(events) > 1:
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"⚠ Multiple events were found.",
 				events=events,
 				description=(
-					"No events were deleted. Please specify which event you would like"
-					" to update. To resolve the issue manually, you can edit directly on Google calendar"
-					f' (use `++calendar.grant <email>` to get access).\n\nShowing results for "{query}"'
+					'Please specify which event you would like to delete.'
+					f'\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
+				enumeration=self.number_emoji,
 			)
-			return await ctx.send(embed=embed)
+			await response.edit(embed=embed)
+			try:
+				timeout = 60
+				# get reaction and user
+				reaction, _ = await wait_for_reaction(
+					bot=self.bot,
+					message=response,
+					emoji_list=self.number_emoji[:len(events)],
+					allowed_users=[ctx.author],
+					timeout=timeout
+				)
+			except asyncio.TimeoutError as error:
+				# clear reactions
+				await response.clear_reactions()
+				# raise timeout error as friendly error
+				raise FriendlyError (
+					f"You did not react within {timeout} seconds",
+					ctx.channel,
+					ctx.author,
+					error,
+				)
+			else:
+				# clear reactions
+				await response.clear_reactions()
+				# get emoji selection index
+				emoji_index = self.number_emoji.index(str(reaction.emoji))
+				# get the event to update based on selection
+				event_to_delete = events[emoji_index]
+		# only 1 event found
+		else:
+			# get the event at index 0 if there's only 1
+			event_to_delete = events[0]
 		# delete event
 		try:
-			self.calendar_service.delete_event(calendar.id, events[0])
+			self.calendar_service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
-			"🗑 Event deleted successfully", events[0]
+			"🗑 Event deleted successfully", event_to_delete
 		)
-		await ctx.send(embed=embed)
+		await response.edit(embed=embed)
 
 	@commands.command(
 		**build_aliases(
@@ -467,36 +535,6 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendars = self.calendar_service.get_calendar_list()
 		details = (f"{calendar['summary']}: {calendar['id']}" for calendar in calendars)
 		await ctx.send("\n".join(details))
-
-	@commands.command(
-		**build_aliases(
-			name="calendar.reaction",
-			prefix=["calendar", "events", "event"],
-			suffix=["reaction"],
-			more_aliases=["reaction"]
-		)
-	)
-	async def reaction(self, ctx):
-		message = await ctx.send("React to this message")
-		try:
-			timeout = 60
-			reaction, user = await wait_for_reaction(
-				bot=self.bot,
-				message=message,
-				emoji_list=["1️⃣", "2️⃣", "3️⃣"],
-				allowed_users=[ctx.author],
-				timeout=timeout
-			)
-		except asyncio.TimeoutError as error:
-			# clear reactions
-			await message.clear_reactions()
-			# raise timeout error as friendly error
-			raise FriendlyError(f"No one reacted within {timeout} seconds", ctx.channel, ctx.author, error)
-		else:
-			# clear reactions
-			await message.clear_reactions()
-			# update selected message
-			await message.edit(content=f"{user.mention} reacted with the {str(reaction.emoji)} emoji")
 
 
 # setup functions for bot

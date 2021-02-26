@@ -16,8 +16,17 @@ class CalendarEmbedder:
 		events: Iterable[Event],
 		description: str = "",
 		colour: discord.Colour = discord.Colour.green(),
+		enumeration: Iterable[str] = [],
 	) -> discord.Embed:
-		"""Generates an embed with event summaries, links, and dates for each event in the given list"""
+		"""Generates an embed with event summaries, links, and dates for each event in the given list
+
+		Arguments:
+		<title> - title to display at the top
+		<events> - list of events to embed
+		[description] - description to embed below the title
+		[colour] - embed colour
+		[enumeration] - list of emojis to display alongside events in order (for reaction choices)
+		"""
 		embed = discord.Embed(title=title, colour=colour)
 		# set initial description if available
 		embed.description = "" if description == "" else f"{description}\n\n"
@@ -26,11 +35,16 @@ class CalendarEmbedder:
 		else:
 			# add events to embed
 			event_details = map(self.__get_formatted_event_details, events)
-			for details in event_details:
+			for i, details in enumerate(event_details):
+				# add enumeration emoji if available
+				event_description = f"\n{enumeration[i]} " if i < len(enumeration) else "\n"
+				# add event details
+				event_description += details;
 				# make sure embed doesn't exceed max size
-				if len(embed.description + "\n" + details) > self.max_length:
+				if len(embed.description + event_description) > self.max_length:
 					break
-				embed.description += "\n" + details
+				# add event to embed
+				embed.description += event_description
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
 
