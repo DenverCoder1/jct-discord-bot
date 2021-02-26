@@ -240,7 +240,6 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**location**: The new location of the event.
 		**description**: The new description of the event.
 		"""
-		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# check command syntax
 		allowed_params = "|".join(("title", "start", "end", "location", "description"))
 		# check for correct pattern in message
@@ -266,11 +265,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		# loading message
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# get a list of upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
 		num_events = len(events)
 		# no events found
 		if num_events == 0:
+			await response.delete()
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
@@ -314,6 +316,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				calendar.id, event_to_update, **param_args
 			)
 		except ValueError as error:
+			await response.delete()
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
 			":white_check_mark: Event updated successfully", event
@@ -346,7 +349,6 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
 		**<Class Name>**: The calendar to delete the event from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
-		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(" ".join(args))
 		match = re.search(r"^\s*(.*?)\s*(in \w{3} \d{4})?\s*$", query)
@@ -357,11 +359,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		# loading message
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# fetch upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
 		num_events = len(events)
 		# no events found
 		if num_events == 0:
+			await response.delete()
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
@@ -395,6 +400,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		try:
 			self.calendar_service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
+			await response.delete()
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
 			"🗑 Event deleted successfully", event_to_delete
