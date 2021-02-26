@@ -292,7 +292,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				bot=self.bot,
 				message=response,
 				emoji_list=self.number_emoji[:num_events],
-				allowed_users=[ctx.author]
+				allowed_users=[ctx.author],
 			)
 			# get the event selected by the user
 			event_to_update = events[selection_index]
@@ -383,7 +383,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				bot=self.bot,
 				message=response,
 				emoji_list=self.number_emoji[:num_events],
-				allowed_users=[ctx.author]
+				allowed_users=[ctx.author],
 			)
 			# get the event selected by the user
 			event_to_delete = events[selection_index]

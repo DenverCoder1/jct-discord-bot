@@ -1,4 +1,3 @@
-import asyncio
 import os
 import re
 import csv
@@ -6,6 +5,7 @@ from datetime import datetime
 from itertools import product
 from typing import Dict, Iterable, Mapping, Optional, Tuple
 import dateparser
+import asyncio
 import discord
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
