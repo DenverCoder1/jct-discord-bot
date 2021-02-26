@@ -1,4 +1,3 @@
-import asyncio
 import os
 import re
 import discord
@@ -21,7 +20,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	def __init__(self, bot):
 		self.bot = bot
 		self.calendar_service = CalendarService()
-		self.calendar_embedder = CalendarEmbedder()
+		self.calendar_embedder = CalendarEmbedder(bot)
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
@@ -287,33 +286,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				enumeration=self.number_emoji,
 			)
 			await response.edit(embed=embed)
-			try:
-				timeout = 60
-				# get reaction and user
-				reaction, _ = await wait_for_reaction(
-					bot=self.bot,
-					message=response,
-					emoji_list=self.number_emoji[:len(events)],
-					allowed_users=[ctx.author],
-					timeout=timeout
-				)
-			except asyncio.TimeoutError as error:
-				# clear reactions
-				await response.clear_reactions()
-				# raise timeout error as friendly error
-				raise FriendlyError (
-					f"You did not react within {timeout} seconds",
-					ctx.channel,
-					ctx.author,
-					error,
-				)
-			else:
-				# clear reactions
-				await response.clear_reactions()
-				# get emoji selection index
-				emoji_index = self.number_emoji.index(str(reaction.emoji))
-				# get the event to update based on selection
-				event_to_update = events[emoji_index]
+			# ask user to pick an event with emojis
+			selection_index = await self.calendar_embedder.wait_for_selection(
+				ctx=ctx,
+				message=response,
+				enumeration=self.number_emoji,
+				num_events=len(events),
+			)
+			# get the event selected by the user
+			event_to_update = events[selection_index]
 		# only 1 event found
 		else:
 			# get the event at index 0
@@ -395,33 +376,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				enumeration=self.number_emoji,
 			)
 			await response.edit(embed=embed)
-			try:
-				timeout = 60
-				# get reaction and user
-				reaction, _ = await wait_for_reaction(
-					bot=self.bot,
-					message=response,
-					emoji_list=self.number_emoji[:len(events)],
-					allowed_users=[ctx.author],
-					timeout=timeout
-				)
-			except asyncio.TimeoutError as error:
-				# clear reactions
-				await response.clear_reactions()
-				# raise timeout error as friendly error
-				raise FriendlyError (
-					f"You did not react within {timeout} seconds",
-					ctx.channel,
-					ctx.author,
-					error,
-				)
-			else:
-				# clear reactions
-				await response.clear_reactions()
-				# get emoji selection index
-				emoji_index = self.number_emoji.index(str(reaction.emoji))
-				# get the event to update based on selection
-				event_to_delete = events[emoji_index]
+			# ask user to pick an event with emojis
+			selection_index = await self.calendar_embedder.wait_for_selection(
+				ctx=ctx,
+				message=response,
+				enumeration=self.number_emoji,
+				num_events=len(events),
+			)
+			# get the event selected by the user
+			event_to_delete = events[selection_index]
 		# only 1 event found
 		else:
 			# get the event at index 0 if there's only 1

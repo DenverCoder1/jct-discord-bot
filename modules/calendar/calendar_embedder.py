@@ -1,12 +1,17 @@
+import asyncio
 import re
 from .event import Event
 from typing import Iterable, Dict
 from functools import reduce
 import discord
+from discord.ext import commands
+from utils.utils import wait_for_reaction
+from modules.error.friendly_error import FriendlyError
 
 
 class CalendarEmbedder:
-	def __init__(self):
+	def __init__(self, bot):
+		self.bot = bot
 		self.timezone = "Asia/Jerusalem"
 		self.max_length = 2048
 
@@ -25,7 +30,7 @@ class CalendarEmbedder:
 		<events> - list of events to embed
 		[description] - description to embed below the title
 		[colour] - embed colour
-		[enumeration] - list of emojis to display alongside events in order (for reaction choices)
+		[enumeration] - list of emojis to display alongside events (for reaction choices)
 		"""
 		embed = discord.Embed(title=title, colour=colour)
 		# set initial description if available
@@ -36,10 +41,12 @@ class CalendarEmbedder:
 			# add events to embed
 			event_details = map(self.__get_formatted_event_details, events)
 			for i, details in enumerate(event_details):
-				# add enumeration emoji if available
-				event_description = f"\n{enumeration[i]} " if i < len(enumeration) else "\n"
-				# add event details
-				event_description += details;
+				# add enumeration emoji if available, otherwise, just the details
+				event_description = (
+					f"\n{enumeration[i]} {details}"
+					if i < len(enumeration)
+					else f"\n{details}"
+				)
 				# make sure embed doesn't exceed max size
 				if len(embed.description + event_description) > self.max_length:
 					break
@@ -70,6 +77,40 @@ class CalendarEmbedder:
 		embed.description = self.__get_formatted_event_details(event)
 		embed.set_footer(text=self.__get_footer_text())
 		return embed
+
+	async def wait_for_selection(
+		self,
+		ctx: commands.Context,
+		message: discord.Message,
+		enumeration: Iterable[str],
+		num_events: int,
+		timeout: int = 60,
+	):
+		"""Adds reactions to message, waits for selection, clears reactions, and returns selection index"""
+		try:
+			# get reaction and user
+			reaction, _ = await wait_for_reaction(
+				bot=self.bot,
+				message=message,
+				emoji_list=enumeration[:num_events],
+				allowed_users=[ctx.author],
+				timeout=timeout,
+			)
+		except asyncio.TimeoutError as error:
+			# clear reactions
+			await message.clear_reactions()
+			# raise timeout error as friendly error
+			raise FriendlyError(
+				f"You did not react within {timeout} seconds",
+				ctx.channel,
+				ctx.author,
+				error,
+			)
+		else:
+			# clear reactions
+			await message.clear_reactions()
+			# get emoji selection index
+			return enumeration.index(str(reaction.emoji))
 
 	def __trim_text_links_preserved(self, text: str, max: int = 30) -> str:
 		"""Trims a string of text to a maximum number of characters,
