@@ -24,13 +24,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
-		self.number_emoji = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
+		self.number_emoji = ("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
 
 	@commands.command(
 		**build_aliases(
 			name="calendar.links",
-			prefix=["calendar", "events", "event"],
-			suffix=["link", "links"],
+			prefix=("calendar", "events", "event"),
+			suffix=("link", "links"),
 		)
 	)
 	async def calendar_links(self, ctx, *args):
@@ -63,9 +63,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.list",
-			prefix=["events", "event"],
-			suffix=["upcoming", "list", "events", "search"],
-			more_aliases=["upcoming", "events"],
+			prefix=("events", "event"),
+			suffix=("upcoming", "list", "events", "search"),
+			more_aliases=("upcoming", "events"),
 		)
 	)
 	async def events_list(self, ctx: commands.Context, *args):
@@ -122,9 +122,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.add",
-			prefix=["events", "event"],
-			suffix=["add", "create", "new"],
-			more_aliases=["addevent", "createevent", "newevent"],
+			prefix=("events", "event"),
+			suffix=("add", "create", "new"),
+			more_aliases=("addevent", "createevent", "newevent"),
 		)
 	)
 	async def add_event(self, ctx: commands.Context, *args):
@@ -202,9 +202,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.update",
-			prefix=["calendar", "events", "event"],
-			suffix=["update", "change", "edit"],
-			more_aliases=["updateevent", "editevent", "changeevent"],
+			prefix=("calendar", "events", "event"),
+			suffix=("update", "change", "edit"),
+			more_aliases=("updateevent", "editevent", "changeevent"),
 		)
 	)
 	async def update_event(self, ctx: commands.Context, *, args=None):
@@ -323,9 +323,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.delete",
-			prefix=["calendar", "events", "event"],
-			suffix=["delete", "remove"],
-			more_aliases=["deleteevent", "removeevent"],
+			prefix=("calendar", "events", "event"),
+			suffix=("delete", "remove"),
+			more_aliases=("deleteevent", "removeevent"),
 		)
 	)
 	async def delete_event(self, ctx: commands.Context, *args):
@@ -404,8 +404,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="calendar.grant",
-			prefix=["calendar", "events"],
-			suffix=["grant", "manage", "allow", "invite"],
+			prefix=("calendar", "events"),
+			suffix=("grant", "manage", "allow", "invite"),
 		)
 	)
 	async def addmanager(self, ctx: commands.Context, *args):
@@ -450,7 +450,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="calendars.create",
-			prefix=["calendar", "calendars"],
+			prefix=("calendar", "calendars"),
 			suffix=["create"],
 			more_aliases=["createcalendar"],
 		)
@@ -481,7 +481,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="calendars.list",
-			prefix=["calendar", "calendars"],
+			prefix=("calendar", "calendars"),
 			suffix=["list"],
 		)
 	)
