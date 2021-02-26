@@ -96,7 +96,7 @@ class CalendarService:
 			end_date = start_date
 			# if words suggest no time was specified, make it an all day event
 			time_words = (" at ", " from ", "am ", " midnight ", ":")
-			if start_date.strftime("%H:%M") == "00:00" and not any(
+			if start_date.time() == datetime.min.time() and not any(
 				word in f" {start} " for word in time_words
 			):
 				all_day = True

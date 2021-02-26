@@ -125,13 +125,13 @@ def format_date(
 	"""
 	date_format = ""
 	# include the date if the date is different from the base
-	if date.strftime("%d %b %Y") != base.strftime("%d %b %Y"):
+	if date.date() != base.date():
 		date_format = "%a %d %b"
 		# include the year if the date is in a different year
 		if date.year != base.year:
 			date_format += " %Y"
 	# include the time if it is not an all day event and the time is different from the base
-	if not all_day and date.strftime("%d%b%I%M%S%p") != base.strftime("%d%b%I%M%S%p"):
+	if not all_day and date.isoformat('T', 'seconds') != base.isoformat('T', 'seconds'):
 		date_format += " %I:%M %p"
 	# format the date and remove leading zeros and trailing spaces
 	return date.strftime(date_format).replace(" 0", " ").strip()

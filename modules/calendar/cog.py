@@ -64,8 +64,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**build_aliases(
 			name="events.list",
 			prefix=("events", "event"),
-			suffix=("upcoming", "list", "events", "search"),
-			more_aliases=("upcoming", "events"),
+			suffix=("upcoming", "list", "events", "search", "show", "get"),
+			more_aliases=("upcoming", "events", "getevents", "listevents"),
 		)
 	)
 	async def events_list(self, ctx: commands.Context, *args):
@@ -457,7 +457,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**build_aliases(
 			name="calendars.create",
 			prefix=("calendar", "calendars"),
-			suffix=["create"],
+			suffix=("add", "create", "new"),
 			more_aliases=["createcalendar"],
 		)
 	)
@@ -468,7 +468,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
-		++createcalendar "JCT CompSci Lev 2020"
+		++calendars.create "JCT CompSci Lev 2020"
 		```
 		Arguments:
 		> **JCT CompSci Lev 2020**: name of the calendar to create
@@ -488,7 +488,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**build_aliases(
 			name="calendars.list",
 			prefix=("calendar", "calendars"),
-			suffix=["list"],
+			suffix=("list", "show", "get"),
+			more_aliases=["listcalendars"],
 		)
 	)
 	@commands.has_permissions(manage_roles=True)
@@ -498,7 +499,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
-		++listcalendars
+		++calendars.list
 		```
 		**Note:** to use this command, the user must have permission to manage roles.
 		"""
