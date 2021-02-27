@@ -119,8 +119,8 @@ def format_date(
 	"""Convert dates to a specified format
 	Arguments:
 	<date>: The date to format
-	[base]: When the date or time matches the info from base, it will be skipped. \
-		This helps avoid repeated info when formatting time ranges.
+	[base]: When the date or time matches the info from base, it will be skipped.
+			This helps avoid repeated info when formatting time ranges.
 	[all_day]: If set to true, the time of the day will not be included
 	"""
 	date_format = ""
@@ -131,7 +131,7 @@ def format_date(
 		if date.year != base.year:
 			date_format += " %Y"
 	# include the time if it is not an all day event and the time is different from the base
-	if not all_day and date.isoformat('T', 'seconds') != base.isoformat('T', 'seconds'):
+	if not all_day and date != base:
 		date_format += " %I:%M %p"
 	# format the date and remove leading zeros and trailing spaces
 	return date.strftime(date_format).replace(" 0", " ").strip()
