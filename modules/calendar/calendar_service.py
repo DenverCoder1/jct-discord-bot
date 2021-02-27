@@ -16,8 +16,6 @@ class CalendarService:
 		)
 		self.service = build("calendar", "v3", credentials=self.creds)
 		self.timezone = "Asia/Jerusalem"
-		self.date_time_format = "%Y-%m-%dT%H:%M:%S"
-		self.date_format = "%Y-%m-%d"
 
 	def get_links(self, calendar_id: str) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
@@ -113,19 +111,19 @@ class CalendarService:
 			"description": description,
 			"start": (
 				{
-					"dateTime": start_date.strftime(self.date_time_format),
+					"dateTime": start_date.isoformat("T", "seconds"),
 					"timeZone": self.timezone,
 				}
 				if not all_day
-				else {"date": start_date.strftime(self.date_format)}
+				else {"date": start_date.date().isoformat()}
 			),
 			"end": (
 				{
-					"dateTime": end_date.strftime(self.date_time_format),
+					"dateTime": end_date.isoformat("T", "seconds"),
 					"timeZone": self.timezone,
 				}
 				if not all_day
-				else {"date": end_date.strftime(self.date_format)}
+				else {"date": end_date.date().isoformat()}
 			),
 		}
 		# Add event to the calendar
@@ -184,13 +182,13 @@ class CalendarService:
 				"timeZone": self.timezone,
 				"dateTime": (
 					new_start_date if new_start_date is not None else event.start()
-				).strftime(self.date_time_format),
+				).isoformat("T", "seconds"),
 			},
 			"end": {
 				"timeZone": self.timezone,
 				"dateTime": (
 					new_end_date if new_end_date is not None else event.end()
-				).strftime(self.date_time_format),
+				).isoformat("T", "seconds"),
 			},
 		}
 		# check that new time range is valid
