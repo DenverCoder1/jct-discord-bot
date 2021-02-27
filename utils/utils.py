@@ -126,12 +126,15 @@ def format_date(
 	date_format = ""
 	# include the date if the date is different from the base
 	if date.date() != base.date():
+		# %a = Weekday (ex. "Mon"), %d = Day (ex. "01"), %b = Month (ex. "Sep")
 		date_format = "%a %d %b"
 		# include the year if the date is in a different year
 		if date.year != base.year:
+			# %Y = Year (ex. "2021")
 			date_format += " %Y"
-	# include the time if it is not an all day event and the time is different from the base
+	# include the time if it is not an all day event and not the same as the base
 	if not all_day and date != base:
+		# %I = Hours (12-hour clock), %M = Minutes, %p = AM or PM
 		date_format += " %I:%M %p"
 	# format the date and remove leading zeros and trailing spaces
 	return date.strftime(date_format).replace(" 0", " ").strip()
