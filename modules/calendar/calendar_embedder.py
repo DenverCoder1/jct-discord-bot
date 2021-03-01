@@ -35,12 +35,12 @@ class CalendarEmbedder:
 		else:
 			# add events to embed
 			for i, event in enumerate(events):
-				# add enumeration emoji if available, otherwise, just the details
-				event_description = (
-					f"\n{enumeration[i]} {self.__format_event(event)}"
-					if i < len(enumeration)
-					else f"\n{self.__format_event(event)}"
-				)
+				event_description = "\n"
+				# add enumeration emoji if available
+				if i < len(enumeration):
+					event_description += f"{enumeration[i]} "
+				# add the event details
+				event_description += self.__format_event(event)
 				# make sure embed doesn't exceed max size
 				if len(embed.description + event_description) > self.max_length:
 					break
