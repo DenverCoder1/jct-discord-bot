@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import re
 import discord
@@ -6,12 +7,14 @@ from discord.ext import commands
 from .calendar_service import CalendarService
 from .calendar_embedder import CalendarEmbedder
 from .calendar_finder import CalendarFinder
+from .calendar_creator import CalendarCreator
 from .course_mentions import CourseMentions
 from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
 from utils.utils import is_email, build_aliases, embed_success, wait_for_reaction
+from utils.scheduler.scheduler import Scheduler
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -23,6 +26,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.calendar_embedder = CalendarEmbedder()
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
+		self.calendar_creator = CalendarCreator(self.calendar_service, config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
 		self.number_emoji = ("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
 
@@ -505,8 +509,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		"""
 		# get calendar list
 		calendars = self.calendar_service.get_calendar_list()
-		details = (f"{calendar['summary']}: {calendar['id']}" for calendar in calendars)
+		details = (f"{calendar.name}: {calendar.id}" for calendar in calendars)
 		await ctx.send("\n".join(details))
+
+	@Scheduler.schedule(1)
+	async def on_new_academic_year(self):
+		"""Create calendars for each campus and update the database"""
+		year = datetime.now().year + 3
+		await self.calendar_creator.create_class_calendars(year)
 
 
 # setup functions for bot
