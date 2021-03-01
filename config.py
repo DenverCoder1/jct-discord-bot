@@ -1,6 +1,7 @@
 from dotenv.main import load_dotenv
 import os
 import psycopg2
+import discord
 
 
 prefix = "++"
@@ -9,6 +10,9 @@ load_dotenv()
 
 # Discord setup
 token = os.getenv("DISCORD_TOKEN")
+
+guild_id = os.getenv("DISCORD_GUILD")
+guild: discord.Guild = None  # To be loaded on ready
 
 # Connect to database
 conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")

@@ -10,7 +10,7 @@ class ErrorLogCog(commands.Cog, name="Error Logs"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL_ID"), bot)
+		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL"), bot)
 		self.handler = ErrorHandler(self.logger)
 
 	@commands.command(name="logs")

@@ -42,11 +42,12 @@ class Scheduler:
 
 	def __await_new_academic_year(self):
 		"""Event that will run every year on Av 26 at 4pm"""
-		secs = self.__secs_to_heb_date(5, 26, 16)
+		# secs = self.__secs_to_heb_date(5, 26, 16)
+		secs = self.__secs_to_heb_date(12, 17, 1, 57)
 		self.__await_event(secs, "on_new_academic_year", self.__await_new_academic_year)
 
 	def __await_winter_semester_start(self):
-		"""Event that will run every year on Tishrei 18 at 4pm"""
+		"""Event that will run every year on Tishri 18 at 4pm"""
 		secs = self.__secs_to_heb_date(7, 18, 16)
 		self.__await_event(
 			secs, "on_winter_semester_start", self.__await_winter_semester_start
@@ -81,5 +82,6 @@ class Scheduler:
 		return (dt_trigger - now).total_seconds()
 
 	async def __trigger_event(self, name: str, on_complete):
+		print(f"Triggering event: {name}")
 		await Scheduler.events[name].fire(self.bot)
 		on_complete()

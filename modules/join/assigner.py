@@ -10,9 +10,9 @@ class Assigner:
 	"""
 
 	def __init__(self, guild: discord.Guild):
-		self.unassigned_role = guild.get_role(utils.get_id("UNASSIGNED_ROLE_ID"))
-		self.student_role = guild.get_role(utils.get_id("STUDENT_ROLE_ID"))
-		self.welcome_channel = guild.get_channel(utils.get_id("OFF_TOPIC_CHANNEL_ID"))
+		self.unassigned_role = guild.get_role(utils.get_id("UNASSIGNED_ROLE"))
+		self.student_role = guild.get_role(utils.get_id("STUDENT_ROLE"))
+		self.welcome_channel = guild.get_channel(utils.get_id("OFF_TOPIC_CHANNEL"))
 
 	async def assign(self, member: discord.Member, name: str, campus: str, year: int):
 		if self.unassigned_role in member.roles:
@@ -25,8 +25,8 @@ class Assigner:
 
 	async def __add_role(self, member: discord.Member, campus: str, year: int):
 		"""adds the right role to the user that used the command"""
-		# formatting role for csv file, eg LEV_YEAR_1_ROLE_ID
-		role_label = f"{campus.upper()}_YEAR_{year}_ROLE_ID"
+		# formatting role for csv file, eg LEV_YEAR_1_ROLE
+		role_label = f"{campus.upper()}_YEAR_{year}_ROLE"
 		class_role = utils.get_discord_obj(member.guild.roles, role_label)
 
 		# check if the role was found

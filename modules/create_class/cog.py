@@ -1,4 +1,5 @@
-from modules.create_class.class_creator import classes_creator
+from .class_channel_creator import ClassChannelCreator
+from .class_creator import classes_creator
 from utils.scheduler.scheduler import Scheduler
 from utils.sql_fetcher import SqlFetcher
 from utils import utils
@@ -21,10 +22,9 @@ class CreateClassCog(commands.Cog, name="Year Roles"):
 		"""Create roles for lev and tal of the new year."""
 		year = datetime.datetime.now().year + 3
 		# Create class objects for each campus of the new year
-		classes = await self.classes_creator.create_classes(
-			year, self.bot.get_guild(utils.get_id("JCT_GUILD_ID"))
-		)
-		# TODO: Add a record to the classes table for each of the created classes
+		classes = await self.classes_creator.create_classes(year)
+		# Create a channel for all the classes of the new year
+		await ClassChannelCreator.create_class_channel(f"{year}-all", classes)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
