@@ -78,4 +78,4 @@ class Event:
 
 	def __one_day(self) -> bool:
 		"""Returns whether or not the event is a one day event"""
-		return self.all_day() and self.end() - self.start() == timedelta(days=1)
+		return self.all_day() and self.end() - self.start() <= timedelta(days=1)
