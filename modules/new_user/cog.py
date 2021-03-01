@@ -1,6 +1,6 @@
 from modules.new_user.greeter import Greeter
 import discord
-import utils.utils as utils
+from utils import utils
 from discord.ext import commands
 
 

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import utils.utils as utils
+from utils import utils
 import config
 
 
@@ -23,11 +23,11 @@ class Greeter:
 		)
 
 	def __intro_channel(self):
-		guild = self.bot.get_guild(utils.get_id("JCT_GUILD_ID"))
-		return guild.get_channel(utils.get_id("INTRO_CHANNEL_ID"))
+		guild = self.bot.get_guild(utils.get_id("JCT_GUILD"))
+		return guild.get_channel(utils.get_id("INTRO_CHANNEL"))
 
 	async def give_initial_role(self, member: discord.Member):
-		label = "BOT_ROLE_ID" if member.bot else "UNASSIGNED_ROLE_ID"
+		label = "BOT_ROLE" if member.bot else "UNASSIGNED_ROLE"
 		role = member.guild.get_role(utils.get_id(label))
 		await member.add_roles(role)
 		print(f"Gave {role.name} to {member.name}")
