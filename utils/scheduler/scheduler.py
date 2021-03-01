@@ -42,8 +42,8 @@ class Scheduler:
 
 	def __await_new_academic_year(self):
 		"""Event that will run every year on Av 26 at 4pm"""
-		# secs = self.__secs_to_heb_date(5, 26, 16)
-		secs = self.__secs_to_heb_date(12, 17, 1, 57)
+		# TODO: restore: secs = self.__secs_to_heb_date(5, 26, 16)
+		secs = self.__secs_to_heb_date(12, 17, 14, 17, 30)
 		self.__await_event(secs, "on_new_academic_year", self.__await_new_academic_year)
 
 	def __await_winter_semester_start(self):
@@ -56,7 +56,12 @@ class Scheduler:
 	def __await_event(self, secs: int, event_name: str, on_complete):
 		if threading.TIMEOUT_MAX > secs:
 			threading.Timer(
-				secs, asyncio.run, args=(self.__trigger_event(event_name, on_complete),)
+				secs,
+				asyncio.run_coroutine_threadsafe,
+				args=(
+					self.__trigger_event(event_name, on_complete),
+					asyncio.get_running_loop(),
+				),
 			).start()
 
 	def __secs_to_heb_date(

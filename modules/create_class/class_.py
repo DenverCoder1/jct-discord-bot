@@ -20,6 +20,7 @@ class Class:
 
 	async def add_to_system(self):
 		await self.__create_role()
+		await self.__move_role()
 		await self.__create_class_channel()
 		self.__add_to_database()
 
@@ -40,6 +41,11 @@ class Class:
 			hoist=True,
 			mentionable=True,
 		)
+
+	async def __move_role(self):
+		# TODO: calculate the new position
+		positions = {self.role: new_position}
+		config.guild.edit_role_positions(positions)
 
 	async def __create_class_channel(self):
 		self.channel = await ClassChannelCreator.create_class_channel(
