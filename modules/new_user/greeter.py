@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import utils.utils as utils
+from utils import utils
 import config
 
 

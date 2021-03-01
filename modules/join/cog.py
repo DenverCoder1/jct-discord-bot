@@ -1,8 +1,11 @@
+import os
 from utils import utils
 from modules.join.assigner import Assigner
 from modules.error.friendly_error import FriendlyError
 from modules.join.join_parser import JoinParseError, JoinParser
 from discord.ext import commands
+from utils.sql_fetcher import SqlFetcher
+import config
 
 
 class JoinCog(commands.Cog, name="Join"):
@@ -12,10 +15,11 @@ class JoinCog(commands.Cog, name="Join"):
 		self.bot = bot
 		self.assigner = None
 		self.attempts = {}
+		self.sql_fetcher = SqlFetcher(os.path.join("modules", "join", "queries"))
 
 	@commands.Cog.listener()
 	async def on_ready(self):
-		self.assigner = Assigner(self.bot.get_guild(utils.get_id("JCT_GUILD")))
+		self.assigner = Assigner(config.guild, config.conn, self.sql_fetcher)
 
 	@commands.command(name="join")
 	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
