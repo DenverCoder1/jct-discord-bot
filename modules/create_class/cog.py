@@ -24,7 +24,7 @@ class CreateClassCog(commands.Cog, name="Year Roles"):
 		# Create class objects for each campus of the new year
 		classes = await self.classes_creator.create_classes(year)
 		# Create a channel for all the classes of the new year
-		await ClassChannelCreator.create_class_channel(f"{year}-all", classes)
+		await ClassChannelCreator.create_class_channel(f"🧮{year}-all", classes)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

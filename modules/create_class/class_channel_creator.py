@@ -15,5 +15,7 @@ class ClassChannelCreator:
 
 		category = utils.get_discord_obj(config.guild.categories, "CLASS_CHAT_CATEGORY")
 		return await category.create_text_channel(
-			name=name, overwrites=overwrites, position=len(category.channels),
+			name=name,
+			overwrites=overwrites,
+			position=len(category.channels) + category.channels[0].position,
 		)

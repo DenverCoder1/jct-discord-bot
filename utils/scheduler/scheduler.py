@@ -42,8 +42,7 @@ class Scheduler:
 
 	def __await_new_academic_year(self):
 		"""Event that will run every year on Av 26 at 4pm"""
-		# TODO: restore: secs = self.__secs_to_heb_date(5, 26, 16)
-		secs = self.__secs_to_heb_date(12, 17, 14, 17, 30)
+		secs = self.__secs_to_heb_date(5, 26, 16)
 		self.__await_event(secs, "on_new_academic_year", self.__await_new_academic_year)
 
 	def __await_winter_semester_start(self):

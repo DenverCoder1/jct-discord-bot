@@ -43,13 +43,19 @@ class Class:
 		)
 
 	async def __move_role(self):
-		# TODO: calculate the new position
+		query = self.__sql_fetcher["get_roles.sql"]
+		with self.__conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query)
+				roles = [row[0] for row in cursor.fetchall()]
+		positions = [config.guild.get_role(role).position for role in roles]
+		new_position = min(positions) - 1
 		positions = {self.role: new_position}
-		config.guild.edit_role_positions(positions)
+		await config.guild.edit_role_positions(positions)
 
 	async def __create_class_channel(self):
 		self.channel = await ClassChannelCreator.create_class_channel(
-			f"{self.year}-{self.campus.name.lower()}", [self]
+			f"📚{self.year}-{self.campus.name.lower()}", [self]
 		)
 
 	def __add_to_database(self):
