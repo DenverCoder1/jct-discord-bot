@@ -2,7 +2,7 @@ import discord
 from utils.utils import get_discord_obj
 import psycopg2.extensions as sql
 from utils.sql_fetcher import SqlFetcher
-from .campus import Campus
+from utils.campus.campus import Campus
 from .class_channel_creator import ClassChannelCreator
 import config
 
