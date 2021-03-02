@@ -114,37 +114,19 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			max_results = 15
 		# loading message
 		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
-		# fetch events
-		events, page_token = self.calendar_service.fetch_upcoming(
-			calendar.id, max_results, full_query
-		)
 		# set initial page number
-		page_num = 1 if page_token else None
-		# create embed
-		embed = self.calendar_embedder.embed_event_list(
-			title=f"📅 Upcoming Events for {calendar.name}",
-			events=events,
-			description=f'Showing results for "{full_query}"' if full_query else "",
-			page_num=page_num,
-		)
-		# send list of events
-		await response.edit(embed=embed)
-		# add reaction for requesting more events
-		while page_token:
+		page_num = 1
+		page_token = None
+		# display events and allow showing more with reactions
+		while True:
 			try:
-				# wait for author to respond with "⏬"
-				await wait_for_reaction(
-					bot=self.bot,
-					message=response,
-					emoji_list=["⏬"],
-					allowed_users=[ctx.author]
-				)
-				# fetch next page of events
+				# fetch a page of events
 				events, page_token = self.calendar_service.fetch_upcoming(
 					calendar.id, max_results, full_query, page_token
 				)
-				# increment page count
-				page_num += 1
+				# don't show page number if only 1 page
+				if page_num == 1 and not page_token:
+					page_num = None
 				# create embed
 				embed = self.calendar_embedder.embed_event_list(
 					title=f"📅 Upcoming Events for {calendar.name}",
@@ -154,6 +136,18 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				)
 				# send list of events
 				await response.edit(embed=embed)
+				# break when no more events
+				if not page_token:
+					break
+				# wait for author to respond with "⏬"
+				await wait_for_reaction(
+					bot=self.bot,
+					message=response,
+					emoji_list=["⏬"],
+					allowed_users=[ctx.author]
+				)
+				# increment page count
+				page_num += 1
 			# time window exceeded
 			except FriendlyError:
 				break
