@@ -17,6 +17,7 @@ class CalendarEmbedder:
 		description: str = "",
 		colour: discord.Colour = discord.Colour.green(),
 		enumeration: Iterable[str] = [],
+		page_num: int = None,
 	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
@@ -46,7 +47,7 @@ class CalendarEmbedder:
 					break
 				# add event to embed
 				embed.description += event_description
-		embed.set_footer(text=self.__footer_text())
+		embed.set_footer(text=self.__footer_text(page_num=page_num))
 		return embed
 
 	def embed_link(
@@ -107,6 +108,8 @@ class CalendarEmbedder:
 			info += f":round_pushpin: {self.__trim_text_links_preserved(event.location())}\n"
 		return info
 
-	def __footer_text(self):
+	def __footer_text(self, page_num: int = None) -> str:
 		"""Return text about timezone to display at end of embeds with dates"""
-		return f"Times are shown for {self.timezone}"
+		page_num_text = f"Page {page_num} | " if page_num is not None else ""
+		timezone_text = f"Times are shown for {self.timezone}"
+		return page_num_text + timezone_text
