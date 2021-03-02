@@ -114,8 +114,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			max_results = 15
 		# loading message
 		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
-		# set initial page number
-		page_num = 1
+		# set initial page number and token
+		page_num = None
 		page_token = None
 		# display events and allow showing more with reactions
 		while True:
@@ -123,10 +123,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				# fetch a page of events
 				events, page_token = self.calendar_service.fetch_upcoming(
 					calendar.id, max_results, full_query, page_token
-				)
-				# don't show page number if only 1 page
-				if page_num == 1 and not page_token:
-					page_num = None
+				)					
+				# initialize count if there are multiple pages
+				if page_num is None and page_token:
+					page_num = 1
 				# create embed
 				embed = self.calendar_embedder.embed_event_list(
 					title=f"📅 Upcoming Events for {calendar.name}",
