@@ -158,10 +158,16 @@ async def wait_for_reaction(
 	[timeout]: int - number of seconds to wait before timing out
 	"""
 
-	def validate_reaction(reaction, user):
-		"""Validate that reaction is one of the options, not a reaction by the bot, and user is allowed"""
+	def validate_reaction(reaction: discord.Reaction, user: discord.Member) -> bool:
+		"""Validates that:
+			- The reaction is on the message currently being checked
+			- The emoji is one of the emojis on the list
+			- The reaction is not a reaction by the bot
+			- The user who reacted is one of the allowed users
+		"""
 		return (
-			str(reaction.emoji) in emoji_list
+			reaction.message == message
+			and str(reaction.emoji) in emoji_list
 			and user != bot.user
 			and (allowed_users is None or user in allowed_users)
 		)

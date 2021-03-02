@@ -112,16 +112,45 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# check ahead 15 results by default if there is a query
 		elif query:
 			max_results = 15
-		# fetch events
-		events = self.calendar_service.fetch_upcoming(
-			calendar.id, max_results, full_query
-		)
-		embed = self.calendar_embedder.embed_event_list(
-			title=f"📅 Upcoming Events for {calendar.name}",
-			events=events,
-			description=f'Showing results for "{full_query}"' if full_query else "",
-		)
-		await ctx.send(embed=embed)
+		# loading message
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
+		# set initial page number and token
+		page_num = None
+		page_token = None
+		# display events and allow showing more with reactions
+		while True:
+			try:
+				# fetch a page of events
+				events, page_token = self.calendar_service.fetch_upcoming(
+					calendar.id, max_results, full_query, page_token
+				)					
+				# initialize count if there are multiple pages
+				if page_num is None and page_token:
+					page_num = 1
+				# create embed
+				embed = self.calendar_embedder.embed_event_list(
+					title=f"📅 Upcoming Events for {calendar.name}",
+					events=events,
+					description=f'Showing results for "{full_query}"' if full_query else "",
+					page_num=page_num,
+				)
+				# send list of events
+				await response.edit(embed=embed)
+				# break when no more events
+				if not page_token:
+					break
+				# wait for author to respond with "⏬"
+				await wait_for_reaction(
+					bot=self.bot,
+					message=response,
+					emoji_list=["⏬"],
+					allowed_users=[ctx.author]
+				)
+				# increment page count
+				page_num += 1
+			# time window exceeded
+			except FriendlyError:
+				break
 
 	@commands.command(
 		**build_aliases(
@@ -272,7 +301,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# loading message
 		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# get a list of upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		events, _ = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
 		num_events = len(events)
 		# no events found
 		if num_events == 0:
@@ -366,7 +395,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# loading message
 		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# fetch upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		events, _ = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
 		num_events = len(events)
 		# no events found
 		if num_events == 0:

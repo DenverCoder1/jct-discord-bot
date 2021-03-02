@@ -36,7 +36,11 @@ class CalendarService:
 		}
 
 	def fetch_upcoming(
-		self, calendar_id: str, max_results: int, query: str = ""
+		self,
+		calendar_id: str,
+		max_results: int,
+		query: str = "",
+		page_token: str = None,
 	) -> Iterable[Event]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
@@ -50,16 +54,21 @@ class CalendarService:
 				maxResults=max_results,
 				singleEvents=True,
 				orderBy="startTime",
+				pageToken=page_token,
 			)
 			.execute()
 		)
+		# get next page token
+		next_page_token = events_result.get("nextPageToken")
 		# return list of events
 		events = events_result.get("items", [])
 		# filter by search term
 		query = query.lower()
 		filtered = filter(lambda item: query in item.get("summary").lower(), events)
 		# convert dicts to Event objects
-		return tuple(map(lambda item: Event(item, self.timezone), filtered))
+		converted_events = tuple(map(lambda item: Event(item, self.timezone), filtered))
+		# return events and the next page's token
+		return converted_events, next_page_token
 
 	def add_event(
 		self,
