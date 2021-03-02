@@ -160,9 +160,9 @@ async def wait_for_reaction(
 
 	def validate_reaction(reaction: discord.Reaction, user: discord.Member) -> bool:
 		"""Validates that:
-			- The reaction is not a reaction by the bot
 			- The reaction is on the message currently being checked
 			- The emoji is one of the emojis on the list
+			- The reaction is not a reaction by the bot
 			- The user who reacted is one of the allowed users
 		"""
 		return (
