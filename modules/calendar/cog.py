@@ -516,7 +516,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	async def on_new_academic_year(self):
 		"""Create calendars for each campus and update the database"""
 		year = datetime.now().year + 3
-		await self.calendar_creator.create_class_calendars(year)
+		self.calendar_creator.create_class_calendars(year)
 
 
 # setup functions for bot

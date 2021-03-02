@@ -12,7 +12,7 @@ class Campus:
 	sql_fetcher = SqlFetcher(os.path.join("utils", "campus", "queries"))
 
 	@staticmethod
-	def get_campuses(self) -> Iterable["Campus"]:
+	def get_campuses() -> Iterable["Campus"]:
 		"""Fetch a list of campuses from the database"""
 		query = Campus.sql_fetcher["get_campuses.sql"]
 		with config.conn as conn:
