@@ -207,16 +207,17 @@ class CalendarService:
 
 	def create_calendar(self, summary: str) -> Calendar:
 		"""Creates a new public calendar on the service account given the name
-		Returns the id of the new calendar"""
+		Returns the calendar object"""
 		# create the calendar
 		calendar = {"summary": summary, "timeZone": self.timezone}
-		created_calendar = self.service.calendars().insert(body=calendar).execute()
+		created_calendar = Calendar(
+			self.service.calendars().insert(body=calendar).execute()
+		)
 		# make calendar public
 		rule = {"scope": {"type": "default"}, "role": "reader"}
-		self.service.acl().insert(
-			calendarId=created_calendar["id"], body=rule
-		).execute()
-		return Calendar(created_calendar)
+		self.service.acl().insert(calendarId=created_calendar.id, body=rule).execute()
+		# return the calendar object
+		return created_calendar
 
 	def get_calendar_list(self) -> Iterable[Calendar]:
 		"""Returns a complete list of calendars on the service account"""
