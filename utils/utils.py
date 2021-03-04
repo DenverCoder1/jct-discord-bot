@@ -36,7 +36,9 @@ def remove_tabs(string: str) -> str:
 
 def blockquote(string: str) -> str:
 	"""Add blockquotes to a string"""
-	return re.sub(r"(^|\n)", r"\1> ", string)
+	# inserts > at the start of string and after new lines
+	# as long as it is not at the end of the string
+	return re.sub(r"(^|\n)(?!$)", r"\1> ", string.strip())
 
 
 def embed_success(
