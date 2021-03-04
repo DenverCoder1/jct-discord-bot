@@ -35,7 +35,7 @@ This bot was created by the contribution of the following members. If you would 
 
 ## Issues and Feature Requests
 
-If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://https://github.com/DenverCoder1/jct-discord-bot/issues).
+If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://github.com/DenverCoder1/jct-discord-bot/issues).
 
 ## Features
 
