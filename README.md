@@ -29,6 +29,13 @@ This bot was created by the contribution of the following members. If you would 
             <br />
             <sub><b>PSilver22</b></sub>
         </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/etandinnerman">
+            <img src="https://avatars.githubusercontent.com/u/48675226?v=4" width="100;" alt="etandinnerman"/>
+            <br />
+            <sub><b>etandinnerman</b></sub>
+        </a>
     </td></tr>
 </table>
 <!-- readme: contributors -end -->
