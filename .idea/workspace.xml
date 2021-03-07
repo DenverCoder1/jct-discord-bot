@@ -21,9 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="73a12c1e-d4cf-4c34-8091-f1bb213b9fb7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/AddCourseChannel/add_course.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/AddCourseChannel/add_course.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/AddCourseChannel/cog.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/AddCourseChannel/cog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/ids.csv" beforeDir="false" afterPath="$PROJECT_DIR$/utils/ids.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +147,9 @@
       <workItem from="1611422245058" duration="4542000" />
       <workItem from="1612636030453" duration="907000" />
       <workItem from="1613905347174" duration="2654000" />
-      <workItem from="1613932233824" duration="4327000" />
+      <workItem from="1613932233824" duration="4546000" />
+      <workItem from="1614859411351" duration="3883000" />
+      <workItem from="1615119211640" duration="1849000" />
     </task>
     <servers />
   </component>
@@ -173,61 +173,54 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="426" y="47" key="#cog_(1)/0.0.1440.900@0.0.1440.900" timestamp="1611059808056" />
-    <state width="1398" height="212" key="GridCell.Tab.0.bottom" timestamp="1613937483087">
+    <state x="420" y="364" key="#com.jetbrains.python.refactoring.move.PyMakeFunctionTopLevelDialog" timestamp="1615120145907">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="212" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613937483087" />
+    <state x="420" y="364" key="#com.jetbrains.python.refactoring.move.PyMakeFunctionTopLevelDialog/0.0.1440.900@0.0.1440.900" timestamp="1615120145907" />
+    <state width="1398" height="103" key="GridCell.Tab.0.bottom" timestamp="1615120949549">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="103" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1615120949549" />
     <state width="1398" height="128" key="GridCell.Tab.0.bottom/0.23.1440.808@0.23.1440.808" timestamp="1610823718889" />
-    <state width="1398" height="212" key="GridCell.Tab.0.center" timestamp="1613937483084">
+    <state width="1398" height="103" key="GridCell.Tab.0.center" timestamp="1615120949546">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="212" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613937483084" />
+    <state width="1398" height="103" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1615120949546" />
     <state width="1398" height="128" key="GridCell.Tab.0.center/0.23.1440.808@0.23.1440.808" timestamp="1610823718887" />
-    <state width="1398" height="212" key="GridCell.Tab.0.left" timestamp="1613937483082">
+    <state width="1398" height="103" key="GridCell.Tab.0.left" timestamp="1615120949545">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="212" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613937483082" />
+    <state width="1398" height="103" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1615120949545" />
     <state width="1398" height="128" key="GridCell.Tab.0.left/0.23.1440.808@0.23.1440.808" timestamp="1610823718886" />
-    <state width="1398" height="212" key="GridCell.Tab.0.right" timestamp="1613937483085">
+    <state width="1398" height="103" key="GridCell.Tab.0.right" timestamp="1615120949548">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="212" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613937483085" />
+    <state width="1398" height="103" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1615120949548" />
     <state width="1398" height="128" key="GridCell.Tab.0.right/0.23.1440.808@0.23.1440.808" timestamp="1610823718888" />
-    <state width="1398" height="244" key="GridCell.Tab.1.bottom" timestamp="1613937480305">
+    <state width="1398" height="244" key="GridCell.Tab.1.bottom" timestamp="1613937854791">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="244" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613937480305" />
-    <state width="1398" height="244" key="GridCell.Tab.1.center" timestamp="1613937480300">
+    <state width="1398" height="244" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613937854791" />
+    <state width="1398" height="244" key="GridCell.Tab.1.center" timestamp="1613937854789">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="244" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1613937480300" />
-    <state width="1398" height="244" key="GridCell.Tab.1.left" timestamp="1613937480299">
+    <state width="1398" height="244" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1613937854789" />
+    <state width="1398" height="244" key="GridCell.Tab.1.left" timestamp="1613937854789">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="244" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1613937480299" />
-    <state width="1398" height="244" key="GridCell.Tab.1.right" timestamp="1613937480303">
+    <state width="1398" height="244" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1613937854789" />
+    <state width="1398" height="244" key="GridCell.Tab.1.right" timestamp="1613937854790">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="244" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1613937480303" />
+    <state width="1398" height="244" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1613937854790" />
     <state x="229" y="89" key="SettingsEditor" timestamp="1611066652825">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="229" y="89" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1611066652825" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/modules/AddCourseChannel/add_course.py</url>
-          <line>21</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/jct_discord_bot$cog__1_.coverage" NAME="cog (1) Coverage Results" MODIFIED="1611060755809" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/ping" />
-    <SUITE FILE_PATH="coverage/jct_discord_bot$bot.coverage" NAME="bot Coverage Results" MODIFIED="1613937483058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/jct_discord_bot$bot.coverage" NAME="bot Coverage Results" MODIFIED="1615120949516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jct_discord_bot$cog.coverage" NAME="cog Coverage Results" MODIFIED="1611062741041" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules/AddCourseChannel" />
   </component>
 </project>

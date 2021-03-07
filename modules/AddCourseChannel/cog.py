@@ -18,18 +18,33 @@ class AddCourseChannelCog(commands.Cog):
     # except discord.Forbidden:
     #     await ctx.send('I do not have permission to delete this role')
     @commands.command(name="addcourse")
-    async def add_course(self, ctx: commands.Context, *args):
+    # async def add_course(self, ctx, channel_name: str, full_course_name: str = None, *args):#ctx: commands.Context, *args,):
+    #     names = " ".join(args)
+    #     print("this is args ", args)
+    #     split_names = names.split(",")
+    #     print("this is split name ", split_names)
+    #     channel_name = split_names[0]
+    #     if full_course_name:
+    #         full_course_name = split_names[1]
+    #     else:
+    #         full_course_name = channel_name.strip().replace("-", " ")
+    #         full_course_name.capitalize()
+    #
+    #     await add_course.create_channel(ctx, channel_name)
 
+    async def add_course(self, ctx, *args):
         names = " ".join(args)
         split_names = names.split(",")
+        channel_name = split_names[0]
+        #check if the user entered more than one name for the course
+        if len(split_names) > 1:
+            full_course_name = split_names[1]
 
-        course_name = split_names[0]
-        update_course_name = course_name.strip().replace(" ", "-")
-        update_course_name.lower()
-
-        await add_course.create_channel(
-                ctx, update_course_name)
-
+        #otherwise just make the course name the channel name with capitalization and no dashes
+        else:
+            full_course_name = channel_name.strip().replace("-", " ")
+            full_course_name.capitalize()
+        await add_course.create_channel(ctx, channel_name)
 
 def setup(bot):
     bot.add_cog(AddCourseChannelCog(bot))
