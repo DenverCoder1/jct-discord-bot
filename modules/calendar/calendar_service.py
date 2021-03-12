@@ -202,8 +202,8 @@ class CalendarService:
 		}
 		# check that new time range is valid
 		new_event = Event(event_details)
-		new_start_date = new_event.start()
-		new_end_date = new_event.end()
+		new_start_date = new_event.start().replace(tzinfo=None)
+		new_end_date = new_event.end().replace(tzinfo=None)
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# update the event
