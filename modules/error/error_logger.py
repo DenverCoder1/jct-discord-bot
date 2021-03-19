@@ -35,8 +35,7 @@ class ErrorLogger:
 			)
 
 	def __get_err_text(self, error: Exception, message: discord.Message = None):
-		trace = traceback.format_exc()
-		description = trace if trace != "NoneType: None\n" else str(error)
+		description = "".join(traceback.format_exception(error.__class__, error, error.__traceback__))
 		if message is None:
 			return description
 		return self.__attach_context(description, message)
@@ -47,7 +46,7 @@ class ErrorLogger:
 			f"Author:\n{message.author} ({message.author.display_name})\n\n"
 			f"Channel:\n{message.channel}\n\n"
 			f"Message:\n{message.content}\n\n"
-			f"Error:\n{description}\n"
+			f"{description}\n"
 		)
 
 	def read_logs(self, n_lines: int = 50, char_lim: int = 2000) -> str:
