@@ -16,8 +16,6 @@ class CalendarService:
 		)
 		self.service = build("calendar", "v3", credentials=self.creds)
 		self.timezone = "Asia/Jerusalem"
-		self.date_time_format = "%Y-%m-%dT%H:%M:%S"
-		self.date_format = "%Y-%m-%d"
 
 	def get_links(self, calendar_id: str) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
@@ -38,7 +36,11 @@ class CalendarService:
 		}
 
 	def fetch_upcoming(
-		self, calendar_id: str, max_results: int, query: str = ""
+		self,
+		calendar_id: str,
+		max_results: int,
+		query: str = "",
+		page_token: str = None,
 	) -> Iterable[Event]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
@@ -52,16 +54,21 @@ class CalendarService:
 				maxResults=max_results,
 				singleEvents=True,
 				orderBy="startTime",
+				pageToken=page_token,
 			)
 			.execute()
 		)
+		# get next page token
+		next_page_token = events_result.get("nextPageToken")
 		# return list of events
 		events = events_result.get("items", [])
 		# filter by search term
 		query = query.lower()
 		filtered = filter(lambda item: query in item.get("summary").lower(), events)
 		# convert dicts to Event objects
-		return tuple(map(lambda item: Event(item, self.timezone), filtered))
+		converted_events = tuple(map(lambda item: Event(item, self.timezone), filtered))
+		# return events and the next page's token
+		return converted_events, next_page_token
 
 	def add_event(
 		self,
@@ -96,7 +103,7 @@ class CalendarService:
 			end_date = start_date
 			# if words suggest no time was specified, make it an all day event
 			time_words = (" at ", " from ", "am ", " midnight ", ":")
-			if start_date.strftime("%H:%M") == "00:00" and not any(
+			if start_date.time() == datetime.min.time() and not any(
 				word in f" {start} " for word in time_words
 			):
 				all_day = True
@@ -113,19 +120,19 @@ class CalendarService:
 			"description": description,
 			"start": (
 				{
-					"dateTime": start_date.strftime(self.date_time_format),
+					"dateTime": start_date.isoformat("T", "seconds"),
 					"timeZone": self.timezone,
 				}
 				if not all_day
-				else {"date": start_date.strftime(self.date_format)}
+				else {"date": start_date.date().isoformat()}
 			),
 			"end": (
 				{
-					"dateTime": end_date.strftime(self.date_time_format),
+					"dateTime": end_date.isoformat("T", "seconds"),
 					"timeZone": self.timezone,
 				}
 				if not all_day
-				else {"date": end_date.strftime(self.date_format)}
+				else {"date": end_date.date().isoformat()}
 			),
 		}
 		# Add event to the calendar
@@ -184,19 +191,19 @@ class CalendarService:
 				"timeZone": self.timezone,
 				"dateTime": (
 					new_start_date if new_start_date is not None else event.start()
-				).strftime(self.date_time_format),
+				).isoformat("T", "seconds"),
 			},
 			"end": {
 				"timeZone": self.timezone,
 				"dateTime": (
 					new_end_date if new_end_date is not None else event.end()
-				).strftime(self.date_time_format),
+				).isoformat("T", "seconds"),
 			},
 		}
 		# check that new time range is valid
 		new_event = Event(event_details)
-		new_start_date = new_event.start()
-		new_end_date = new_event.end()
+		new_start_date = new_event.start().replace(tzinfo=None)
+		new_end_date = new_event.end().replace(tzinfo=None)
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# update the event
@@ -209,16 +216,17 @@ class CalendarService:
 
 	def create_calendar(self, summary: str) -> Calendar:
 		"""Creates a new public calendar on the service account given the name
-		Returns the id of the new calendar"""
+		Returns the calendar object"""
 		# create the calendar
 		calendar = {"summary": summary, "timeZone": self.timezone}
-		created_calendar = self.service.calendars().insert(body=calendar).execute()
+		created_calendar = Calendar(
+			self.service.calendars().insert(body=calendar).execute()
+		)
 		# make calendar public
 		rule = {"scope": {"type": "default"}, "role": "reader"}
-		self.service.acl().insert(
-			calendarId=created_calendar["id"], body=rule
-		).execute()
-		return Calendar(created_calendar)
+		self.service.acl().insert(calendarId=created_calendar.id, body=rule).execute()
+		# return the calendar object
+		return created_calendar
 
 	def get_calendar_list(self) -> Iterable[Calendar]:
 		"""Returns a complete list of calendars on the service account"""

@@ -16,8 +16,18 @@ class CalendarEmbedder:
 		events: Iterable[Event],
 		description: str = "",
 		colour: discord.Colour = discord.Colour.green(),
+		enumeration: Iterable[str] = [],
+		page_num: int = None,
 	) -> discord.Embed:
-		"""Generates an embed with event summaries, links, and dates for each event in the given list"""
+		"""Generates an embed with event summaries, links, and dates for each event in the given list
+
+		Arguments:
+		<title> - title to display at the top
+		<events> - list of events to embed
+		[description] - description to embed below the title
+		[colour] - embed colour
+		[enumeration] - list of emojis to display alongside events (for reaction choices)
+		"""
 		embed = discord.Embed(title=title, colour=colour)
 		# set initial description if available
 		embed.description = "" if description == "" else f"{description}\n\n"
@@ -25,13 +35,19 @@ class CalendarEmbedder:
 			embed.description += "No events found"
 		else:
 			# add events to embed
-			event_details = map(self.__get_formatted_event_details, events)
-			for details in event_details:
+			for i, event in enumerate(events):
+				event_description = "\n"
+				# add enumeration emoji if available
+				if i < len(enumeration):
+					event_description += f"{enumeration[i]} "
+				# add the event details
+				event_description += self.__format_event(event)
 				# make sure embed doesn't exceed max size
-				if len(embed.description + "\n" + details) > self.max_length:
+				if len(embed.description + event_description) > self.max_length:
 					break
-				embed.description += "\n" + details
-		embed.set_footer(text=self.__get_footer_text())
+				# add event to embed
+				embed.description += event_description
+		embed.set_footer(text=self.__footer_text(page_num=page_num))
 		return embed
 
 	def embed_link(
@@ -53,8 +69,8 @@ class CalendarEmbedder:
 		"""Embed an event with the summary, link, and dates"""
 		embed = discord.Embed(title=title, colour=colour)
 		# add overview of event to the embed
-		embed.description = self.__get_formatted_event_details(event)
-		embed.set_footer(text=self.__get_footer_text())
+		embed.description = self.__format_event(event)
+		embed.set_footer(text=self.__footer_text())
 		return embed
 
 	def __trim_text_links_preserved(self, text: str, max: int = 30) -> str:
@@ -80,7 +96,7 @@ class CalendarEmbedder:
 				trimmed = text[:start] + f'[{before}...]({full} "{full}")'
 		return trimmed
 
-	def __get_formatted_event_details(self, event: Event) -> str:
+	def __format_event(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
 		info = f"**[{event.title()}]({event.link()})**\n"
 		info += f"{event.date_range_str()}\n"
@@ -92,6 +108,8 @@ class CalendarEmbedder:
 			info += f":round_pushpin: {self.__trim_text_links_preserved(event.location())}\n"
 		return info
 
-	def __get_footer_text(self):
+	def __footer_text(self, page_num: int = None) -> str:
 		"""Return text about timezone to display at end of embeds with dates"""
-		return f"Times are shown for {self.timezone}"
+		page_num_text = f"Page {page_num} | " if page_num is not None else ""
+		timezone_text = f"Times are shown for {self.timezone}"
+		return page_num_text + timezone_text

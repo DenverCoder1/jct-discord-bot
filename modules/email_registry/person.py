@@ -6,7 +6,7 @@ class Person:
 		self.categories = self.__no_duplicates(categories)
 
 	def linked_emails(self) -> str:
-		return ", ".join([f"__{email}__" for email in self.emails.split(", ")])
+		return ", ".join([f"__{email}__" for email in self.emails.split(", ") if email])
 
 	def __no_duplicates(
 		self, list_as_str: str, sep_in: str = ",", sep_out: str = ", "

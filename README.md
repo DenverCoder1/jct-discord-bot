@@ -29,13 +29,20 @@ This bot was created by the contribution of the following members. If you would 
             <br />
             <sub><b>PSilver22</b></sub>
         </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/etandinnerman">
+            <img src="https://avatars.githubusercontent.com/u/48675226?v=4" width="100;" alt="etandinnerman"/>
+            <br />
+            <sub><b>Etandinnerman</b></sub>
+        </a>
     </td></tr>
 </table>
 <!-- readme: contributors -end -->
 
 ## Issues and Feature Requests
 
-If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://https://github.com/DenverCoder1/jct-discord-bot/issues).
+If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://github.com/DenverCoder1/jct-discord-bot/issues).
 
 ## Features
 

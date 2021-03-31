@@ -1,8 +1,11 @@
+import os
 from utils import utils
 from modules.join.assigner import Assigner
 from modules.error.friendly_error import FriendlyError
 from modules.join.join_parser import JoinParseError, JoinParser
 from discord.ext import commands
+from utils.sql_fetcher import SqlFetcher
+import config
 
 
 class JoinCog(commands.Cog, name="Join"):
@@ -12,13 +15,14 @@ class JoinCog(commands.Cog, name="Join"):
 		self.bot = bot
 		self.assigner = None
 		self.attempts = {}
+		self.sql_fetcher = SqlFetcher(os.path.join("modules", "join", "queries"))
 
 	@commands.Cog.listener()
 	async def on_ready(self):
-		self.assigner = Assigner(self.bot.get_guild(utils.get_id("JCT_GUILD_ID")))
+		self.assigner = Assigner(config.guild, config.conn, self.sql_fetcher)
 
 	@commands.command(name="join")
-	@commands.has_role(utils.get_id("UNASSIGNED_ROLE_ID"))
+	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
 	async def join(self, ctx: commands.Context):
 		"""
 		Join command to get new users information and place them in the right roles
@@ -46,7 +50,7 @@ class JoinCog(commands.Cog, name="Join"):
 			err_msg = str(err)
 			if self.attempts[ctx.author] > 1:
 				err_msg += (
-					f"\n\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
+					f"\n\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE').mention}"
 					f" Help! {ctx.author.mention} doesn't seem to be able to read"
 					" instructions."
 				)

@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import re
 import discord
@@ -6,12 +7,14 @@ from discord.ext import commands
 from .calendar_service import CalendarService
 from .calendar_embedder import CalendarEmbedder
 from .calendar_finder import CalendarFinder
+from .calendar_creator import CalendarCreator
 from .course_mentions import CourseMentions
 from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email, build_aliases, embed_success
+from utils.utils import is_email, build_aliases, embed_success, wait_for_reaction
+from utils.scheduler.scheduler import Scheduler
 
 
 class CalendarCog(commands.Cog, name="Calendar"):
@@ -23,7 +26,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.calendar_embedder = CalendarEmbedder()
 		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
+		self.calendar_creator = CalendarCreator(self.calendar_service, config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
+		self.number_emoji = ("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
 
 	@commands.command(
 		**build_aliases(
@@ -62,9 +67,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	@commands.command(
 		**build_aliases(
 			name="events.list",
-			prefix=("calendar", "events", "event"),
-			suffix=("upcoming", "list", "events", "search"),
-			more_aliases=("upcoming", "events"),
+			prefix=("events", "event"),
+			suffix=("upcoming", "list", "events", "search", "show", "get"),
+			more_aliases=("upcoming", "events", "getevents", "listevents"),
 		)
 	)
 	async def events_list(self, ctx: commands.Context, *args):
@@ -107,21 +112,50 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# check ahead 15 results by default if there is a query
 		elif query:
 			max_results = 15
-		# fetch events
-		events = self.calendar_service.fetch_upcoming(
-			calendar.id, max_results, full_query
-		)
-		embed = self.calendar_embedder.embed_event_list(
-			title=f"📅 Upcoming Events for {calendar.name}",
-			events=events,
-			description=f'Showing results for "{full_query}"' if full_query else "",
-		)
-		await ctx.send(embed=embed)
+		# loading message
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
+		# set initial page number and token
+		page_num = None
+		page_token = None
+		# display events and allow showing more with reactions
+		while True:
+			try:
+				# fetch a page of events
+				events, page_token = self.calendar_service.fetch_upcoming(
+					calendar.id, max_results, full_query, page_token
+				)					
+				# initialize count if there are multiple pages
+				if page_num is None and page_token:
+					page_num = 1
+				# create embed
+				embed = self.calendar_embedder.embed_event_list(
+					title=f"📅 Upcoming Events for {calendar.name}",
+					events=events,
+					description=f'Showing results for "{full_query}"' if full_query else "",
+					page_num=page_num,
+				)
+				# send list of events
+				await response.edit(embed=embed)
+				# break when no more events
+				if not page_token:
+					break
+				# wait for author to respond with "⏬"
+				await wait_for_reaction(
+					bot=self.bot,
+					message=response,
+					emoji_list=["⏬"],
+					allowed_users=[ctx.author]
+				)
+				# increment page count
+				page_num += 1
+			# time window exceeded
+			except FriendlyError:
+				break
 
 	@commands.command(
 		**build_aliases(
 			name="events.add",
-			prefix=("calendar", "events", "event"),
+			prefix=("events", "event"),
 			suffix=("add", "create", "new"),
 			more_aliases=("addevent", "createevent", "newevent"),
 		)
@@ -264,24 +298,43 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
-		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
-		if len(events) == 0:
+		# loading message
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
+		# get a list of upcoming events
+		events, _ = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		num_events = len(events)
+		# no events found
+		if num_events == 0:
+			await response.delete()
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
-		if len(events) > 1:
-			# TODO: Allow user to choose an event
+		# multiple events found
+		elif num_events > 1:
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"⚠ Multiple events were found.",
 				events=events,
 				description=(
-					"No events were updated. Please specify which event you would like"
-					" to update. To resolve the issue manually, you can edit directly on Google calendar"
-					f' (use `++calendar.grant <email>` to get access).\n\nShowing results for "{query}"'
+					"Please specify which event you would like to update."
+					f'\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
+				enumeration=self.number_emoji,
 			)
-			return await ctx.send(embed=embed)
+			await response.edit(embed=embed)
+			# ask user to pick an event with emojis
+			selection_index = await wait_for_reaction(
+				bot=self.bot,
+				message=response,
+				emoji_list=self.number_emoji[:num_events],
+				allowed_users=[ctx.author],
+			)
+			# get the event selected by the user
+			event_to_update = events[selection_index]
+		# only 1 event found
+		else:
+			# get the event at index 0
+			event_to_update = events[0]
 		# Extract params into kwargs
 		param_args = dict(
 			re.findall(
@@ -293,14 +346,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			param_args[key] = self.course_mentions.replace_channel_mentions(value)
 		try:
 			event = self.calendar_service.update_event(
-				calendar.id, events[0], **param_args
+				calendar.id, event_to_update, **param_args
 			)
 		except ValueError as error:
+			await response.delete()
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
 			":white_check_mark: Event updated successfully", event
 		)
-		await ctx.send(embed=embed)
+		await response.edit(embed=embed)
 
 	@commands.command(
 		**build_aliases(
@@ -338,34 +392,53 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
+		# loading message
+		response = await ctx.send(embed=embed_success("🗓 Searching for events..."))
 		# fetch upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
-		if len(events) == 0:
+		events, _ = self.calendar_service.fetch_upcoming(calendar.id, 50, query)
+		num_events = len(events)
+		# no events found
+		if num_events == 0:
+			await response.delete()
 			raise FriendlyError(
 				f"No events were found for '{query}'.", ctx.channel, ctx.author
 			)
-		if len(events) > 1:
-			# TODO: Allow user to choose an event
+		# multiple events found
+		elif num_events > 1:
 			embed = self.calendar_embedder.embed_event_list(
 				title=f"⚠ Multiple events were found.",
 				events=events,
 				description=(
-					"No events were deleted. Please specify which event you would like"
-					" to update. To resolve the issue manually, you can edit directly on Google calendar"
-					f' (use `++calendar.grant <email>` to get access).\n\nShowing results for "{query}"'
+					'Please specify which event you would like to delete.'
+					f'\n\nShowing results for "{query}"'
 				),
 				colour=discord.Colour.gold(),
+				enumeration=self.number_emoji,
 			)
-			return await ctx.send(embed=embed)
+			await response.edit(embed=embed)
+			# ask user to pick an event with emojis
+			selection_index = await wait_for_reaction(
+				bot=self.bot,
+				message=response,
+				emoji_list=self.number_emoji[:num_events],
+				allowed_users=[ctx.author],
+			)
+			# get the event selected by the user
+			event_to_delete = events[selection_index]
+		# only 1 event found
+		else:
+			# get the event at index 0 if there's only 1
+			event_to_delete = events[0]
 		# delete event
 		try:
-			self.calendar_service.delete_event(calendar.id, events[0])
+			self.calendar_service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
+			await response.delete()
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author, error)
 		embed = self.calendar_embedder.embed_event(
-			"🗑 Event deleted successfully", events[0]
+			"🗑 Event deleted successfully", event_to_delete
 		)
-		await ctx.send(embed=embed)
+		await response.edit(embed=embed)
 
 	@commands.command(
 		**build_aliases(
@@ -413,7 +486,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				"An error occurred while applying changes.", ctx.channel, ctx.author
 			)
 
-	@commands.command(name="createcalendar")
+	@commands.command(
+		**build_aliases(
+			name="calendars.create",
+			prefix=("calendar", "calendars"),
+			suffix=("add", "create", "new"),
+			more_aliases=["createcalendar"],
+		)
+	)
 	@commands.has_permissions(manage_roles=True)
 	async def createcalendar(self, ctx: commands.Context, *args):
 		"""
@@ -421,10 +501,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
-		++createcalendar "JCT CompSci Lev 2020"
+		++calendars.create "JCT CompSci Lev 2020"
 		```
 		Arguments:
 		> **JCT CompSci Lev 2020**: name of the calendar to create
+
+		**Note:** to use this command, the user must have permission to manage roles.
 		"""
 		name = " ".join(args)
 		# create calendar
@@ -435,7 +517,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		)
 		await ctx.send(embed=embed)
 
-	@commands.command(name="listcalendars")
+	@commands.command(
+		**build_aliases(
+			name="calendars.list",
+			prefix=("calendar", "calendars"),
+			suffix=("list", "show", "get"),
+			more_aliases=["listcalendars"],
+		)
+	)
 	@commands.has_permissions(manage_roles=True)
 	async def listcalendars(self, ctx):
 		"""
@@ -443,13 +532,20 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 		Usage:
 		```
-		++listcalendars
+		++calendars.list
 		```
+		**Note:** to use this command, the user must have permission to manage roles.
 		"""
 		# get calendar list
 		calendars = self.calendar_service.get_calendar_list()
-		details = (f"{calendar['summary']}: {calendar['id']}" for calendar in calendars)
+		details = (f"{calendar.name}: {calendar.id}" for calendar in calendars)
 		await ctx.send("\n".join(details))
+
+	@Scheduler.schedule(1)
+	async def on_new_academic_year(self):
+		"""Create calendars for each campus and update the database"""
+		year = datetime.now().year + 3
+		self.calendar_creator.create_class_calendars(year)
 
 
 # setup functions for bot

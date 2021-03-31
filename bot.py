@@ -24,13 +24,13 @@ def main():
 	async def on_ready():
 		"""When discord is connected"""
 		print(f"{client.user.name} has connected to Discord!")
+		config.guild = client.get_guild(int(config.guild_id))
 		await client.change_presence(activity=discord.Game("with students' patience"))
+		# Start Scheduler
+		Scheduler(client)
 
 	# Run Discord bot
 	client.run(config.token)
-
-	# Start Scheduler
-	Scheduler(client)
 
 
 
