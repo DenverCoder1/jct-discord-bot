@@ -15,8 +15,8 @@ class TipFormatter:
 			"spoiler": Tip("||spoiler|| (click to reveal)", "\||spoiler||"),
 			"inline": Tip("`inline code`", "\`inline code`"),
 			"codeblock": Tip(
-				'```cpp\ncout << "Code Block";\n```',
-				'\```cpp\n// replace this with your code\ncout << "Code Block";\n```',
+				'```cpp\ncout << "This is a code block" << endl;\n```',
+				'\```cpp\n// replace this with your code\n```',
 			),
 		}
 		# alternative ways to request formats (spaces and case is already ignored)

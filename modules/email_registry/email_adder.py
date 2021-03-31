@@ -5,7 +5,6 @@ from typing import Iterable, Set
 from modules.email_registry.person import Person
 import psycopg2.extensions as sql
 from psycopg2.errors import UniqueViolation
-import re
 
 
 class EmailAdder:

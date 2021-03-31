@@ -10,17 +10,17 @@ This bot was created by the contribution of the following members. If you would 
 <table>
 <tr>
     <td align="center">
-        <a href="https://github.com/abrahammurciano">
-            <img src="https://avatars.githubusercontent.com/u/25041135?v=4" width="100;" alt="abrahammurciano"/>
-            <br />
-            <sub><b>Abraham Murciano</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/DenverCoder1">
             <img src="https://avatars.githubusercontent.com/u/20955511?v=4" width="100;" alt="DenverCoder1"/>
             <br />
             <sub><b>Jonah Lawrence</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/abrahammurciano">
+            <img src="https://avatars.githubusercontent.com/u/25041135?v=4" width="100;" alt="abrahammurciano"/>
+            <br />
+            <sub><b>Abraham Murciano</b></sub>
         </a>
     </td>
     <td align="center">
@@ -29,13 +29,20 @@ This bot was created by the contribution of the following members. If you would 
             <br />
             <sub><b>PSilver22</b></sub>
         </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/etandinnerman">
+            <img src="https://avatars.githubusercontent.com/u/48675226?v=4" width="100;" alt="etandinnerman"/>
+            <br />
+            <sub><b>Etandinnerman</b></sub>
+        </a>
     </td></tr>
 </table>
 <!-- readme: contributors -end -->
 
 ## Issues and Feature Requests
 
-If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://https://github.com/DenverCoder1/jct-discord-bot/issues).
+If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://github.com/DenverCoder1/jct-discord-bot/issues).
 
 ## Features
 

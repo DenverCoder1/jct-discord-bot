@@ -9,13 +9,13 @@ class PersonEmbedder:
 		embed = discord.Embed(colour=discord.Colour.green())
 
 		for person in people:
-			if person.emails:
-				embed.add_field(
-					name=person.name,
-					value=utils.blockquote(
-						f"{person.linked_emails()}\n{person.categories}"
-					),
-					inline=False,
-				)
+			embed.add_field(
+				name=person.name,
+				value=(
+					utils.blockquote(f"{person.linked_emails()}\n{person.categories}")
+					or utils.blockquote("No info found.")
+				),
+				inline=False,
+			)
 
 		return embed
