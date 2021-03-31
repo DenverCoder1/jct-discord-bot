@@ -105,9 +105,8 @@ class JoinCog(commands.Cog, name="Join"):
 		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
 	):
 		try:
-			parser = JoinParser(f"++join {first_name}, {last_name}, {campus}, {year}")
 			await self.assigner.assign(
-				ctx.author, parser.name(), parser.campus(), parser.year()
+				ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
 			)
 		except JoinParseError as err:
 			if ctx.author not in self.attempts:
