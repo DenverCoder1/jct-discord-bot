@@ -1,6 +1,6 @@
 import os
 import discord
-from discord_slash.client import SlashCommand
+from discord_slash import SlashCommand
 import config
 from discord.ext import commands
 from utils.scheduler.scheduler import Scheduler
@@ -13,9 +13,7 @@ def main():
 	intents.members = True
 
 	client = commands.Bot(config.prefix, intents=intents)  # bot command prefix
-	client.slash = SlashCommand(
-		client, override_type=True, auto_register=True, auto_delete=True
-	)
+	client.slash = SlashCommand(client, override_type=True, sync_commands=True)
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
 	for folder in os.listdir("modules"):

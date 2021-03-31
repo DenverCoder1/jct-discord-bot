@@ -6,6 +6,9 @@ from modules.join.join_parser import JoinParseError, JoinParser
 from discord.ext import commands
 from utils.sql_fetcher import SqlFetcher
 import config
+from discord_slash import cog_ext, SlashContext
+from discord_slash.model import SlashCommandOptionType
+from discord_slash.utils.manage_commands import create_option, create_choice
 
 
 class JoinCog(commands.Cog, name="Join"):
@@ -51,6 +54,69 @@ class JoinCog(commands.Cog, name="Join"):
 			if self.attempts[ctx.author] > 1:
 				err_msg += (
 					f"\n\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE').mention}"
+					f" Help! {ctx.author.mention} doesn't seem to be able to read"
+					" instructions."
+				)
+			self.attempts[ctx.author] += 1
+			raise FriendlyError(err_msg, ctx.channel, ctx.author)
+
+	@cog_ext.cog_slash(
+		name="join",
+		description="Join command to get new users information and place them in the right roles.",
+		guild_ids=[],
+		options=[
+			create_option(
+				name="first_name",
+				description="Your first name",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="last_name",
+				description="Your last name",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="campus",
+				description="Your campus (Lev or Tal)",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+				choices=[
+					create_choice(name="Lev", value="Lev"),
+					create_choice(name="Tal", value="Tal"),
+				],
+			),
+			create_option(
+				name="year",
+				description="Your year (an integer 1 to 4 inclusive)",
+				option_type=SlashCommandOptionType.INTEGER,
+				required=True,
+				choices=[
+					create_choice(name="Year1", value=1),
+					create_choice(name="Year2", value=2),
+					create_choice(name="Year3", value=3),
+					create_choice(name="Year4", value=4),
+				],
+			),
+		],
+	)
+	@commands.has_role(utils.get_id("UNASSIGNED_ROLE_ID"))
+	async def test(
+		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
+	):
+		try:
+			parser = JoinParser(f"++join {first_name}, {last_name}, {campus}, {year}")
+			await self.assigner.assign(
+				ctx.author, parser.name(), parser.campus(), parser.year()
+			)
+		except JoinParseError as err:
+			if ctx.author not in self.attempts:
+				self.attempts[ctx.author] = 0
+			err_msg = str(err)
+			if self.attempts[ctx.author] > 1:
+				err_msg += (
+					f"\n\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
 					f" Help! {ctx.author.mention} doesn't seem to be able to read"
 					" instructions."
 				)
