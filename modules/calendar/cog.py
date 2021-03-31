@@ -90,6 +90,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<Class Name>**: The calendar to get events from (ex. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		try:
+			# get last occurrence of "in" to split at calendar name if it is provided
 			last_occurence = max(loc for loc, val in enumerate(args) if val == "in") if "in" in args else len(args)
 			calendar_name = " ".join(args[last_occurence+1:])
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
@@ -136,18 +137,21 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				)
 				# send list of events
 				await response.edit(embed=embed)
-				# break when no more events
+				# increment page count
+				page_num += 1
+				# default next emoji
+				next_emoji = "⏬"
+				# change emoji and clear page num to restart when no more events
 				if not page_token:
-					break
-				# wait for author to respond with "⏬"
+					page_num = None
+					next_emoji = "⤴️"
+				# wait for author to respond to go to next page
 				await wait_for_reaction(
 					bot=self.bot,
 					message=response,
-					emoji_list=["⏬"],
+					emoji_list=[next_emoji],
 					allowed_users=[ctx.author]
 				)
-				# increment page count
-				page_num += 1
 			# time window exceeded
 			except FriendlyError:
 				break
