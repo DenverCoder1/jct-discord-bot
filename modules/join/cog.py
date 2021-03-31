@@ -6,6 +6,9 @@ from modules.join.join_parser import JoinParseError, JoinParser
 from discord.ext import commands
 from utils.sql_fetcher import SqlFetcher
 import config
+from discord_slash import cog_ext, SlashContext
+from discord_slash.model import SlashCommandOptionType
+from discord_slash.utils.manage_commands import create_option, create_choice
 
 
 class JoinCog(commands.Cog, name="Join"):
@@ -33,10 +36,10 @@ class JoinCog(commands.Cog, name="Join"):
 		```
 		Arguments:
 
-			> **first name**: Your first name
-			> **last name**: Your last name
-			> **campus**: Lev or Tal
-			> **year**: an integer from 1 to 4 (inclusive)
+		> **first name**: Your first name
+		> **last name**: Your last name
+		> **campus**: Lev or Tal
+		> **year**: an integer from 1 to 4 (inclusive)
 
 		"""
 		try:
@@ -56,6 +59,61 @@ class JoinCog(commands.Cog, name="Join"):
 				)
 			self.attempts[ctx.author] += 1
 			raise FriendlyError(err_msg, ctx.channel, ctx.author)
+
+	@cog_ext.cog_slash(
+		name="join",
+		description="Join command to get new users' information and place them in the right roles.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="first_name",
+				description="Your first name",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="last_name",
+				description="Your last name",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="campus",
+				description="Your campus (Lev or Tal)",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+				choices=[
+					create_choice(name="Lev", value="Lev"),
+					create_choice(name="Tal", value="Tal"),
+				],
+			),
+			create_option(
+				name="year",
+				description="Your year (an integer 1 to 4 inclusive)",
+				option_type=SlashCommandOptionType.INTEGER,
+				required=True,
+				choices=[
+					create_choice(name="Year 1", value=1),
+					create_choice(name="Year 2", value=2),
+					create_choice(name="Year 3", value=3),
+					create_choice(name="Year 4", value=4),
+				],
+			),
+		],
+	)
+	async def _join(
+		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
+	):
+		await self.assigner.assign(
+			ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
+		)
+		await ctx.send(
+			embeds=[
+				utils.embed_success(
+					title=f"**{ctx.author.display_name}** used **/{ctx.invoked_with}**"
+				)
+			]
+		)
 
 
 # setup functions for bot

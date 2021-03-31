@@ -11,13 +11,13 @@ class Greeter:
 		self.bot = bot
 		self.command_desc = utils.remove_tabs(
 			f"""
-			```{config.prefix}join first name, last name, campus, year```
+			```/join first_name, last_name, campus, year```
 
 			Where:
-			> **first-name** is your first name,
-			> **last-name** is your last name,
-			> **campus** is *Lev* or *Tal* (case insensitive),
-			> **year** is one of 1, 2, 3, or 4
+			> **first_name** is your first name,
+			> **last_name** is your last name,
+			> **campus** is *Lev* or *Tal*,
+			> **year** is one of Year 1, Year 2, Year 3, or Year 4
 
 			"""
 		)

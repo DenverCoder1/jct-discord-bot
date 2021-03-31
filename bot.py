@@ -1,5 +1,6 @@
 import os
 import discord
+from discord_slash import SlashCommand
 import config
 from discord.ext import commands
 from utils.scheduler.scheduler import Scheduler
@@ -12,6 +13,7 @@ def main():
 	intents.members = True
 
 	client = commands.Bot(config.prefix, intents=intents)  # bot command prefix
+	client.slash = SlashCommand(client, override_type=True, sync_commands=True)
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
 	for folder in os.listdir("modules"):
@@ -22,7 +24,7 @@ def main():
 	async def on_ready():
 		"""When discord is connected"""
 		print(f"{client.user.name} has connected to Discord!")
-		config.guild = client.get_guild(int(config.guild_id))
+		config.guild = client.get_guild(config.guild_id)
 		await client.change_presence(activity=discord.Game("with students' patience"))
 		# Start Scheduler
 		Scheduler(client)
