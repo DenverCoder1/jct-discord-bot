@@ -9,6 +9,7 @@ class HelpCog(commands.Cog, name="Help"):
 		self._original_help_command = bot.help_command
 		bot.help_command = NewHelpCommand()
 		bot.help_command.cog = self
+		self.bot = bot
 
 	def cog_unload(self):
 		self.bot.help_command = self._original_help_command
