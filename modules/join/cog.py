@@ -1,5 +1,4 @@
 import os
-import discord
 from utils import utils
 from modules.join.assigner import Assigner
 from modules.error.friendly_error import FriendlyError
@@ -37,10 +36,10 @@ class JoinCog(commands.Cog, name="Join"):
 		```
 		Arguments:
 
-			> **first name**: Your first name
-			> **last name**: Your last name
-			> **campus**: Lev or Tal
-			> **year**: an integer from 1 to 4 (inclusive)
+		> **first name**: Your first name
+		> **last name**: Your last name
+		> **campus**: Lev or Tal
+		> **year**: an integer from 1 to 4 (inclusive)
 
 		"""
 		try:
@@ -122,7 +121,14 @@ class JoinCog(commands.Cog, name="Join"):
 				)
 			self.attempts[ctx.author] += 1
 			raise FriendlyError(err_msg, ctx.channel, ctx.author)
-		await ctx.send(embeds=[discord.Embed(title=f"{ctx.author} used `/{ctx.invoked_with}`")])
+		await ctx.send(
+			embeds=[
+				utils.embed_success(
+					title=f"**{ctx.author.display_name}** used **/{ctx.invoked_with}**"
+				)
+			]
+		)
+
 
 # setup functions for bot
 def setup(bot: commands.Bot):
