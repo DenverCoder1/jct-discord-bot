@@ -104,22 +104,9 @@ class JoinCog(commands.Cog, name="Join"):
 	async def _join(
 		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
 	):
-		try:
-			await self.assigner.assign(
-				ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
-			)
-		except JoinParseError as err:
-			if ctx.author not in self.attempts:
-				self.attempts[ctx.author] = 0
-			err_msg = str(err)
-			if self.attempts[ctx.author] > 1:
-				err_msg += (
-					f"\n\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE_ID').mention}"
-					f" Help! {ctx.author.mention} doesn't seem to be able to read"
-					" instructions."
-				)
-			self.attempts[ctx.author] += 1
-			raise FriendlyError(err_msg, ctx.channel, ctx.author)
+		await self.assigner.assign(
+			ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
+		)
 		await ctx.send(
 			embeds=[
 				utils.embed_success(
