@@ -11,7 +11,7 @@ load_dotenv()
 # Discord setup
 token = os.getenv("DISCORD_TOKEN")
 
-guild_id = os.getenv("DISCORD_GUILD")
+guild_id = int(os.getenv("DISCORD_GUILD"))
 guild: discord.Guild = None  # To be loaded on ready
 
 # Connect to database

@@ -1,4 +1,5 @@
 import os
+import discord
 from utils import utils
 from modules.join.assigner import Assigner
 from modules.error.friendly_error import FriendlyError
@@ -63,7 +64,7 @@ class JoinCog(commands.Cog, name="Join"):
 	@cog_ext.cog_slash(
 		name="join",
 		description="Join command to get new users information and place them in the right roles.",
-		guild_ids=[],
+		guild_ids=[config.guild_id],
 		options=[
 			create_option(
 				name="first_name",
@@ -93,16 +94,15 @@ class JoinCog(commands.Cog, name="Join"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=True,
 				choices=[
-					create_choice(name="Year1", value=1),
-					create_choice(name="Year2", value=2),
-					create_choice(name="Year3", value=3),
-					create_choice(name="Year4", value=4),
+					create_choice(name="Year 1", value=1),
+					create_choice(name="Year 2", value=2),
+					create_choice(name="Year 3", value=3),
+					create_choice(name="Year 4", value=4),
 				],
 			),
 		],
 	)
-	@commands.has_role(utils.get_id("UNASSIGNED_ROLE_ID"))
-	async def test(
+	async def _join(
 		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
 	):
 		try:
@@ -122,7 +122,7 @@ class JoinCog(commands.Cog, name="Join"):
 				)
 			self.attempts[ctx.author] += 1
 			raise FriendlyError(err_msg, ctx.channel, ctx.author)
-
+		await ctx.send(embeds=[discord.Embed(title=f"{ctx.author} used `/{ctx.invoked_with}`")])
 
 # setup functions for bot
 def setup(bot: commands.Bot):
