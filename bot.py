@@ -1,5 +1,4 @@
 import os
-
 import discord
 import config
 from discord.ext import commands
