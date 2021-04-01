@@ -127,6 +127,7 @@ dmypy.json
 # IDE stuff
 .vscode/
 .idea/
+.DS_Store
 
 # Google OAUTH
 jct-compsci-esp-*.json

@@ -13,8 +13,8 @@ class CourseManagerCog(commands.Cog):
 		self.adder = CourseAdder(config.conn, config.sql_fetcher)
 		self.deleter = CourseDeleter(config.conn, config.sql_fetcher)
 
-	@has_permissions(manage_channels=True)
 	@commands.command(name="courses.add")
+	@has_permissions(manage_channels=True)
 	async def add_course(
 		self,
 		ctx: commands.Context,
