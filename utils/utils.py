@@ -10,6 +10,7 @@ import discord
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
 
+
 class IdNotFoundError(Exception):
 	def __init__(self, *args: object) -> None:
 		super().__init__(*args)
@@ -39,18 +40,6 @@ def blockquote(string: str) -> str:
 	# inserts > at the start of string and after new lines
 	# as long as it is not at the end of the string
 	return re.sub(r"(^|\n)(?!$)", r"\1> ", string.strip())
-
-
-def embed_success(
-	title: str,
-	description: str = None,
-	colour: discord.Colour = discord.Colour.green(),
-) -> discord.Embed:
-	"""Embed a success message and an optional description"""
-	embed = discord.Embed(title=title, colour=colour)
-	if description:
-		embed.description = description
-	return embed
 
 
 def ordinal(n: int):
@@ -97,8 +86,8 @@ def parse_date(
 	"""Returns datetime object for given date string
 	Arguments:
 	<date_str>: date string to parse
-	[from_tz]: string representing the timezone to interpret the date as (ex. "Asia/Jerusalem")
-	[to_tz]: string representing the timezone to return the date in (ex. "Asia/Jerusalem")
+	[from_tz]: string representing the timezone to interpret the date as (eg. "Asia/Jerusalem")
+	[to_tz]: string representing the timezone to return the date in (eg. "Asia/Jerusalem")
 	[future]: set to true to prefer dates from the future when parsing
 	[base]: datetime representing where dates should be parsed relative to
 	[settings]: dict of additional settings for dateparser.parse()
@@ -128,11 +117,11 @@ def format_date(
 	date_format = ""
 	# include the date if the date is different from the base
 	if date.date() != base.date():
-		# %a = Weekday (ex. "Mon"), %d = Day (ex. "01"), %b = Month (ex. "Sep")
+		# %a = Weekday (eg. "Mon"), %d = Day (eg. "01"), %b = Month (eg. "Sep")
 		date_format = "%a %d %b"
 		# include the year if the date is in a different year
 		if date.year != base.year:
-			# %Y = Year (ex. "2021")
+			# %Y = Year (eg. "2021")
 			date_format += " %Y"
 	# include the time if it is not an all day event and not the same as the base
 	if not all_day and date != base:
@@ -151,7 +140,7 @@ async def wait_for_reaction(
 ) -> int:
 	"""Add reactions to message and wait for user to react with one.
 	Returns the index of the selected emoji (integer in range 0 to len(emoji_list) - 1)
-	
+
 	Arguments:
 	<bot>: str - the bot user
 	<message>: str - the message to apply reactions to
@@ -162,10 +151,10 @@ async def wait_for_reaction(
 
 	def validate_reaction(reaction: discord.Reaction, user: discord.Member) -> bool:
 		"""Validates that:
-			- The reaction is on the message currently being checked
-			- The emoji is one of the emojis on the list
-			- The reaction is not a reaction by the bot
-			- The user who reacted is one of the allowed users
+		- The reaction is on the message currently being checked
+		- The emoji is one of the emojis on the list
+		- The reaction is not a reaction by the bot
+		- The user who reacted is one of the allowed users
 		"""
 		return (
 			reaction.message == message
@@ -180,7 +169,9 @@ async def wait_for_reaction(
 
 	try:
 		# wait for reaction (returns reaction and user)
-		reaction, _ = await bot.wait_for("reaction_add", check=validate_reaction, timeout=timeout)
+		reaction, _ = await bot.wait_for(
+			"reaction_add", check=validate_reaction, timeout=timeout
+		)
 	except asyncio.TimeoutError as error:
 		# clear reactions
 		await message.clear_reactions()

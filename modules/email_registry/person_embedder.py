@@ -6,7 +6,7 @@ import discord
 
 class PersonEmbedder:
 	def gen_embed(self, people: Iterable[Person]) -> discord.Embed:
-		embed = discord.Embed(colour=discord.Colour.green())
+		embed = discord.Embed(colour=discord.Colour.teal())
 
 		for person in people:
 			embed.add_field(

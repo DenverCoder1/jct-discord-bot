@@ -20,7 +20,7 @@ class FormattingCog(commands.Cog, name="Formatting Tips"):
 		```
 		Arguments:
 
-			> **format** (optional): The format to display information about (ex. "bold", "italics", "codeblock", ...)
+			> **format** (optional): The format to display information about (eg. "bold", "italics", "codeblock", ...)
 
 		If no argument is specified, all markdown tips will be displayed.
 		"""

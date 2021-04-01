@@ -1,3 +1,4 @@
+import os
 import discord
 import psycopg2.extensions as sql
 from typing import Iterable
@@ -18,7 +19,9 @@ class PersonAdder:
 		categoriser: Categoriser,
 		member_id: int = None,
 	) -> int:
-		query = self.sql_fetcher["add_person.sql"]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "email_registry", "queries", "add_person.sql")
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

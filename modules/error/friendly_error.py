@@ -1,4 +1,5 @@
 import discord
+import utils.embedder
 
 
 class FriendlyError(Exception):
@@ -23,6 +24,4 @@ class FriendlyError(Exception):
 		return f"Sorry {self.member.display_name}, " if self.member is not None else ""
 
 	async def reply(self):
-		await self.channel.send(
-			embed=discord.Embed(title=str(self), colour=discord.Colour.red())
-		)
+		await self.channel.send(embed=utils.embedder.embed_error(str(self)))

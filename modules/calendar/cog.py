@@ -13,7 +13,8 @@ from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
-from utils.utils import is_email, build_aliases, embed_success, wait_for_reaction
+from utils.embedder import embed_success
+from utils.utils import is_email, build_aliases, wait_for_reaction
 from utils.scheduler.scheduler import Scheduler
 
 
@@ -24,7 +25,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.bot = bot
 		self.calendar_service = CalendarService()
 		self.calendar_embedder = CalendarEmbedder()
-		self.sql_fetcher = SqlFetcher(os.path.join("modules", "calendar", "queries"))
+		self.sql_fetcher = config.sql_fetcher
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
 		self.calendar_creator = CalendarCreator(self.calendar_service, config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
@@ -50,7 +51,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		++calendar.links <Class Name>
 		```
 		Arguments:
-		**<Class Name>**: The calendar to get links for (ex. "Lev 2023").
+		**<Class Name>**: The calendar to get links for (eg. "Lev 2023").
 		"""
 		try:
 			calendar_name = " ".join(args) if args else None
@@ -87,7 +88,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Arguments:
 		**<query>**: The query to search for within event titles. This can be a string to search for or a channel mention. (Default: shows any events)
 		**<max_results>**: The maximum number of events to display. (Default: 5 results or 15 with query)
-		**<Class Name>**: The calendar to get events from (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to get events from (eg. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		try:
 			last_occurence = max(loc for loc, val in enumerate(args) if val == "in") if "in" in args else len(args)
@@ -123,7 +124,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				# fetch a page of events
 				events, page_token = self.calendar_service.fetch_upcoming(
 					calendar.id, max_results, full_query, page_token
-				)					
+				)
 				# initialize count if there are multiple pages
 				if page_num is None and page_token:
 					page_num = 1
@@ -184,7 +185,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		**<Title>**: The name of the event to add. (You can use channel mentions in here to get fully qualified course names.)
 		**<Start>**: The start date and/or time of the event (Israel time).
 		**<End>**: The end date and/or time of the event (Israel time). If not specified, the start time is used.
-		**<Class Name>**: The calendar to add the event to (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to add the event to (eg. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# replace channel mentions with course names
 		message = self.course_mentions.replace_channel_mentions(" ".join(args))
@@ -264,7 +265,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		Arguments:
 		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
 		**[parameters to set]**: List of parameters in the form `title="new title"`. See below for the list of parameters.
-		**<Class Name>**: The calendar to update the event in (ex. "in Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to update the event in (eg. "in Lev 2023"). Only necessary if you have more than one class role.
 
 		Allowed parameters (all are optional):
 		**title**: The new title of the event.
@@ -380,7 +381,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		**<query>**: A keyword to look for in event titles. This can be a string to search or include a channel mention.
-		**<Class Name>**: The calendar to delete the event from (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to delete the event from (eg. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(" ".join(args))
@@ -461,7 +462,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		```
 		Arguments:
 		**<email>**: Email address to add as a calendar manager.
-		**<Class Name>**: The calendar to grant access to (ex. "Lev 2023"). Only necessary if you have more than one class role.
+		**<Class Name>**: The calendar to grant access to (eg. "Lev 2023"). Only necessary if you have more than one class role.
 		"""
 		# check if calendar was specified
 		calendar_match = re.search(r"\b(\w{3} \d{4})", " ".join(args))

@@ -1,3 +1,4 @@
+import os
 from utils.sql_fetcher import SqlFetcher
 from utils.utils import is_email
 from modules.error.quiet_warning import QuietWarning
@@ -21,7 +22,9 @@ class EmailAdder:
 	def __add_remove_emails(
 		self, sql_file: str, person: Person, emails: Iterable[str]
 	) -> None:
-		query = self.sql_fetcher[sql_file]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "email_registry", "queries", sql_file)
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for email in emails:

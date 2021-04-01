@@ -6,6 +6,7 @@ from discord.ext import commands
 
 class XKCDCog(commands.Cog, name="XKCD Comics"):
 	"""Displays the latest xkcd comic, random comics, or comics for your search terms"""
+
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.xkcd_fetcher = XKCDFetcher()
@@ -16,16 +17,16 @@ class XKCDCog(commands.Cog, name="XKCD Comics"):
 		"""Displays the latest xkcd comic, random comics, or comics for your search terms
 
 		Usage:
-		
+
 		`++xkcd` - displays a random xkcd comic
 
 		`++xkcd latest` - displays the latest xkcd comic
 
-		`++xkcd [number]` - displays an xkcd comic given its id (ex. `++xkcd 327`)
+		`++xkcd [number]` - displays an xkcd comic given its id (eg. `++xkcd 327`)
 
-		`++xkcd [search term]` - displays a comic for your search term (ex. `++xkcd sql`)
+		`++xkcd [search term]` - displays a comic for your search term (eg. `++xkcd sql`)
 		"""
-		
+
 		search = " ".join(args).lower()
 
 		try:
