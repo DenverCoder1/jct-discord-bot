@@ -124,8 +124,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# VS Code stuff
+# IDE stuff
 .vscode/
+.idea/
 
 # Google OAUTH
 jct-compsci-esp-*.json
