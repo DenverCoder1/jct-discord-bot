@@ -1,10 +1,6 @@
-import os
 from utils import utils
 from modules.join.assigner import Assigner
-from modules.error.friendly_error import FriendlyError
-from modules.join.join_parser import JoinParseError, JoinParser
 from discord.ext import commands
-from utils.sql_fetcher import SqlFetcher
 import config
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
@@ -23,42 +19,6 @@ class JoinCog(commands.Cog, name="Join"):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		self.assigner = Assigner(config.guild, config.conn, self.sql_fetcher)
-
-	@commands.command(name="join")
-	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
-	async def join(self, ctx: commands.Context):
-		"""
-		Join command to get new users information and place them in the right roles
-
-		Usage:
-		```
-		++join first name, last name, campus, year
-		```
-		Arguments:
-
-		> **first name**: Your first name
-		> **last name**: Your last name
-		> **campus**: Lev or Tal
-		> **year**: an integer from 1 to 4 (inclusive)
-
-		"""
-		try:
-			parser = JoinParser(ctx.message.content)
-			await self.assigner.assign(
-				ctx.author, parser.name(), parser.campus(), parser.year()
-			)
-		except JoinParseError as err:
-			if ctx.author not in self.attempts:
-				self.attempts[ctx.author] = 0
-			err_msg = str(err)
-			if self.attempts[ctx.author] > 1:
-				err_msg += (
-					f"\n\n{utils.get_discord_obj(ctx.guild.roles, 'ADMIN_ROLE').mention}"
-					f" Help! {ctx.author.mention} doesn't seem to be able to read"
-					" instructions."
-				)
-			self.attempts[ctx.author] += 1
-			raise FriendlyError(err_msg, ctx.channel, ctx.author)
 
 	@cog_ext.cog_slash(
 		name="join",
