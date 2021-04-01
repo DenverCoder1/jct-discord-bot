@@ -1,3 +1,7 @@
+import discord
+from discord_slash import cog_ext, SlashContext
+from discord_slash.model import SlashCommandOptionType
+from discord_slash.utils.manage_commands import create_choice, create_option
 from modules.email_registry.categoriser import Categoriser
 from modules.email_registry.person_embedder import PersonEmbedder
 from modules.email_registry.person_finder import PersonFinder
@@ -25,18 +29,29 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		self.person_adder = PersonAdder(config.conn, self.sql_fetcher)
 		self.categoriser = Categoriser(config.conn, self.sql_fetcher)
 
-	@commands.command(name="getemail", aliases=["email", "emailof"])
-	async def get_email(self, ctx: commands.Context, *args):
-		"""This command returns the email address of the person you ask for.
-
-		Usage:
-		```
-		++getemail query
-		```
-		Arguments:
-		> **query**: A string with the professor's name and/or any courses they teach (or their channels) (e.g. eitan computer science)
-		"""
-		people = self.finder.search(args, ctx.channel)
+	@cog_ext.cog_slash(
+		name="email",
+		description="Get the email address of the person you search for",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="name",
+				description="Professor's first name, last name, or both. eg moti",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+			create_option(
+				name="course",
+				description="Mention a course the professor teaches",
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=False,
+			),
+		],
+	)
+	async def get_email(
+		self, ctx: SlashContext, name: str, course_channel: discord.TextChannel
+	):
+		people = self.finder.search(name, course_channel or ctx.channel)
 		people = {person for person in people if person.emails}
 		if not people:
 			raise FriendlyError(
