@@ -41,7 +41,7 @@ This bot was created by the contribution of the following members. If you would 
         <a href="https://github.com/zabrown2000">
             <img src="https://avatars.githubusercontent.com/u/25807259?v=4" width="100;" alt="zabrown2000"/>
             <br />
-            <sub><b>zabrown2000</b></sub>
+            <sub><b>Zabrown2000</b></sub>
         </a>
     </td>
     <td align="center">
