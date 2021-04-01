@@ -53,7 +53,7 @@ def decode_mention(mention: str) -> Tuple[Optional[str], Optional[int]]:
 		return None, None
 	else:
 		groups = match.groups()
-		return "channel" if groups[0] == "#" else "member", groups[1]
+		return "channel" if groups[0] == "#" else "member", int(groups[1])
 
 
 def is_email(email: str) -> bool:

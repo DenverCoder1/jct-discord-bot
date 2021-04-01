@@ -1,4 +1,3 @@
-import os
 import config
 from typing import Iterable
 from utils.sql_fetcher import SqlFetcher
@@ -15,7 +14,7 @@ class Campus:
 	def get_campuses() -> Iterable["Campus"]:
 		"""Fetch a list of campuses from the database"""
 		query = Campus.sql_fetcher.fetch(
-			os.path.join("utils", "campus", "queries", "get_campuses.sql")
+			"utils", "campus", "queries", "get_campuses.sql"
 		)
 		with config.conn as conn:
 			with conn.cursor() as cursor:

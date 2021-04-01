@@ -1,4 +1,3 @@
-import os
 from .calendar import Calendar
 import discord
 import psycopg2.extensions as sql
@@ -17,7 +16,7 @@ class CalendarFinder:
 	def get_calendar_id(self, grad_year: int, campus: str) -> str:
 		"""Searches the database the calendar id for a given graduation year and campus"""
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "calendar", "queries", "search_calendar.sql")
+			"modules", "calendar", "queries", "search_calendar.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -31,7 +30,7 @@ class CalendarFinder:
 	def get_campus(self, text: str) -> str:
 		"""Searches the database the campus matching the user's string"""
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "calendar", "queries", "search_campus.sql")
+			"modules", "calendar", "queries", "search_campus.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -76,7 +75,7 @@ class CalendarFinder:
 	def __get_class_roles(self, member: discord.Member) -> Iterable[tuple]:
 		"""Returns a list of (grad_year, campus) pairs found in a member's roles"""
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "calendar", "queries", "get_class_roles.sql")
+			"modules", "calendar", "queries", "get_class_roles.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:

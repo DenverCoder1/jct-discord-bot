@@ -1,4 +1,3 @@
-import os
 import discord
 import config
 import psycopg2.extensions as sql
@@ -79,7 +78,7 @@ class PersonFinder:
 		if not ids:
 			return set()
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "email_registry", "queries", "get_people.sql")
+			"modules", "email_registry", "queries", "get_people.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -92,7 +91,7 @@ class PersonFinder:
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the people who belong to its category"""
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "email_registry", "queries", "search_channel.sql")
+			"modules", "email_registry", "queries", "search_channel.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -103,7 +102,7 @@ class PersonFinder:
 	def __search_member(self, id: int) -> Optional[int]:
 		"""searches the database for a person's id and returns the IDs of the people who match it"""
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "email_registry", "queries", "search_member.sql")
+			"modules", "email_registry", "queries", "search_member.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -114,7 +113,7 @@ class PersonFinder:
 	def __search_kw(self, keyword: str) -> Set[int]:
 		"""searches the database for a single keyword and returns the IDs of the people who match it"""
 		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "email_registry", "queries", "search_kw.sql")
+			"modules", "email_registry", "queries", "search_kw.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:

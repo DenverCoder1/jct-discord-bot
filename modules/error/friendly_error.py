@@ -14,14 +14,18 @@ class FriendlyError(Exception):
 		channel: discord.TextChannel,
 		member: discord.Member = None,
 		inner: Exception = None,
+		description: str = None,
 	):
 		self.channel = channel
 		self.member = member
 		self.inner = inner
+		self.description = description
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
 		return f"Sorry {self.member.display_name}, " if self.member is not None else ""
 
 	async def reply(self):
-		await self.channel.send(embed=utils.embedder.embed_error(str(self)))
+		await self.channel.send(
+			embed=utils.embedder.embed_error(str(self), description=self.description)
+		)
