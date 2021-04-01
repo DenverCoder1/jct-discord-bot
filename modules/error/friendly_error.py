@@ -41,10 +41,6 @@ class FriendlyError(Exception):
 		return f"Sorry {self.member.display_name}, " if self.member is not None else ""
 
 	async def reply(self):
-<<<<<<< Updated upstream
-		await self.channel.send(
-=======
 		await self.sendable.send(
->>>>>>> Stashed changes
 			embed=utils.embedder.embed_error(str(self), description=self.description)
 		)
