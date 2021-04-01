@@ -16,14 +16,11 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.sql_fetcher = SqlFetcher(
-			os.path.join("modules", "email_registry", "queries")
-		)
-		self.finder = PersonFinder(config.conn, self.sql_fetcher)
+		self.finder = PersonFinder(config.conn, config.sql_fetcher)
 		self.embedder = PersonEmbedder()
-		self.email_adder = EmailAdder(config.conn, self.sql_fetcher)
-		self.person_adder = PersonAdder(config.conn, self.sql_fetcher)
-		self.categoriser = Categoriser(config.conn, self.sql_fetcher)
+		self.email_adder = EmailAdder(config.conn, config.sql_fetcher)
+		self.person_adder = PersonAdder(config.conn, config.sql_fetcher)
+		self.categoriser = Categoriser(config.conn, config.sql_fetcher)
 
 	@commands.command(name="getemail", aliases=["email", "emailof"])
 	async def get_email(self, ctx: commands.Context, *args):
@@ -163,15 +160,18 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 	async def __link_unlink(self, args, ctx: commands.Context, sep_word: str, func):
 		# search for professor's detailschannel-mentions
 		try:
-			index_to = len(args) - 1 - args[::-1].index(sep_word)  # last index
+			# index of last occurrence of sep_word in args
+			index_sep = len(args) - 1 - args[::-1].index(sep_word)
 		except ValueError as e:
 			raise FriendlyError(
 				f'You must include the word "{sep_word}" in between your query and the'
 				" channel mentions",
 				ctx.channel,
+				ctx.author,
+				e,
 			)
-		person = self.finder.search_one(args[:index_to], ctx.channel)
-		success, error_msg = func(person.id, args[index_to + 1 :])
+		person = self.finder.search_one(args[:index_sep], ctx.channel)
+		success, error_msg = func(person.id, args[index_sep + 1 :])
 		if not success:
 			raise FriendlyError(error_msg, ctx.channel, ctx.author)
 		person = self.finder.get_people([person.id])

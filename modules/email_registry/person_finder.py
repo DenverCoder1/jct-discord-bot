@@ -1,3 +1,4 @@
+import os
 import discord
 import config
 import psycopg2.extensions as sql
@@ -59,9 +60,9 @@ class PersonFinder:
 		people = self.search(query, curr_channel)
 		if not people:
 			raise FriendlyError(
-				"Unable to find someone who matches your query. Check your spelling or"
-				" try a different query. If you still can't find them, You can add"
-				f" them with `{config.prefix}addperson`.",
+				f'Unable to find someone who matches "{" ".join(query)}". Check your'
+				" spelling or try a different query. If you still can't find them,"
+				f" You can add them with `{config.prefix}addperson`.",
 				curr_channel,
 			)
 		if len(people) > 1:
@@ -77,7 +78,9 @@ class PersonFinder:
 		"""searches the database for a person with a given id and returns a Person object"""
 		if not ids:
 			return set()
-		query = self.sql_fetcher["get_people.sql"]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "email_registry", "queries", "get_people.sql")
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"ids": tuple(ids)})
@@ -88,7 +91,9 @@ class PersonFinder:
 
 	def __search_channel(self, id: int) -> Set[int]:
 		"""searches the database for a channel id and returns the IDs of the people who belong to its category"""
-		query = self.sql_fetcher["search_channel.sql"]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "email_registry", "queries", "search_channel.sql")
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"channel_id": id})
@@ -97,7 +102,9 @@ class PersonFinder:
 
 	def __search_member(self, id: int) -> Optional[int]:
 		"""searches the database for a person's id and returns the IDs of the people who match it"""
-		query = self.sql_fetcher["search_member.sql"]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "email_registry", "queries", "search_member.sql")
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"member_id": id})
@@ -106,7 +113,9 @@ class PersonFinder:
 
 	def __search_kw(self, keyword: str) -> Set[int]:
 		"""searches the database for a single keyword and returns the IDs of the people who match it"""
-		query = self.sql_fetcher["search_kw.sql"]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "email_registry", "queries", "search_kw.sql")
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"kw": keyword})

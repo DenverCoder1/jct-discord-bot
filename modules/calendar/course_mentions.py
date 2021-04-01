@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 import psycopg2.extensions as sql
@@ -16,7 +17,9 @@ class CourseMentions:
 
 	def get_channel_full_name(self, channel: str) -> str:
 		"""Searches the database for the course name given the channel id"""
-		query = self.sql_fetcher["search_category_name.sql"]
+		query = self.sql_fetcher.fetch(
+			os.path.join("modules", "calendar", "queries", "search_category_name.sql")
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"channel": channel})

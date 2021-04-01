@@ -15,7 +15,7 @@ class CalendarEmbedder:
 		title: str,
 		events: Iterable[Event],
 		description: str = "",
-		colour: discord.Colour = discord.Colour.green(),
+		colour: discord.Colour = discord.Colour.blue(),
 		enumeration: Iterable[str] = [],
 		page_num: int = None,
 	) -> discord.Embed:
@@ -54,7 +54,7 @@ class CalendarEmbedder:
 		self,
 		title: str,
 		links: Dict[str, str],
-		colour: discord.Colour = discord.Colour.green(),
+		colour: discord.Colour = discord.Colour.dark_blue(),
 	) -> discord.Embed:
 		"""Embed a list of links given a mapping of link text to urls"""
 		embed = discord.Embed(title=title, colour=colour)
