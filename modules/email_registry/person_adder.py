@@ -18,7 +18,9 @@ class PersonAdder:
 		categoriser: Categoriser,
 		member_id: int = None,
 	) -> int:
-		query = self.sql_fetcher["add_person.sql"]
+		query = self.sql_fetcher.fetch(
+			"modules", "email_registry", "queries", "add_person.sql"
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

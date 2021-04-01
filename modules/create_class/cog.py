@@ -14,7 +14,7 @@ class CreateClassCog(commands.Cog, name="Year Roles"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		sql_fetcher = SqlFetcher(os.path.join("modules", "create_class", "queries"))
+		sql_fetcher = config.sql_fetcher
 		self.classes_creator = classes_creator(config.conn, sql_fetcher)
 
 	@Scheduler.schedule()

@@ -15,7 +15,9 @@ class CalendarFinder:
 
 	def get_calendar_id(self, grad_year: int, campus: str) -> str:
 		"""Searches the database the calendar id for a given graduation year and campus"""
-		query = self.sql_fetcher["search_calendar.sql"]
+		query = self.sql_fetcher.fetch(
+			"modules", "calendar", "queries", "search_calendar.sql"
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"grad_year": grad_year, "campus": campus})
@@ -27,7 +29,9 @@ class CalendarFinder:
 
 	def get_campus(self, text: str) -> str:
 		"""Searches the database the campus matching the user's string"""
-		query = self.sql_fetcher["search_campus.sql"]
+		query = self.sql_fetcher.fetch(
+			"modules", "calendar", "queries", "search_campus.sql"
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"text": text})
@@ -70,7 +74,9 @@ class CalendarFinder:
 
 	def __get_class_roles(self, member: discord.Member) -> Iterable[tuple]:
 		"""Returns a list of (grad_year, campus) pairs found in a member's roles"""
-		query = self.sql_fetcher["get_class_roles.sql"]
+		query = self.sql_fetcher.fetch(
+			"modules", "calendar", "queries", "get_class_roles.sql"
+		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

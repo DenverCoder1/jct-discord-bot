@@ -1,4 +1,5 @@
 import discord
+import utils.embedder
 
 
 class FriendlyError(Exception):
@@ -13,10 +14,12 @@ class FriendlyError(Exception):
 		channel: discord.TextChannel,
 		member: discord.Member = None,
 		inner: Exception = None,
+		description: str = None,
 	):
 		self.channel = channel
 		self.member = member
 		self.inner = inner
+		self.description = description
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
@@ -24,5 +27,5 @@ class FriendlyError(Exception):
 
 	async def reply(self):
 		await self.channel.send(
-			embed=discord.Embed(title=str(self), colour=discord.Colour.red())
+			embed=utils.embedder.embed_error(str(self), description=self.description)
 		)

@@ -38,7 +38,7 @@ class Assigner:
 		base_year = last_elul.to_pydate().year
 		grad_year = base_year + 4 - year
 
-		query = self.sql_fetcher["get_role.sql"]
+		query = self.sql_fetcher.fetch("modules", "join", "queries", "get_role.sql")
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"campus": campus, "grad_year": grad_year})

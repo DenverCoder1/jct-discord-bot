@@ -43,7 +43,9 @@ class Class:
 		)
 
 	async def __move_role(self):
-		query = self.__sql_fetcher["get_roles.sql"]
+		query = self.__sql_fetcher.fetch(
+			"modules", "create_class", "queries", "get_roles.sql"
+		)
 		with self.__conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)
@@ -59,7 +61,9 @@ class Class:
 		)
 
 	def __add_to_database(self):
-		query = self.__sql_fetcher["add_class.sql"]
+		query = self.__sql_fetcher.fetch(
+			"modules", "create_class", "queries", "add_class.sql"
+		)
 		with self.__conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

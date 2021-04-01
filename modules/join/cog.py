@@ -18,7 +18,7 @@ class JoinCog(commands.Cog, name="Join"):
 		self.bot = bot
 		self.assigner = None
 		self.attempts = {}
-		self.sql_fetcher = SqlFetcher(os.path.join("modules", "join", "queries"))
+		self.sql_fetcher = config.sql_fetcher
 
 	@commands.Cog.listener()
 	async def on_ready(self):

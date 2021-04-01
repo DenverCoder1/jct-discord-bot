@@ -21,7 +21,7 @@ class EmailAdder:
 	def __add_remove_emails(
 		self, sql_file: str, person: Person, emails: Iterable[str]
 	) -> None:
-		query = self.sql_fetcher[sql_file]
+		query = self.sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for email in emails:

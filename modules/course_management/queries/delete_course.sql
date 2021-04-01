@@ -1,0 +1,1 @@
+delete from categories where channel = %(channel_id)s
