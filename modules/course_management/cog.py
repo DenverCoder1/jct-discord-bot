@@ -55,7 +55,7 @@ class CourseManagerCog(commands.Cog):
 
 		Usage:
 		```
-		++courses.add <course mention>
+		++courses.delete <course mention>
 		```
 		Arguments:
 		**<course mention>**: Mention the channel of the course you want to delete using #. (eg. #object-oriented-programming)
