@@ -10,7 +10,6 @@ class CourseManagerCog(commands.Cog):
 	def __init__(self):
 		self.adder = CourseAdder(config.conn, config.sql_fetcher)
 
-	@has_permissions(manage_channels=True)
 	@commands.command(
 		**build_aliases(
 			name="courses.add",
@@ -19,6 +18,7 @@ class CourseManagerCog(commands.Cog):
 			more_aliases=("addcourse",),
 		)
 	)
+	@has_permissions(manage_channels=True)
 	async def add_course(
 		self,
 		ctx: commands.Context,
