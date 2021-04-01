@@ -31,6 +31,20 @@ This bot was created by the contribution of the following members. If you would 
         </a>
     </td>
     <td align="center">
+        <a href="https://github.com/shirapahmer">
+            <img src="https://avatars.githubusercontent.com/u/65983020?v=4" width="100;" alt="shirapahmer"/>
+            <br />
+            <sub><b>Shira Pahmer</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/zabrown2000">
+            <img src="https://avatars.githubusercontent.com/u/25807259?v=4" width="100;" alt="zabrown2000"/>
+            <br />
+            <sub><b>zabrown2000</b></sub>
+        </a>
+    </td>
+    <td align="center">
         <a href="https://github.com/etandinnerman">
             <img src="https://avatars.githubusercontent.com/u/48675226?v=4" width="100;" alt="etandinnerman"/>
             <br />
