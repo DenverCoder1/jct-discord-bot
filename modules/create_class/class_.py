@@ -1,4 +1,3 @@
-import os
 import discord
 from utils.utils import get_discord_obj
 import psycopg2.extensions as sql
@@ -45,7 +44,7 @@ class Class:
 
 	async def __move_role(self):
 		query = self.__sql_fetcher.fetch(
-			os.path.join("modules", "create_class", "queries", "get_roles.sql")
+			"modules", "create_class", "queries", "get_roles.sql"
 		)
 		with self.__conn as conn:
 			with conn.cursor() as cursor:
@@ -63,7 +62,7 @@ class Class:
 
 	def __add_to_database(self):
 		query = self.__sql_fetcher.fetch(
-			os.path.join("modules", "create_class", "queries", "add_class.sql")
+			"modules", "create_class", "queries", "add_class.sql"
 		)
 		with self.__conn as conn:
 			with conn.cursor() as cursor:

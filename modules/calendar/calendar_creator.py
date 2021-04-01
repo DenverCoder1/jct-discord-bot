@@ -1,4 +1,3 @@
-import os
 from utils.sql_fetcher import SqlFetcher
 import psycopg2.extensions as sql
 from .calendar_service import CalendarService
@@ -26,7 +25,7 @@ class CalendarCreator:
 	def __add_calendar(self, calendar_id: str, campus_id: int, year: int):
 		"""Update the class entry in the database with the calendar id"""
 		query = self.__sql_fetcher.fetch(
-			os.path.join("modules", "calendar", "queries", "add_calendar.sql")
+			"modules", "calendar", "queries", "add_calendar.sql"
 		)
 		with self.__conn as conn:
 			with conn.cursor() as cursor:

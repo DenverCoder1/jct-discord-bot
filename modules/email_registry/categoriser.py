@@ -1,4 +1,3 @@
-import os
 from typing import Iterable, Optional, Tuple
 from utils.sql_fetcher import SqlFetcher
 from utils.utils import decode_mention
@@ -29,9 +28,7 @@ class Categoriser:
 	def __add_remove_categories(
 		self, sql_file: str, person_id: int, channel_mentions: Iterable[str]
 	) -> Tuple[bool, Optional[str]]:
-		query = self.sql_fetcher.fetch(
-			os.path.join("modules", "email_registry", "queries", sql_file)
-		)
+		query = self.sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for channel in channel_mentions:

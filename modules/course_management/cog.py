@@ -1,23 +1,19 @@
-from utils.utils import build_aliases
+from utils.utils import decode_mention
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
 from modules.course_management.course_adder import CourseAdder
+from modules.course_management.course_deleter import CourseDeleter
+from modules.error.friendly_error import FriendlyError
 import config
 
 
 class CourseManagerCog(commands.Cog):
 	def __init__(self):
 		self.adder = CourseAdder(config.conn, config.sql_fetcher)
+		self.deleter = CourseDeleter(config.conn, config.sql_fetcher)
 
-	@commands.command(
-		**build_aliases(
-			name="courses.add",
-			prefix=("course", "courses"),
-			suffix=("add", "new"),
-			more_aliases=("addcourse",),
-		)
-	)
+	@commands.command(name="courses.add")
 	@has_permissions(manage_channels=True)
 	async def add_course(
 		self,
@@ -28,7 +24,7 @@ class CourseManagerCog(commands.Cog):
 		channel_name: str = "",
 	):
 		"""
-		Add a new course to the database and create a channel for it
+		Add a new course to the database and create a channel for it.
 
 		Usage:
 		```
@@ -50,6 +46,31 @@ class CourseManagerCog(commands.Cog):
 		await ctx.send(
 			embed=embed_success("Nice! You created a course channel.", channel.mention)
 		)
+
+	@has_permissions(manage_channels=True)
+	@commands.command(name="courses.delete")
+	async def delete_course(self, ctx: commands.Context, channel_mention: str):
+		"""
+		Delete course from the database and delete its channel. Note: This should only be done for a course that will never be taught again.
+
+		Usage:
+		```
+		++courses.delete <course mention>
+		```
+		Arguments:
+		**<course mention>**: Mention the channel of the course you want to delete using #. (eg. #object-oriented-programming)
+		"""
+		mention_type, channel_id = decode_mention(channel_mention)
+		if mention_type != "channel":
+			raise FriendlyError(
+				"Expected a channel mention.",
+				description=(
+					f"For example use ```\n{config.prefix}courses.delete"
+					" #object-oriented-programming```"
+				),
+			)
+		await self.deleter.delete_course(ctx, channel_id)
+		await ctx.send(embed=embed_success("You successfully deleted the course."))
 
 
 def setup(bot):

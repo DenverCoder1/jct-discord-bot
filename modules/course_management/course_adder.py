@@ -1,4 +1,3 @@
-import os
 import psycopg2.extensions as sql
 import discord
 import discord.utils
@@ -38,8 +37,7 @@ class CourseAdder:
 		self, ctx: commands.Context, channel_name: str
 	) -> discord.TextChannel:
 		# find courses category
-		guild = ctx.guild
-		category = get_discord_obj(guild.categories, "COURSES_CATEGORY")
+		category = get_discord_obj(ctx.guild.categories, "COURSES_CATEGORY")
 
 		# make sure the channel doesn't already exist
 		if discord.utils.get(category.text_channels, name=channel_name) is not None:
@@ -49,19 +47,16 @@ class CourseAdder:
 				ctx.author,
 			)
 
-		# create the new course channel
+		# create the new course channel at the bottom of the category
 		new_channel = await category.create_text_channel(channel_name)
 
 		# find position to insert the new course channel
-		position = category.text_channels[-1].position + 1
 		for channel in category.text_channels:
 			if channel.name > new_channel.name:
-				position = channel.position - 1
+				# reposition course channel to be in alphabetic order
+				# must be done post-creation because channel name may be changed by discord on creation
+				await new_channel.edit(position=channel.position)
 				break
-
-		# reposition course channel to be in alphabetic order
-		# must be done post-creation because channel name may be changed by discord on creation
-		await new_channel.edit(position=position)
 
 		return new_channel
 
@@ -69,10 +64,10 @@ class CourseAdder:
 		self, channel: discord.TextChannel, course_name: str, labels: Iterable[str]
 	):
 		course_query = self.sql_fetcher.fetch(
-			os.path.join("modules", "course_management", "queries", "add_course.sql")
+			"modules", "course_management", "queries", "add_course.sql"
 		)
 		labels_query = self.sql_fetcher.fetch(
-			os.path.join("modules", "course_management", "queries", "add_label.sql")
+			"modules", "course_management", "queries", "add_label.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
