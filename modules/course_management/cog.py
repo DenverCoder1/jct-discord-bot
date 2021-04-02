@@ -1,4 +1,4 @@
-from utils.mention import decode_mention
+from utils.utils import decode_mention
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands

@@ -1,7 +1,8 @@
 from discord.ext import commands
 import psycopg2.extensions as sql
+from typing import Iterable
 from utils.sql_fetcher import SqlFetcher
-from utils.mention import decode_mention
+from utils.utils import decode_mention
 
 
 class CourseMentions:
