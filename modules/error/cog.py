@@ -1,4 +1,6 @@
 import sys
+
+from discord_slash.context import SlashContext
 from utils import utils
 from discord.ext import commands
 from modules.error.error_handler import ErrorHandler
@@ -30,6 +32,11 @@ class ErrorLogCog(commands.Cog, name="Error Logs"):
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx: commands.Context, error: Exception):
 		"""When a command exception is raised, log it in err.log and bot log channel"""
+		await self.handler.handle(error, ctx.message)
+
+	@commands.Cog.listener()
+	async def on_slash_command_error(self, ctx: SlashContext, error: Exception):
+		"""When a slash exception is raised, log it in err.log and bot log channel"""
 		await self.handler.handle(error, ctx.message)
 
 	@commands.Cog.listener()

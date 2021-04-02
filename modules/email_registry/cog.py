@@ -45,7 +45,10 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		],
 	)
 	async def get_email(
-		self, ctx: SlashContext, name: str, course_channel: discord.TextChannel
+		self,
+		ctx: SlashContext,
+		name: str = None,
+		course_channel: discord.TextChannel = None,
 	):
 		await ctx.defer()  # let discord know the response may take more than 3 seconds
 		people = self.finder.search(name, course_channel or ctx.channel)
@@ -54,14 +57,11 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			raise FriendlyError(
 				"The email you are looking for aught to be here... But it isn't."
 				" Perhaps the archives are incomplete.",
-				ctx.channel,
+				ctx,
 			)
 		else:
-			title = (
-				"**_YOU_ get an email!! _YOU_ get an email!!**\nEveryone gets an email!"
-			)
 			embeds = person_embedder.gen_embeds(people)
-			await ctx.send(content=title, embeds=embeds)
+			await ctx.send(embeds=embeds)
 
 	@commands.command(name="addemail")
 	async def add_email(self, ctx: commands.Context, *args):

@@ -12,25 +12,27 @@ class PersonFinder:
 	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
 		self.conn = conn
 		self.search_weights = {
-			"word": 1,
+			"word": 2,
 			"channel": 1,
 		}
 		self.sql_fetcher = sql_fetcher
 
 	def search(
-		self, name: Optional[str], channel: Optional[discord.TextChannel]
+		self, name: str = None, channel: discord.TextChannel = None
 	) -> Set[Person]:
 		"""returns a list of people who best match the name and channel"""
 		weights = WeightedSet()
 
 		# add the people belonging to the category of the given channel (if any)
-		for person_id in self.__search_channel(channel.id):
-			weights[person_id] += self.search_weights["channel"]
+		if channel:
+			for person_id in self.__search_channel(channel.id):
+				weights[person_id] += self.search_weights["channel"]
 
 		# search their name
-		for word in name:
-			for person_id in self.__search_by_name(word):
-				weights[person_id] += self.search_weights["word"]
+		if name:
+			for word in name.split():
+				for person_id in self.__search_by_name(word):
+					weights[person_id] += self.search_weights["word"]
 
 		people = self.get_people(weights.heaviest_items())
 		return people
@@ -39,7 +41,7 @@ class PersonFinder:
 		self, query: Iterable[str], curr_channel: discord.TextChannel,
 	) -> Person:
 		"""returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one."""
-		people = self.search(query, curr_channel)
+		people = self.search(" ".join(query), curr_channel)
 		if not people:
 			raise FriendlyError(
 				f'Unable to find someone who matches "{" ".join(query)}". Check your'
