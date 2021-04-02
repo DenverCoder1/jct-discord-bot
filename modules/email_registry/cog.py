@@ -1,7 +1,7 @@
 import discord
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
-from discord_slash.utils.manage_commands import create_choice, create_option
+from discord_slash.utils.manage_commands import create_option
 from modules.email_registry.categoriser import Categoriser
 from modules.email_registry import person_embedder
 from modules.email_registry.person_finder import PersonFinder
@@ -9,9 +9,7 @@ from modules.email_registry.email_adder import EmailAdder
 from modules.email_registry.person_adder import PersonAdder
 from modules.error.friendly_error import FriendlyError
 from modules.role_tag.member import Member
-from utils.sql_fetcher import SqlFetcher
 from discord.ext import commands
-import os
 import config
 
 
@@ -27,18 +25,18 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 
 	@cog_ext.cog_slash(
 		name="email",
-		description="Get the email address of the person you search for",
+		description="Get the email address of the person you search for.",
 		guild_ids=[config.guild_id],
 		options=[
 			create_option(
 				name="name",
-				description="Professor's first name, last name, or both. eg moti",
+				description="First name, last name, or both. (eg. moti)",
 				option_type=SlashCommandOptionType.STRING,
 				required=False,
 			),
 			create_option(
-				name="course",
-				description="Mention a course the professor teaches",
+				name="channel",
+				description="Mention a course the professor teaches. (eg. #automata)",
 				option_type=SlashCommandOptionType.CHANNEL,
 				required=False,
 			),
@@ -63,34 +61,64 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			embeds = person_embedder.gen_embeds(people)
 			await ctx.send(embeds=embeds)
 
-	@commands.command(name="addemail")
-	async def add_email(self, ctx: commands.Context, *args):
-		"""Add the email of a professor with this command.
+	@cog_ext.cog_slash(
+		name="email_add",
+		description="Add the email of a professor with this command.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="email",
+				description="The email address you wish to add to the person.",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="name",
+				description="First name, last name, or both. (eg. moti)",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+			create_option(
+				name="channel",
+				description="Mention a course the professor teaches. (eg. #automata)",
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=False,
+			),
+		],
+	)
+	async def add_email(
+		self,
+		ctx: SlashContext,
+		email: str,
+		name: str = None,
+		channel: discord.TextChannel = None,
+	):
+		await self.__add_remove_emails(
+			name=name,
+			channel=channel,
+			email=email,
+			ctx=ctx,
+			func=self.email_adder.add_email,
+		)
 
-		Usage:
-		```
-		++addemail query emails
-		```
-		Arguments:
-		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
-		> **emails**: One or more of the teacher's email addresses
-		"""
-		await self.__add_remove_emails(args, ctx, self.email_adder.add_emails)
-
-	@commands.command(name="removeemail")
+	@cog_ext.cog_slash(
+		name="email_remove",
+		description="Remove the email of a professor with this command.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="email",
+				description="The email address you wish to remove from its owner.",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+		],
+	)
 	@commands.has_guild_permissions(manage_roles=True)
-	async def remove_email(self, ctx: commands.Context, *args):
-		"""Remove the email of a professor with this command.
-
-		Usage:
-		```
-		++removeemail query emails
-		```
-		Arguments:
-		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
-		> **emails**: One or more of the teacher's email addresses
-		"""
-		await self.__add_remove_emails(args, ctx, self.email_adder.remove_emails)
+	async def remove_email(self, ctx: SlashContext, email: str):
+		await self.__add_remove_emails(
+			email=email, ctx=ctx, func=self.email_adder.remove_email
+		)
 
 	@commands.command(name="addperson")
 	@commands.has_guild_permissions(manage_roles=True)
@@ -163,11 +191,22 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			args, ctx, "from", self.categoriser.decategorise_person
 		)
 
-	async def __add_remove_emails(self, args, ctx: commands.Context, func):
+	async def __add_remove_emails(
+		self,
+		ctx: SlashContext,
+		func,
+		name: str = None,
+		channel: discord.TextChannel = None,
+		email: str = None,
+	):
+		await ctx.defer()
 		# search for professor's details
-		person = self.finder.search_one(args, ctx.channel)
+		# if either name or channel are provided, no need to search using email
+		person = self.finder.search_one(
+			ctx, name, channel, None if (name or channel) is not None else email
+		)
 		# add/remove the emails to the database
-		func(person, self.email_adder.filter_emails(args))
+		func(person, email, ctx)
 		# update professors set from database
 		person = self.finder.get_people([person.id])
 		await ctx.send(embed=person_embedder.gen_embed(person))
