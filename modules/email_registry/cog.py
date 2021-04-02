@@ -37,7 +37,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 				required=False,
 			),
 			create_option(
-				name="course",
+				name="course_channel",
 				description="Mention a course the professor teaches",
 				option_type=SlashCommandOptionType.CHANNEL,
 				required=False,
