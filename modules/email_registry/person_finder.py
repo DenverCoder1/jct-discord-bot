@@ -1,3 +1,4 @@
+from utils.utils import one
 import discord
 from discord.channel import TextChannel
 from discord_slash.context import SlashContext
@@ -68,7 +69,7 @@ class PersonFinder:
 				+ ", ".join(person.name for person in people),
 				sendable,
 			)
-		return next(iter(people))
+		return one(people)
 
 	def get_people(self, ids: Iterable[int]) -> Set[Person]:
 		"""searches the database for a person with a given id and returns a Person object"""

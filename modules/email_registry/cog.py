@@ -1,3 +1,5 @@
+from utils.utils import one
+from utils.mention import extract_channel_mentions
 import discord
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
@@ -23,8 +25,9 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		self.person_adder = PersonAdder(config.conn, config.sql_fetcher)
 		self.categoriser = Categoriser(config.conn, config.sql_fetcher)
 
-	@cog_ext.cog_slash(
-		name="email",
+	@cog_ext.cog_subcommand(
+		base="email",
+		name="of",
 		description="Get the email address of the person you search for.",
 		guild_ids=[config.guild_id],
 		options=[
@@ -61,8 +64,9 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			embeds = person_embedder.gen_embeds(people)
 			await ctx.send(embeds=embeds)
 
-	@cog_ext.cog_slash(
-		name="email_add",
+	@cog_ext.cog_subcommand(
+		base="email",
+		name="add",
 		description="Add the email of a professor with this command.",
 		guild_ids=[config.guild_id],
 		options=[
@@ -101,8 +105,9 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			func=self.email_adder.add_email,
 		)
 
-	@cog_ext.cog_slash(
-		name="email_remove",
+	@cog_ext.cog_subcommand(
+		base="email",
+		name="remove",
 		description="Remove the email of a professor with this command.",
 		guild_ids=[config.guild_id],
 		options=[
@@ -120,42 +125,42 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			email=email, ctx=ctx, func=self.email_adder.remove_email
 		)
 
-	@commands.command(name="addperson")
+	@cog_ext.cog_subcommand(
+		base="email",
+		subcommand_group="person",
+		name="add",
+		description="Add a faculty member to the email registry.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="first_name",
+				description="The first name of the person you want to add.",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="last_name",
+				description="The last name of the person you want to add.",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="channels",
+				description="Mention the channels this person is associated with.",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+		],
+	)
 	@commands.has_guild_permissions(manage_roles=True)
-	async def add_person(self, ctx: commands.Context, *args):
-		"""Add a faculty member to the email registry
-
-		Usage:
-		```
-		++addperson @member channel-mentions
-		```or
-		```
-		++addperson name surname channel-mentions
-		```
-		Arguments:
-		> **@member**: A mention of the person you want to add, if they are in the server
-		> **name**: The first name of the person you want to add (use quotes if it contains a space)
-		> **surname**: The last name of the person you want to add
-		> **channel-mentions**: A (possibly empty) space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
-		"""
-		if ctx.message.mentions:
-			if len(ctx.message.mentions) > 1:
-				raise FriendlyError("Please mention only one member.")
-			full_name = Member(ctx.message.mentions[0]).base_name
-			member_id = ctx.message.mentions[0].id
-			name, surname = full_name.rsplit(" ", 1)
-		else:
-			name, surname = (s.strip() for s in args[0:2])
-			member_id = None
-			if "<" in {name[0], surname[0]}:
-				raise FriendlyError(
-					"The first two arguments must be a first name and a last name if"
-					" you haven't mentioned the person you want to add."
-				)
+	async def add_person(
+		self, ctx: SlashContext, first_name: str, last_name: str, channels: str
+	):
+		await ctx.defer()
 		person_id = self.person_adder.add_person(
-			name, surname, ctx.message.channel_mentions, self.categoriser, member_id
+			first_name, last_name, extract_channel_mentions(channels), self.categoriser,
 		)
-		person = self.finder.get_people([person_id])
+		person = one(self.finder.get_people([person_id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	@commands.command(name="link")
@@ -208,7 +213,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		# add/remove the emails to the database
 		func(person, email, ctx)
 		# update professors set from database
-		person = self.finder.get_people([person.id])
+		person = one(self.finder.get_people([person.id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	async def __link_unlink(self, args, ctx: commands.Context, sep_word: str, func):
@@ -228,7 +233,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		success, error_msg = func(person.id, args[index_sep + 1 :])
 		if not success:
 			raise FriendlyError(error_msg, ctx.channel, ctx.author)
-		person = self.finder.get_people([person.id])
+		person = one(self.finder.get_people([person.id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 
