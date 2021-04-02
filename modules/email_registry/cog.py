@@ -10,7 +10,6 @@ from modules.email_registry.person_finder import PersonFinder
 from modules.email_registry.email_adder import EmailAdder
 from modules.email_registry.person_adder import PersonAdder
 from modules.error.friendly_error import FriendlyError
-from modules.role_tag.member import Member
 from discord.ext import commands
 import config
 
