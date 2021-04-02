@@ -1,5 +1,9 @@
+import discord
+from discord_slash import cog_ext, SlashContext
+from discord_slash.model import SlashCommandOptionType
+from discord_slash.utils.manage_commands import create_choice, create_option
 from modules.email_registry.categoriser import Categoriser
-from modules.email_registry.person_embedder import PersonEmbedder
+from modules.email_registry import person_embedder
 from modules.email_registry.person_finder import PersonFinder
 from modules.email_registry.email_adder import EmailAdder
 from modules.email_registry.person_adder import PersonAdder
@@ -17,36 +21,47 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.finder = PersonFinder(config.conn, config.sql_fetcher)
-		self.embedder = PersonEmbedder()
 		self.email_adder = EmailAdder(config.conn, config.sql_fetcher)
 		self.person_adder = PersonAdder(config.conn, config.sql_fetcher)
 		self.categoriser = Categoriser(config.conn, config.sql_fetcher)
 
-	@commands.command(name="getemail", aliases=["email", "emailof"])
-	async def get_email(self, ctx: commands.Context, *args):
-		"""This command returns the email address of the person you ask for.
-
-		Usage:
-		```
-		++getemail query
-		```
-		Arguments:
-		> **query**: A string with the professor's name and/or any courses they teach (or their channels) (e.g. eitan computer science)
-		"""
-		people = self.finder.search(args, ctx.channel)
+	@cog_ext.cog_slash(
+		name="email",
+		description="Get the email address of the person you search for",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="name",
+				description="Professor's first name, last name, or both. eg moti",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+			create_option(
+				name="course",
+				description="Mention a course the professor teaches",
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=False,
+			),
+		],
+	)
+	async def get_email(
+		self,
+		ctx: SlashContext,
+		name: str = None,
+		course_channel: discord.TextChannel = None,
+	):
+		await ctx.defer()  # let discord know the response may take more than 3 seconds
+		people = self.finder.search(name, course_channel or ctx.channel)
 		people = {person for person in people if person.emails}
 		if not people:
 			raise FriendlyError(
 				"The email you are looking for aught to be here... But it isn't."
 				" Perhaps the archives are incomplete.",
-				ctx.channel,
+				ctx,
 			)
 		else:
-			title = (
-				"**_YOU_ get an email!! _YOU_ get an email!!**\nEveryone gets an email!"
-			)
-			embed = self.embedder.gen_embed(people)
-			await ctx.send(content=title, embed=embed)
+			embeds = person_embedder.gen_embeds(people)
+			await ctx.send(embeds=embeds)
 
 	@commands.command(name="addemail")
 	async def add_email(self, ctx: commands.Context, *args):
@@ -113,7 +128,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			name, surname, ctx.message.channel_mentions, self.categoriser, member_id
 		)
 		person = self.finder.get_people([person_id])
-		await ctx.send(embed=self.embedder.gen_embed(person))
+		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	@commands.command(name="link")
 	@commands.has_guild_permissions(manage_roles=True)
@@ -155,7 +170,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		func(person, self.email_adder.filter_emails(args))
 		# update professors set from database
 		person = self.finder.get_people([person.id])
-		await ctx.send(embed=self.embedder.gen_embed(person))
+		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	async def __link_unlink(self, args, ctx: commands.Context, sep_word: str, func):
 		# search for professor's detailschannel-mentions
@@ -175,7 +190,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		if not success:
 			raise FriendlyError(error_msg, ctx.channel, ctx.author)
 		person = self.finder.get_people([person.id])
-		await ctx.send(embed=self.embedder.gen_embed(person))
+		await ctx.send(embed=person_embedder.gen_embed(person))
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
