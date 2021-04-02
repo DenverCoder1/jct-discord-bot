@@ -14,9 +14,8 @@ class PersonAdder:
 		self,
 		name: str,
 		surname: str,
-		channels: Iterable[discord.TextChannel],
+		channel_mentions: Iterable[str],
 		categoriser: Categoriser,
-		member_id: int = None,
 	) -> int:
 		query = self.sql_fetcher.fetch(
 			"modules", "email_registry", "queries", "add_person.sql"
@@ -24,10 +23,8 @@ class PersonAdder:
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(
-					query, {"name": name, "surname": surname, "member_id": member_id}
+					query, {"name": name.capitalize(), "surname": surname.capitalize()}
 				)
 				person_id = cursor.fetchone()[0]
-		categoriser.categorise_person(
-			person_id, [channel.mention for channel in channels]
-		)
+		categoriser.categorise_person(person_id, channel_mentions)
 		return person_id
