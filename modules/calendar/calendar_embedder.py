@@ -1,4 +1,9 @@
 import re
+from discord.ext import commands
+from utils.utils import wait_for_reaction
+from discord_slash.context import SlashContext
+from modules.error.friendly_error import FriendlyError
+from .calendar import Calendar
 from .event import Event
 from typing import Iterable, Dict
 from functools import reduce
@@ -6,9 +11,56 @@ import discord
 
 
 class CalendarEmbedder:
-	def __init__(self):
+	def __init__(self, bot: commands.Bot):
 		self.timezone = "Asia/Jerusalem"
 		self.max_length = 2048
+		self.bot = bot
+
+	async def embed_event_pages(
+		self,
+		ctx: SlashContext,
+		events: Iterable[Event],
+		full_query: str,
+		results_per_page: int,
+		calendar: Calendar,
+	) -> None:
+		# set start index
+		page_num = 1 if len(events) > results_per_page else None
+		while True:
+			try:
+				start = (page_num - 1) * results_per_page if page_num else 0
+				# create embed
+				embed = self.embed_event_list(
+					title=f"📅 Upcoming Events for {calendar.name}",
+					events=events[start : start + results_per_page],
+					description=f'Showing results for "{full_query}"'
+					if full_query
+					else "",
+					page_num=page_num,
+				)
+				sender = ctx.send if ctx.message is None else ctx.message.edit
+				await sender(embed=embed)
+				# if only 1 page, break out of loop
+				if page_num is None:
+					break
+				# default emoji
+				next_emoji = "⏬"
+				# increment page number
+				page_num += 1
+				# change emoji and reset page if no more events
+				if start + results_per_page >= len(events):
+					next_emoji = "⤴️"
+					page_num = 1
+				# wait for author to respond to go to next page
+				await wait_for_reaction(
+					bot=self.bot,
+					message=ctx.message,
+					emoji_list=[next_emoji],
+					allowed_users=[ctx.author],
+				)
+			# time window exceeded
+			except FriendlyError:
+				break
 
 	def embed_event_list(
 		self,

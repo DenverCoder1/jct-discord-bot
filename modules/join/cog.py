@@ -22,7 +22,10 @@ class JoinCog(commands.Cog, name="Join"):
 
 	@cog_ext.cog_slash(
 		name="join",
-		description="Join command to get new users' information and place them in the right roles.",
+		description=(
+			"Join command to get new users' information and place them in the right"
+			" roles."
+		),
 		guild_ids=[config.guild_id],
 		options=[
 			create_option(
@@ -61,7 +64,7 @@ class JoinCog(commands.Cog, name="Join"):
 			),
 		],
 	)
-	async def _join(
+	async def join(
 		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
 	):
 		await self.assigner.assign(

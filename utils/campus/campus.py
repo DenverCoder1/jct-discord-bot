@@ -1,6 +1,5 @@
 import config
 from typing import Iterable
-from utils.sql_fetcher import SqlFetcher
 
 
 class Campus:
