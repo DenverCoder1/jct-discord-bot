@@ -47,16 +47,6 @@ def ordinal(n: int):
 	return "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4])
 
 
-def decode_mention(mention: str) -> Tuple[Optional[str], Optional[int]]:
-	"""returns whether mention is a member mention or a channel mention (or neither) as well as the id of the mentioned object"""
-	match = re.search(r"<(#|@)!?(\d+)>", mention)
-	if match is None:
-		return None, None
-	else:
-		groups = match.groups()
-		return "channel" if groups[0] == "#" else "member", int(groups[1])
-
-
 def is_email(email: str) -> bool:
 	return bool(re.search(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", email))
 
@@ -188,3 +178,8 @@ async def wait_for_reaction(
 		await message.clear_reactions()
 		# return the index of the emoji selection
 		return emoji_list.index(str(reaction.emoji))
+
+
+def one(iterable: Iterable):
+	"""Returns a single element from an iterable or throws an error if it was empty."""
+	return next(iter(iterable))

@@ -1,6 +1,6 @@
 from typing import Iterable, Optional, Tuple
 from utils.sql_fetcher import SqlFetcher
-from utils.utils import decode_mention
+from utils.mention import decode_channel_mention
 import psycopg2.extensions as sql
 
 
@@ -32,8 +32,8 @@ class Categoriser:
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for channel in channel_mentions:
-					mention_type, channel_id = decode_mention(channel)
-					if mention_type != "channel":
+					channel_id = decode_channel_mention(channel)
+					if channel_id is None:
 						return (
 							False,
 							f'Expected a channel mention in place of "{channel}".',
@@ -41,4 +41,4 @@ class Categoriser:
 					cursor.execute(
 						query, {"person_id": person_id, "channel_id": channel_id}
 					)
-					return True, None
+				return True, None
