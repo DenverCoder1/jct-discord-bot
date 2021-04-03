@@ -53,7 +53,18 @@ class PersonFinder:
 		channel: discord.TextChannel = None,
 		email: str = None,
 	) -> Person:
-		"""returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one."""
+		"""
+		Returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one.
+
+		:param sendable: An object with the send method where friendly errors will be sent to.
+		:type sendable: discord.TextChannel | commands.Context | SlashContext
+		:param name: The name of the person you want to search for.
+		:type name: Optional[str]
+		:param channel: A channel the person is linked to.
+		:type channel: Optional[discord.TextChannel]
+		:param email: The email of the person you want to search for.
+		:type email: Optional[str]
+		"""
 		people = self.search(name, channel, email)
 		if not people:
 			raise FriendlyError(

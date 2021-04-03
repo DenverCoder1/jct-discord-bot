@@ -1,17 +1,18 @@
-from utils.utils import one
-from utils.mention import extract_channel_mentions
+from typing import Callable, Iterable, Tuple
+import config
 import discord
+from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
-from modules.email_registry.categoriser import Categoriser
 from modules.email_registry import person_embedder
+from modules.email_registry.categoriser import Categoriser
 from modules.email_registry.person_finder import PersonFinder
 from modules.email_registry.email_adder import EmailAdder
 from modules.email_registry.person_adder import PersonAdder
 from modules.error.friendly_error import FriendlyError
-from discord.ext import commands
-import config
+from utils.mention import extract_channel_mentions
+from utils.utils import one
 
 
 class EmailRegistryCog(commands.Cog, name="Email Registry"):
@@ -159,37 +160,80 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		person = one(self.finder.get_people([person_id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
-	@commands.command(name="link")
+	@cog_ext.cog_subcommand(
+		base="email",
+		subcommand_group="person",
+		name="link",
+		description=(
+			"Link a person to a category (for example a professor to a course they"
+			" teach)."
+		),
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="name_or_email",
+				description=(
+					"First name, last name, or both, (eg. moti). Alternatively, you may"
+					" use the person's email."
+				),
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="channel_mentions",
+				description=(
+					"Mention one or more course channels the professor teaches. (eg."
+					" #automata #computability)"
+				),
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+		],
+	)
 	@commands.has_guild_permissions(manage_roles=True)
-	async def link_person_to_category(self, ctx: commands.Context, *args):
-		"""Link a person to a category (for example a professor to a course they teach)
-
-		Usage:
-		```
-		++link query to channel-mentions
-		```
-		Arguments:
-		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
-		> **channel-mentions**: A space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
-		"""
-		# search for professor's detailschannel-mentions
-		await self.__link_unlink(args, ctx, "to", self.categoriser.categorise_person)
-
-	@commands.command(name="unlink")
-	@commands.has_guild_permissions(manage_roles=True)
-	async def unlink_person_from_category(self, ctx: commands.Context, *args):
-		"""Unlink a person from a category (for example a professor from a course they no longer teach)
-
-		Usage:
-		```
-		++unlink query from channel-mentions
-		```
-		Arguments:
-		> **query**: A string to identify a person. Must be specific enough to match a single person. Can contain their name and/or courses (or their channel mentions) they teach. (e.g. eitan c++)
-		> **channel-mentions**: A space separated list of #channel-mentions which the professor teaches, or #ask-the-staff for a member of the administration
-		"""
+	async def link_person_to_category(
+		self, ctx: SlashContext, name_or_email: str, channel_mentions: str
+	):
 		await self.__link_unlink(
-			args, ctx, "from", self.categoriser.decategorise_person
+			ctx, name_or_email, channel_mentions, self.categoriser.categorise_person
+		)
+
+	@cog_ext.cog_subcommand(
+		base="email",
+		subcommand_group="person",
+		name="unlink",
+		description=(
+			"Unlink a person from a category (for example a professor from a course"
+			" they no longer teach)."
+		),
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="name_or_email",
+				description=(
+					"First name, last name, or both, (eg. moti). Alternatively, you may"
+					" use the person's email."
+				),
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="channel_mentions",
+				description=(
+					"Mention the course channels to unlink from the specified person."
+					" (eg. #automata #tcp-ip)"
+				),
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+		],
+	)
+	@commands.has_guild_permissions(manage_roles=True)
+	async def unlink_person_from_category(
+		self, ctx: SlashContext, name_or_email: str, channel_mentions: str
+	):
+		await self.__link_unlink(
+			ctx, name_or_email, channel_mentions, self.categoriser.decategorise_person
 		)
 
 	async def __add_remove_emails(
@@ -212,23 +256,18 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		person = one(self.finder.get_people([person.id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
-	async def __link_unlink(self, args, ctx: commands.Context, sep_word: str, func):
-		# search for professor's detailschannel-mentions
-		try:
-			# index of last occurrence of sep_word in args
-			index_sep = len(args) - 1 - args[::-1].index(sep_word)
-		except ValueError as e:
-			raise FriendlyError(
-				f'You must include the word "{sep_word}" in between your query and the'
-				" channel mentions",
-				ctx.channel,
-				ctx.author,
-				e,
-			)
-		person = self.finder.search_one(args[:index_sep], ctx.channel)
-		success, error_msg = func(person.id, args[index_sep + 1 :])
-		if not success:
-			raise FriendlyError(error_msg, ctx.channel, ctx.author)
+	async def __link_unlink(
+		self,
+		ctx: SlashContext,
+		name_or_email: str,
+		channel_mentions: str,
+		func: Callable[[int, Iterable[str]], str],
+	):
+		await ctx.defer()
+		person = self.finder.search_one(ctx, name=name_or_email, email=name_or_email)
+		error_msg = func(person.id, extract_channel_mentions(channel_mentions))
+		if error_msg:
+			raise FriendlyError(error_msg, ctx, ctx.author)
 		person = one(self.finder.get_people([person.id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
