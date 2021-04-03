@@ -37,7 +37,7 @@ class SearchCog(commands.Cog, name="Search"):
 			raise FriendlyError("We searched far and wide, but nothing turned up.")
 		link = links[0]
 
-		wiki_links = [link for link in links if "wikipedia.org" in link]
+		wiki_links = [link for link in links if "wikipedia.org" in link[:30]]
 		wiki_intro = (
 			sf.get_wiki_intro(wiki_links[0])
 			if wiki_links and wiki_links[0] != link
