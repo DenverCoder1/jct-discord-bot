@@ -1,10 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from googlesearch import search
-from modules.error.friendly_error import FriendlyError
-import discord
-from discord.ext import commands
-from utils import utils
+from utils.utils import remove_tabs
 
 
 def remove_citations(wiki_paragraph):
@@ -23,82 +19,37 @@ def remove_citations(wiki_paragraph):
 	return wiki_paragraph
 
 
-def get_wiki(searched_string: str):
+def get_wiki(url: str) -> str:
 	"""Does basic setup and formatting of a given wiki page. Returns the plain text of the article."""
-	url = search(
-		searched_string + " wikipedia", num_results=1
-	)  # try to get a wiki link from google
-
-	exception_caught = False
-	while True:
-		try:
-			wiki_info = requests.get(
-				url if exception_caught else url[0]
-			)  # If the googled link doesn't work or doesn't exist the URL should not be treated as a list
-			page = BeautifulSoup(wiki_info.content, "html.parser")
-			wiki_html = page.find(id="bodyContent").find_all("p")
-			break
-
-		except (
-			IndexError,
-			AttributeError,
-		):  # if there is no link received the first time or the link isn't from wikipedia
-			url = "https://en.wikipedia.org/wiki/" + searched_string
-			exception_caught = True
-	return (wiki_html, url if exception_caught else url[0])
+	wiki_info = requests.get(url)
+	page = BeautifulSoup(wiki_info.content, "html.parser")
+	wiki_html = page.find(id="bodyContent").find_all("p")
+	return wiki_html
 
 
-def get_wiki_intro(wiki, wiki_link, last_paragraph, channel_id):
+def get_wiki_intro(wiki_link: str) -> str:
 	"""finds the into to the wiki from the text of the wiki"""
+	wiki = get_wiki(wiki_link)
 
 	# iterate through the paragraphs of the wiki
-	for i in wiki:
-		current_paragraph = i.get_text()
+	for par_obj in wiki:
+		paragraph = par_obj.get_text()
 
 		# can remove bad articles by checking the length of the current paragraph
-		if len(current_paragraph) < 150:
+		if len(paragraph) < 150:
 			continue
 
-		# " is " and " was " will be one of the first words in 99.99% of wiki intros
-		if (" is " in current_paragraph) or (" was " in current_paragraph):
-			last_paragraph[channel_id] = i
-			return (
-				f"\n> {remove_citations(current_paragraph).strip()}\n~ Wikipedia"
-				f" (<{wiki_link}>).\n"
-			)
+		return (
+			f"\n> {remove_citations(paragraph).strip()}\n~ Wikipedia (<{wiki_link}>).\n"
+		)
 
 	return ""
 
 
-async def next_paragraph(ctx: commands.Context, last_paragraph):
-	"""finds the next paragraph in the last searched wiki"""
-	channel_id = ctx.channel.id
-	if last_paragraph[channel_id] != None:
-		try:  # attempt to get the next paragraph in the wiki
-			next_paragraph = last_paragraph[channel_id].find_next("p")
-			last_paragraph[channel_id] = next_paragraph
-			await ctx.send(remove_citations(next_paragraph.get_text()))
-
-		except discord.HTTPException:  # raised when trying to get a non existent piece of html
-			last_paragraph[channel_id] = None
-			raise FriendlyError("The end of the search has been reached.", ctx.channel)
-	else:
-		raise FriendlyError("There is no search to continue.", ctx.channel)
-
-
-async def send_message(
-	ctx: commands.Context, searched_string: str, wiki_string: str, link
-):
-	"""formats and sends the message"""
-	try:
-		await ctx.send(
-			utils.remove_tabs(
-				f"""
-				Search results for: {searched_string}
-				{wiki_string}
-				{link[0]}
-				"""
-			)
-		)
-	except IndexError:
-		raise FriendlyError("No search results found.", ctx.channel)
+def format_message(query: str, url: str, wiki_string: str = None) -> str:
+	"""formats the message"""
+	return remove_tabs(
+		f"Search results for: {query}"
+		+ (f"\n{wiki_string}" if wiki_string else "")
+		+ f"\n{url}"
+	)
