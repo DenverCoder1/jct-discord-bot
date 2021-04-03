@@ -35,7 +35,9 @@ class ErrorLogger:
 			)
 
 	def __get_err_text(self, error: Exception, message: discord.Message = None):
-		description = "".join(traceback.format_exception(error.__class__, error, error.__traceback__))
+		description = "".join(
+			traceback.format_exception(error.__class__, error, error.__traceback__)
+		)
 		if message is None:
 			return description
 		return self.__attach_context(description, message)
@@ -49,7 +51,7 @@ class ErrorLogger:
 			f"{description}\n"
 		)
 
-	def read_logs(self, n_lines: int = 50, char_lim: int = 2000) -> str:
+	def read_logs(self, n_lines, char_lim: int = 2000) -> str:
 		try:
 			with open(self.log_file, "r", encoding="utf-8") as f:
 				# read logs file
