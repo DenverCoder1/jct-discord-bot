@@ -64,6 +64,7 @@ class JoinCog(commands.Cog, name="Join"):
 			),
 		],
 	)
+	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
 	async def join(
 		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
 	):
