@@ -45,13 +45,10 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		],
 	)
 	async def get_email(
-		self,
-		ctx: SlashContext,
-		name: str = None,
-		course_channel: discord.TextChannel = None,
+		self, ctx: SlashContext, name: str = None, channel: discord.TextChannel = None,
 	):
 		await ctx.defer()  # let discord know the response may take more than 3 seconds
-		people = self.finder.search(name, course_channel or ctx.channel)
+		people = self.finder.search(name, channel or ctx.channel)
 		people = {person for person in people if person.emails}
 		if not people:
 			raise FriendlyError(
