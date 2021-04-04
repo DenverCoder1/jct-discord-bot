@@ -1,12 +1,21 @@
+import discord
 import config
 from typing import Iterable
-from utils.sql_fetcher import SqlFetcher
 
 
 class Campus:
-	def __init__(self, id: int, name: str):
+	def __init__(self, id: int, name: str, channel_id: int):
 		self.id = id
 		self.name = name
+		self.channel_id = channel_id
+		self.channel = None
+
+	def campus_channel(self) -> discord.TextChannel:
+		if self.channel is None:
+			self.channel = discord.utils.get(
+				config.guild.text_channels, id=self.channel_id
+			)
+		return self.channel
 
 	sql_fetcher = config.sql_fetcher
 
