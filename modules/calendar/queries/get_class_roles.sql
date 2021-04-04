@@ -1,4 +1,4 @@
-SELECT classes.grad_year, campuses.name
-FROM classes
-INNER JOIN campuses on classes.campus = campuses.id
+SELECT groups.grad_year, campuses.name
+FROM groups
+INNER JOIN campuses on groups.campus = campuses.id
 WHERE role in %(roles)s

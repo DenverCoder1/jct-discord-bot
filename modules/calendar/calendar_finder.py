@@ -63,10 +63,10 @@ class CalendarFinder:
 			id=self.get_calendar_id(grad_year, campus), name=f"{campus} {grad_year}",
 		)
 
-	def __get_class_roles(self, member: discord.Member) -> Iterable[tuple]:
+	def __get_group_roles(self, member: discord.Member) -> Iterable[tuple]:
 		"""Returns a list of (grad_year, campus) pairs found in a member's roles"""
 		query = self.sql_fetcher.fetch(
-			"modules", "calendar", "queries", "get_class_roles.sql"
+			"modules", "calendar", "queries", "get_group_roles.sql"
 		)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
@@ -77,7 +77,7 @@ class CalendarFinder:
 
 	def __get_year_campus_from_role(self, member: discord.Member) -> tuple:
 		"""Returns the grad_year and campus for a member who has only one class role"""
-		class_roles = self.__get_class_roles(member)
+		class_roles = self.__get_group_roles(member)
 		if len(class_roles) > 1:
 			raise ClassRoleError(
 				"You must specify which calendar since you have multiple class roles."

@@ -1,3 +1,4 @@
+from database.campus.campus import Campus
 from utils import utils
 from modules.join.assigner import Assigner
 from discord.ext import commands
@@ -43,11 +44,11 @@ class JoinCog(commands.Cog, name="Join"):
 			create_option(
 				name="campus",
 				description="Your campus (Lev or Tal)",
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=True,
 				choices=[
-					create_choice(name="Lev", value="Lev"),
-					create_choice(name="Tal", value="Tal"),
+					create_choice(name=campus.name, value=campus.id)
+					for campus in Campus.get_campuses()
 				],
 			),
 			create_option(
@@ -65,11 +66,16 @@ class JoinCog(commands.Cog, name="Join"):
 		],
 	)
 	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
-	async def join(
-		self, ctx: SlashContext, first_name: str, last_name: str, campus: str, year: int
+	async def _join(
+		self,
+		ctx: SlashContext,
+		first_name: str,
+		last_name: str,
+		campus_id: int,
+		year: int,
 	):
 		await self.assigner.assign(
-			ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
+			ctx.author, f"{first_name.title()} {last_name.title()}", campus_id, year
 		)
 		await ctx.send(
 			embeds=[

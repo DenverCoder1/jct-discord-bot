@@ -1,1 +1,0 @@
-select role from classes

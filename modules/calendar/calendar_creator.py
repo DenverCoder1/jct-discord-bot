@@ -1,7 +1,7 @@
 from utils.sql_fetcher import SqlFetcher
 import psycopg2.extensions as sql
 from .calendar_service import CalendarService
-from utils.campus.campus import Campus
+from database.campus.campus import Campus
 
 
 class CalendarCreator:
@@ -12,7 +12,7 @@ class CalendarCreator:
 		self.__sql_fetcher = sql_fetcher
 		self.__service = service
 
-	def create_class_calendars(self, year: int):
+	def create_group_calendars(self, year: int):
 		"""Create a calendar for each campus and add it to the database"""
 		for campus in Campus.get_campuses():
 			# create calendar
