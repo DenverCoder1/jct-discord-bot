@@ -21,13 +21,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.calendar_embedder = CalendarEmbedder(bot)
-		self.calendar_service = CalendarService()
+		self.embedder = CalendarEmbedder(bot)
+		self.service = CalendarService()
 		self.sql_fetcher = config.sql_fetcher
 		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
-		self.calendar_creator = CalendarCreator(
-			self.calendar_service, config.conn, self.sql_fetcher
-		)
+		self.creator = CalendarCreator(self.service, config.conn, self.sql_fetcher)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
 
 	@cog_ext.cog_subcommand(
@@ -61,10 +59,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = self.finder.get_calendar(ctx, class_role)
 		# fetch links for calendar
-		links = self.calendar_service.get_links(calendar.id)
-		embed = self.calendar_embedder.embed_link(
-			f"🔗 Calendar Links for {calendar.name}", links
-		)
+		links = self.service.get_links(calendar.id)
+		embed = self.embedder.embed_link(f"🔗 Calendar Links for {calendar.name}", links)
 		await ctx.send(embed=embed)
 
 	@cog_ext.cog_subcommand(
@@ -122,9 +118,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# convert channel mentions to full names
 		full_query = self.course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id, full_query)
+		events = self.service.fetch_upcoming(calendar.id, full_query)
 		# display events and allow showing more with reactions
-		await self.calendar_embedder.embed_event_pages(
+		await self.embedder.embed_event_pages(
 			ctx, events, full_query, results_per_page, calendar
 		)
 
@@ -208,12 +204,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = self.finder.get_calendar(ctx, class_role)
 		try:
-			event = self.calendar_service.add_event(
+			event = self.service.add_event(
 				calendar.id, title, start, end, location, description
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
-		embed = self.calendar_embedder.embed_event(
+		embed = self.embedder.embed_event(
 			":white_check_mark: Event created successfully", event
 		)
 		await ctx.send(embed=embed)
@@ -305,9 +301,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = self.finder.get_calendar(ctx, class_role)
 		# get a list of upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id, query)
+		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
-		event_to_update = await self.calendar_embedder.get_event_choice(
+		event_to_update = await self.embedder.get_event_choice(
 			ctx, events, query, "update"
 		)
 		# replace channel mentions
@@ -318,12 +314,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if location is not None:
 			location = self.course_mentions.replace_channel_mentions(location)
 		try:
-			event = self.calendar_service.update_event(
+			event = self.service.update_event(
 				calendar.id, event_to_update, title, start, end, description, location
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
-		embed = self.calendar_embedder.embed_event(
+		embed = self.embedder.embed_event(
 			":white_check_mark: Event updated successfully", event
 		)
 		# edit message if sent already, otherwise send
@@ -374,17 +370,17 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = self.finder.get_calendar(ctx, class_role)
 		# fetch upcoming events
-		events = self.calendar_service.fetch_upcoming(calendar.id, query)
+		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
-		event_to_delete = await self.calendar_embedder.get_event_choice(
+		event_to_delete = await self.embedder.get_event_choice(
 			ctx, events, query, "delete"
 		)
 		# delete event
 		try:
-			self.calendar_service.delete_event(calendar.id, event_to_delete)
+			self.service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
-		embed = self.calendar_embedder.embed_event(
+		embed = self.embedder.embed_event(
 			"🗑 Event deleted successfully", event_to_delete
 		)
 		# edit message if sent already, otherwise send
@@ -434,7 +430,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx.channel, ctx.author)
 		# add manager to calendar
-		if self.calendar_service.add_manager(calendar.id, email):
+		if self.service.add_manager(calendar.id, email):
 			embed = embed_success(
 				f":office_worker: Successfully added manager to {calendar.name}."
 			)
@@ -448,7 +444,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	async def on_new_academic_year(self):
 		"""Create calendars for each campus and update the database"""
 		year = datetime.now().year + 3
-		self.calendar_creator.create_class_calendars(year)
+		self.creator.create_class_calendars(year)
 
 
 # setup functions for bot
