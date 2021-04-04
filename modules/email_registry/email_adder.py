@@ -32,12 +32,10 @@ class EmailAdder:
 					raise FriendlyError(
 						f"Ignoring request to add {email} to {person.name}; it"
 						" is already in the system.",
-						sendable=ctx,
+						sender=ctx,
 						inner=e,
 					)
 				except CheckViolation as e:
 					raise FriendlyError(
-						f'"{email}" is not a valid email address.',
-						sendable=ctx,
-						inner=e,
+						f'"{email}" is not a valid email address.', sender=ctx, inner=e,
 					)

@@ -22,6 +22,7 @@ class Class:
 		await self.__create_role()
 		await self.__move_role()
 		await self.__create_class_channel()
+		await self.__add_to_campus_channel()
 		self.__add_to_database()
 
 	def __get_colour(self) -> discord.Colour:
@@ -58,6 +59,11 @@ class Class:
 	async def __create_class_channel(self):
 		self.channel = await ClassChannelCreator.create_class_channel(
 			f"📚{self.year}-{self.campus.name.lower()}", [self]
+		)
+
+	async def __add_to_campus_channel(self):
+		self.campus.campus_channel().set_permissions(
+			target=self.role, view_channel=True,
 		)
 
 	def __add_to_database(self):

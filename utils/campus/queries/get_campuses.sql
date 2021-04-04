@@ -1,1 +1,1 @@
-SELECT id, name FROM campuses
+SELECT id, name, channel FROM campuses

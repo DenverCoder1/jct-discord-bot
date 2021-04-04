@@ -48,7 +48,7 @@ class PersonFinder:
 
 	def search_one(
 		self,
-		sendable: Union[TextChannel, SlashContext],
+		sender: Union[TextChannel, SlashContext],
 		name: str = None,
 		channel: discord.TextChannel = None,
 		email: str = None,
@@ -56,9 +56,9 @@ class PersonFinder:
 		"""
 		Returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one.
 
-		:param sendable: An object with the send method where friendly errors will be sent to.
-		:type sendable: discord.TextChannel | commands.Context | SlashContext
-		:param name: The name of the person you want to search for.
+		:param sender: An object with the send method where friendly errors will be sent to.
+		:type sender: discord.TextChannel | commands.Context | SlashContext
+		:param name: The name of the person you want to search for (first, last, or both).
 		:type name: Optional[str]
 		:param channel: A channel the person is linked to.
 		:type channel: Optional[discord.TextChannel]
@@ -71,14 +71,14 @@ class PersonFinder:
 				"Unable to find someone who matches your query. Check your"
 				" spelling or try a different query. If you still can't find them,"
 				f" You can add them with `{config.prefix}addperson`.",
-				sendable,
+				sender,
 			)
 		if len(people) > 1:
 			raise FriendlyError(
 				"I cannot accurately determine which of these people you're"
 				" referring to. Please provide a more specific query.\n"
 				+ ", ".join(person.name for person in people),
-				sendable,
+				sender,
 			)
 		return one(people)
 
