@@ -1,7 +1,7 @@
 SELECT calendar
-FROM classes
-INNER JOIN campuses ON classes.campus = campuses.id
+FROM groups
+INNER JOIN campuses ON groups.campus = campuses.id
 WHERE
-  classes.grad_year = %(grad_year)s
+  groups.grad_year = %(grad_year)s
   AND
   campuses.name = %(campus)s

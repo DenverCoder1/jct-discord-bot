@@ -1,13 +1,13 @@
+from database.group.group import Group
 import discord
-from utils.utils import get_discord_obj
 import psycopg2.extensions as sql
 from utils.sql_fetcher import SqlFetcher
-from utils.campus.campus import Campus
-from .class_channel_creator import ClassChannelCreator
+from database.campus.campus import Campus
+from .group_channel_creator import GroupChannelCreator
 import config
 
 
-class Class:
+class NewGroup:
 	def __init__(
 		self, campus: Campus, year: int, conn: sql.connection, sql_fetcher: SqlFetcher,
 	):
@@ -21,7 +21,7 @@ class Class:
 	async def add_to_system(self):
 		await self.__create_role()
 		await self.__move_role()
-		await self.__create_class_channel()
+		await self.__create_group_channel()
 		await self.__add_to_campus_channel()
 		self.__add_to_database()
 
@@ -35,7 +35,7 @@ class Class:
 		return colours[self.year % len(colours)]
 
 	async def __create_role(self) -> discord.Role:
-		self.role = await config.guild.create_role(
+		self.role = await config.guild().create_role(
 			name=f"{self.campus.name} {self.year}",
 			permissions=discord.Permissions.none(),
 			colour=self.__get_colour(),
@@ -44,31 +44,25 @@ class Class:
 		)
 
 	async def __move_role(self):
-		query = self.__sql_fetcher.fetch(
-			"modules", "create_class", "queries", "get_roles.sql"
-		)
-		with self.__conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query)
-				roles = [row[0] for row in cursor.fetchall()]
-		positions = [config.guild.get_role(role).position for role in roles]
+		roles = [group.role() for group in Group.get_groups()]
+		positions = [config.guild().get_role(role).position for role in roles]
 		new_position = min(positions) - 1
 		positions = {self.role: new_position}
-		await config.guild.edit_role_positions(positions)
+		await config.guild().edit_role_positions(positions)
 
-	async def __create_class_channel(self):
-		self.channel = await ClassChannelCreator.create_class_channel(
-			f"📚{self.year}-{self.campus.name.lower()}", [self]
+	async def __create_group_channel(self):
+		self.channel = await GroupChannelCreator.create_group_channel(
+			f"📚{self.year}-{self.campus.name.lower()}", [self.role]
 		)
 
 	async def __add_to_campus_channel(self):
-		self.campus.campus_channel().set_permissions(
+		self.campus.channel().set_permissions(
 			target=self.role, view_channel=True,
 		)
 
 	def __add_to_database(self):
 		query = self.__sql_fetcher.fetch(
-			"modules", "create_class", "queries", "add_class.sql"
+			"modules", "create_group", "queries", "add_group.sql"
 		)
 		with self.__conn as conn:
 			with conn.cursor() as cursor:
