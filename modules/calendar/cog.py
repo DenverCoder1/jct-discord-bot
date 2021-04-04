@@ -11,7 +11,7 @@ from modules.error.friendly_error import FriendlyError
 from utils.embedder import embed_success
 from utils.utils import is_email, wait_for_reaction
 from utils.scheduler.scheduler import Scheduler
-from utils.class_role.class_role import ClassRole
+from database.group.group import Group
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option, create_choice
@@ -48,10 +48,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 				choices=[
 					create_choice(
-						name=class_role.name,
-						value=f"{class_role.name} {class_role.calendar}",
+						name=f"{group.campus().name} {group.grad_year}",
+						value=(
+							f"{group.campus().name} {group.grad_year} {group.calendar}"
+						),
 					)
-					for class_role in ClassRole.get_class_roles()
+					for group in Group.get_groups()
 				],
 			),
 		],
@@ -67,8 +69,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		await ctx.send(embed=embed)
 
 	@cog_ext.cog_subcommand(
-		base="events",
-		name="list",
+		base="calendar",
+		name="events",
 		description="Display upcoming events from the Google Calendar",
 		guild_ids=[config.guild_id],
 		options=[
@@ -98,10 +100,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 				choices=[
 					create_choice(
-						name=class_role.name,
-						value=f"{class_role.name} {class_role.calendar}",
+						name=f"{group.campus().name} {group.grad_year}",
+						value=(
+							f"{group.campus().name} {group.grad_year} {group.calendar}"
+						),
 					)
-					for class_role in ClassRole.get_class_roles()
+					for group in Group.get_groups()
 				],
 			),
 		],
@@ -126,7 +130,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		)
 
 	@cog_ext.cog_subcommand(
-		base="events",
+		base="calendar",
 		name="add",
 		description="Add events to the Google Calendar",
 		guild_ids=[config.guild_id],
@@ -177,10 +181,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 				choices=[
 					create_choice(
-						name=class_role.name,
-						value=f"{class_role.name} {class_role.calendar}",
+						name=f"{group.campus().name} {group.grad_year}",
+						value=(
+							f"{group.campus().name} {group.grad_year} {group.calendar}"
+						),
 					)
-					for class_role in ClassRole.get_class_roles()
+					for group in Group.get_groups()
 				],
 			),
 		],
@@ -214,7 +220,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		await ctx.send(embed=embed)
 
 	@cog_ext.cog_subcommand(
-		base="events",
+		base="calendar",
 		name="update",
 		description="Update events in the Google Calendar",
 		guild_ids=[config.guild_id],
@@ -273,10 +279,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 				choices=[
 					create_choice(
-						name=class_role.name,
-						value=f"{class_role.name} {class_role.calendar}",
+						name=f"{group.campus().name} {group.grad_year}",
+						value=(
+							f"{group.campus().name} {group.grad_year} {group.calendar}"
+						),
 					)
-					for class_role in ClassRole.get_class_roles()
+					for group in Group.get_groups()
 				],
 			),
 		],
@@ -300,7 +308,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get a list of upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, query)
 		# get event to update
-		event_to_update = self.calendar_embedder.get_event_choice(
+		event_to_update = await self.calendar_embedder.get_event_choice(
 			ctx, events, query, "update"
 		)
 		# replace channel mentions
@@ -324,7 +332,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		await sender(embed=embed)
 
 	@cog_ext.cog_subcommand(
-		base="events",
+		base="calendar",
 		name="delete",
 		description="Delete events from the Google Calendar",
 		guild_ids=[config.guild_id],
@@ -348,10 +356,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 				choices=[
 					create_choice(
-						name=class_role.name,
-						value=f"{class_role.name} {class_role.calendar}",
+						name=f"{group.campus().name} {group.grad_year}",
+						value=(
+							f"{group.campus().name} {group.grad_year} {group.calendar}"
+						),
 					)
-					for class_role in ClassRole.get_class_roles()
+					for group in Group.get_groups()
 				],
 			),
 		],
@@ -367,7 +377,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# fetch upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, query)
 		# get event to delete
-		event_to_delete = self.calendar_embedder.get_event_choice(
+		event_to_delete = await self.calendar_embedder.get_event_choice(
 			ctx, events, query, "delete"
 		)
 		# delete event
@@ -405,10 +415,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 				choices=[
 					create_choice(
-						name=class_role.name,
-						value=f"{class_role.name} {class_role.calendar}",
+						name=f"{group.campus().name} {group.grad_year}",
+						value=(
+							f"{group.campus().name} {group.grad_year} {group.calendar}"
+						),
 					)
-					for class_role in ClassRole.get_class_roles()
+					for group in Group.get_groups()
 				],
 			),
 		],
@@ -437,7 +449,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	async def on_new_academic_year(self):
 		"""Create calendars for each campus and update the database"""
 		year = datetime.now().year + 3
-		self.calendar_creator.create_group_calendars(year)
+		self.calendar_creator.create_class_calendars(year)
 
 
 # setup functions for bot

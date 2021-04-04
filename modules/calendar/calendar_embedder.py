@@ -85,9 +85,7 @@ class CalendarEmbedder:
 		"""
 		# no events found
 		if len(events) == 0:
-			raise FriendlyError(
-				f"No events were found for '{query}'.", ctx.channel, ctx.author
-			)
+			raise FriendlyError(f"No events were found for '{query}'.", ctx, ctx.author)
 		# multiple events found
 		elif len(events) > 1:
 			embed = self.embed_event_list(
@@ -127,15 +125,16 @@ class CalendarEmbedder:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
 		Arguments:
-		<title> - title to display at the top
-		<events> - list of events to embed
-		[description] - description to embed below the title
-		[colour] - embed colour
-		[enumeration] - list of emojis to display alongside events (for reaction choices)
+
+		:param title: :class:`str` the title to display at the top
+		:param events: :class:`Iterable[Event]` the events to display
+		:param description: :class:`Optional[str]` the description to embed below the title
+		:param colour: :class:`Optional[discord.Colour]` the embed colour
+		:param enumeration: :class:`Optional[Iterable[str]]` list of emojis to display alongside events (for reaction choices)
 		"""
 		embed = discord.Embed(title=title, colour=colour)
 		# set initial description if available
-		embed.description = "" if description == "" else f"{description}\n\n"
+		embed.description = "" if description == "" else f"{description}\n"
 		if not events:
 			embed.description += "No events found"
 		else:
