@@ -136,7 +136,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		options=[
 			create_option(
 				name="title",
-				description='Title of the event (eg. "HW 1 #linear-algebra")',
+				description='Title of the event (eg. "HW 1 #linear-algebra-1")',
 				option_type=SlashCommandOptionType.STRING,
 				required=True,
 			),
@@ -234,7 +234,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			),
 			create_option(
 				name="title",
-				description='New title of the event (eg. "HW 1 #linear-algebra")',
+				description='New title of the event (eg. "HW 1 #linear-algebra-1")',
 				option_type=SlashCommandOptionType.STRING,
 				required=False,
 			),
