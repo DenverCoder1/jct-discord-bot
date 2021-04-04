@@ -1,5 +1,4 @@
 from datetime import datetime
-import discord
 import config
 from discord.ext import commands
 from .calendar_service import CalendarService
@@ -9,7 +8,7 @@ from .calendar_creator import CalendarCreator
 from .course_mentions import CourseMentions
 from modules.error.friendly_error import FriendlyError
 from utils.embedder import embed_success
-from utils.utils import is_email, wait_for_reaction
+from utils.utils import is_email
 from utils.scheduler.scheduler import Scheduler
 from database.group.group import Group
 from discord_slash import cog_ext, SlashContext
