@@ -1,10 +1,15 @@
+from discord_slash import cog_ext
+from discord_slash.context import SlashContext
+from discord_slash.model import SlashCommandOptionType
+from discord_slash.utils.manage_commands import create_option
 from .xkcd_fetcher import XKCDFetcher
 from .xkcd_embedder import XKCDEmbedder
 from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
+import config
 
 
-class XKCDCog(commands.Cog, name="XKCD Comics"):
+class XKCDCog(commands.Cog, name="xkcd Comics"):
 	"""Displays the latest xkcd comic, random comics, or comics for your search terms"""
 
 	def __init__(self, bot: commands.Bot):
@@ -12,47 +17,61 @@ class XKCDCog(commands.Cog, name="XKCD Comics"):
 		self.xkcd_fetcher = XKCDFetcher()
 		self.xkcd_embedder = XKCDEmbedder()
 
-	@commands.command(name="xkcd")
-	async def xkcd(self, ctx: commands.Context, *args):
-		"""Displays the latest xkcd comic, random comics, or comics for your search terms
+	@cog_ext.cog_subcommand(
+		base="xkcd",
+		name="get",
+		description="Get a random xkcd comic or one you specify.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="comic_id",
+				description=(
+					"The id of the xkcd comic you want to get. (eg. 221) (default is"
+					" random)"
+				),
+				option_type=SlashCommandOptionType.INTEGER,
+				required=False,
+			)
+		],
+	)
+	async def xkcd(self, ctx: SlashContext, comic_id: int = None):
+		await ctx.defer()
+		comic = (
+			self.xkcd_fetcher.get_comic_by_id(comic_id)
+			if comic_id
+			else self.xkcd_fetcher.get_random()
+		)
+		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
 
-		Usage:
+	@cog_ext.cog_subcommand(
+		base="xkcd",
+		name="latest",
+		description="Get the latest xkcd comix.",
+		guild_ids=[config.guild_id],
+	)
+	async def xkcd_latest(self, ctx: SlashContext):
+		await ctx.defer()
+		comic = self.xkcd_fetcher.get_latest()
+		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
 
-		`++xkcd` - displays a random xkcd comic
-
-		`++xkcd latest` - displays the latest xkcd comic
-
-		`++xkcd [number]` - displays an xkcd comic given its id (eg. `++xkcd 327`)
-
-		`++xkcd [search term]` - displays a comic for your search term (eg. `++xkcd sql`)
-		"""
-
-		search = " ".join(args).lower()
-
-		try:
-			# ++xkcd latest
-			if search == "latest":
-				# get the latest xkcd comic
-				comic = self.xkcd_fetcher.get_latest()
-			# ++xkcd [num]
-			elif search.isdigit():
-				# get response from the xkcd API with search as the id
-				comic = self.xkcd_fetcher.get_comic_by_id(int(search))
-			# ++xkcd [search term]
-			elif len(args) > 0:
-				# get relevant xkcd for search term
-				comic = self.xkcd_fetcher.search_relevant(search)
-			# ++xkcd
-			else:
-				# get a random xkcd comic
-				comic = self.xkcd_fetcher.get_random()
-			# embed the response
-			embed = self.xkcd_embedder.gen_embed(comic)
-			# reply with the embed
-			await ctx.send(embed=embed)
-		except ConnectionError as error:
-			# request did not return a 200 response code
-			raise FriendlyError(error.args[0], ctx.channel, ctx.message.author, error)
+	@cog_ext.cog_subcommand(
+		base="xkcd",
+		name="search",
+		description="Search for an xkcd comic",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="query",
+				description="Your search terms",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			)
+		],
+	)
+	async def xkcd_search(self, ctx: SlashContext, query: str):
+		await ctx.defer()
+		comic = self.xkcd_fetcher.search_relevant(query)
+		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 
 def setup(bot: commands.Bot):

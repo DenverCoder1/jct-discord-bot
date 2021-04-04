@@ -1,4 +1,8 @@
+import config
 import sys
+from discord_slash.model import SlashCommandOptionType
+from discord_slash import cog_ext
+from discord_slash.utils.manage_commands import create_option
 from discord_slash.context import SlashContext
 from utils import utils
 from discord.ext import commands
@@ -14,18 +18,20 @@ class ErrorLogCog(commands.Cog, name="Error Logs"):
 		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL"), bot)
 		self.handler = ErrorHandler(self.logger)
 
-	@commands.command(name="logs")
-	async def logs(self, ctx: commands.Context, num_lines: int = 50):
-		"""Show recent logs from err.log
-
-		Usage:
-		```
-		++logs
-		```
-		"""
-		# log in console that a ping was received
-		print('Executing command "logs".')
-		# send the logs
+	@cog_ext.cog_slash(
+		name="logs",
+		description="Show recent logs from err.log.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="num_lines",
+				description="Default is 50.",
+				option_type=SlashCommandOptionType.INTEGER,
+				required=False,
+			),
+		],
+	)
+	async def logs(self, ctx: SlashContext, num_lines: int = 50):
 		await ctx.send(self.logger.read_logs(num_lines))
 
 	@commands.Cog.listener()
