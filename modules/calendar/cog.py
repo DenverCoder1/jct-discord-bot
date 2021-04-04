@@ -30,18 +30,6 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			self.calendar_service, config.conn, self.sql_fetcher
 		)
 		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
-		self.number_emoji = (
-			"0️⃣",
-			"1️⃣",
-			"2️⃣",
-			"3️⃣",
-			"4️⃣",
-			"5️⃣",
-			"6️⃣",
-			"7️⃣",
-			"8️⃣",
-			"9️⃣",
-		)
 
 	@cog_ext.cog_subcommand(
 		base="calendar",
@@ -210,6 +198,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		await ctx.defer()
 		# replace channel mentions with course names
 		title = self.course_mentions.replace_channel_mentions(title)
+		description = self.course_mentions.replace_channel_mentions(description)
+		location = self.course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
 		calendar = self.finder.get_calendar(ctx, class_role)
 		try:
@@ -309,44 +299,17 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar = self.finder.get_calendar(ctx, class_role)
 		# get a list of upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, query)
-		# no events found
-		if len(events) == 0:
-			raise FriendlyError(
-				f"No events were found for '{query}'.", ctx.channel, ctx.author
-			)
-		# multiple events found
-		elif len(events) > 1:
-			embed = self.calendar_embedder.embed_event_list(
-				title=f"⚠ Multiple events were found.",
-				events=events,
-				description=(
-					"Please specify which event you would like to update."
-					f'\n\nShowing results for "{query}"'
-				),
-				colour=discord.Colour.gold(),
-				enumeration=self.number_emoji,
-			)
-			await ctx.send(embed=embed)
-			# ask user to pick an event with emojis
-			selection_index = await wait_for_reaction(
-				bot=self.bot,
-				message=ctx.message,
-				emoji_list=self.number_emoji[: len(events)],
-				allowed_users=[ctx.author],
-			)
-			# get the event selected by the user
-			event_to_update = events[selection_index]
-		# only 1 event found
-		else:
-			# get the event at index 0
-			event_to_update = events[0]
+		# get event to update
+		event_to_update = self.calendar_embedder.get_event_choice(
+			ctx, events, query, "update"
+		)
 		# replace channel mentions
 		if title is not None:
-			self.course_mentions.replace_channel_mentions(title)
+			title = self.course_mentions.replace_channel_mentions(title)
 		if description is not None:
-			self.course_mentions.replace_channel_mentions(description)
+			description = self.course_mentions.replace_channel_mentions(description)
 		if location is not None:
-			self.course_mentions.replace_channel_mentions(location)
+			location = self.course_mentions.replace_channel_mentions(location)
 		try:
 			event = self.calendar_service.update_event(
 				calendar.id, event_to_update, title, start, end, description, location
@@ -403,35 +366,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar = self.finder.get_calendar(ctx, class_role)
 		# fetch upcoming events
 		events = self.calendar_service.fetch_upcoming(calendar.id, query)
-		# no events found
-		if len(events) == 0:
-			raise FriendlyError(f"No events were found for '{query}'.", ctx, ctx.author)
-		# multiple events found
-		elif len(events) > 1:
-			embed = self.calendar_embedder.embed_event_list(
-				title=f"⚠ Multiple events were found.",
-				events=events,
-				description=(
-					"Please specify which event you would like to delete."
-					f'\n\nShowing results for "{query}"'
-				),
-				colour=discord.Colour.gold(),
-				enumeration=self.number_emoji,
-			)
-			await ctx.send(embed=embed)
-			# ask user to pick an event with emojis
-			selection_index = await wait_for_reaction(
-				bot=self.bot,
-				message=ctx.message,
-				emoji_list=self.number_emoji[: len(events)],
-				allowed_users=[ctx.author],
-			)
-			# get the event selected by the user
-			event_to_delete = events[selection_index]
-		# only 1 event found
-		else:
-			# get the event at index 0 if there's only 1
-			event_to_delete = events[0]
+		# get event to delete
+		event_to_delete = self.calendar_embedder.get_event_choice(
+			ctx, events, query, "delete"
+		)
 		# delete event
 		try:
 			self.calendar_service.delete_event(calendar.id, event_to_delete)

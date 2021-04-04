@@ -12,9 +12,21 @@ import discord
 
 class CalendarEmbedder:
 	def __init__(self, bot: commands.Bot):
+		self.bot = bot
 		self.timezone = "Asia/Jerusalem"
 		self.max_length = 2048
-		self.bot = bot
+		self.number_emoji = (
+			"0️⃣",
+			"1️⃣",
+			"2️⃣",
+			"3️⃣",
+			"4️⃣",
+			"5️⃣",
+			"6️⃣",
+			"7️⃣",
+			"8️⃣",
+			"9️⃣",
+		)
 
 	async def embed_event_pages(
 		self,
@@ -24,6 +36,7 @@ class CalendarEmbedder:
 		results_per_page: int,
 		calendar: Calendar,
 	) -> None:
+		"""Embed page of events and wait for reactions to continue to new pages"""
 		# set start index
 		page_num = 1 if len(events) > results_per_page else None
 		while True:
@@ -61,6 +74,46 @@ class CalendarEmbedder:
 			# time window exceeded
 			except FriendlyError:
 				break
+
+	async def get_event_choice(
+		self, ctx: SlashContext, events: Iterable[Event], query: str, action: str
+	):
+		"""
+		If there are no events, throws an error.
+		If there are multiple events, embed list of events and wait for reaction to select an event.
+		If there is one event, return it.
+		"""
+		# no events found
+		if len(events) == 0:
+			raise FriendlyError(
+				f"No events were found for '{query}'.", ctx.channel, ctx.author
+			)
+		# multiple events found
+		elif len(events) > 1:
+			embed = self.embed_event_list(
+				title=f"⚠ Multiple events were found.",
+				events=events,
+				description=(
+					f"Please specify which event you would like to {action}."
+					f'\n\nShowing results for "{query}"'
+				),
+				colour=discord.Colour.gold(),
+				enumeration=self.number_emoji,
+			)
+			await ctx.send(embed=embed)
+			# ask user to pick an event with emojis
+			selection_index = await wait_for_reaction(
+				bot=self.bot,
+				message=ctx.message,
+				emoji_list=self.number_emoji[: len(events)],
+				allowed_users=[ctx.author],
+			)
+			# get the event selected by the user
+			return events[selection_index]
+		# only 1 event found
+		else:
+			# get the event at index 0
+			return events[0]
 
 	def embed_event_list(
 		self,
