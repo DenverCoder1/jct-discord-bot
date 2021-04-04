@@ -1,16 +1,13 @@
-from re import T
 import discord
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
-from utils.mention import decode_mention
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
 from modules.course_management.course_adder import CourseAdder
 from modules.course_management.course_deleter import CourseDeleter
-from modules.error.friendly_error import FriendlyError
 import config
 
 
