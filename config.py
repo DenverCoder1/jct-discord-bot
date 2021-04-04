@@ -13,7 +13,8 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
 guild_id = int(os.getenv("DISCORD_GUILD"))
-guild: discord.Guild = None  # To be loaded on ready
+_guild: discord.Guild = None  # To be loaded on ready
+guild = lambda: _guild
 
 # Connect to database
 conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")

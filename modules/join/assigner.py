@@ -21,16 +21,18 @@ class Assigner:
 		self.conn = conn
 		self.sql_fetcher = sql_fetcher
 
-	async def assign(self, member: discord.Member, name: str, campus: str, year: int):
+	async def assign(
+		self, member: discord.Member, name: str, campus_id: int, year: int
+	):
 		if self.unassigned_role in member.roles:
 			await member.edit(nick=name)
-			await self.__add_role(member, campus, year)
+			await self.__add_role(member, campus_id, year)
 			await member.add_roles(self.student_role)
 			await member.remove_roles(self.unassigned_role)
 			print(f"Removed Unassigned from {member} and added Student")
 			await self.server_welcome(member)
 
-	async def __add_role(self, member: discord.Member, campus: str, year: int):
+	async def __add_role(self, member: discord.Member, campus_id: int, year: int):
 		"""adds the right role to the user that used the command"""
 		today = HebrewDate.today()
 		last_elul_year = today.year if today.month == 6 else today.year - 1
@@ -41,10 +43,10 @@ class Assigner:
 		query = self.sql_fetcher.fetch("modules", "join", "queries", "get_role.sql")
 		with self.conn as conn:
 			with conn.cursor() as cursor:
-				cursor.execute(query, {"campus": campus, "grad_year": grad_year})
+				cursor.execute(query, {"campus_id": campus_id, "grad_year": grad_year})
 				role_id = cursor.fetchone()[0]
 
-		class_role = self.guild.get_role(role_id)
+		class_role = self.guild().get_role(role_id)
 
 		await member.add_roles(class_role)
 		print(f"Gave {class_role.name} to {member.display_name}")
