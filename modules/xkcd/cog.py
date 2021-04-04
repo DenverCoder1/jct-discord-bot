@@ -69,6 +69,7 @@ class XKCDCog(commands.Cog, name="xkcd Comics"):
 		],
 	)
 	async def xkcd_search(self, ctx: SlashContext, query: str):
+		await ctx.defer()
 		comic = self.xkcd_fetcher.search_relevant(query)
 		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
 
