@@ -1,3 +1,4 @@
+from database.person.person import Person
 from typing import Callable, Iterable, Tuple
 import config
 import discord
@@ -154,10 +155,9 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		self, ctx: SlashContext, first_name: str, last_name: str, channels: str
 	):
 		await ctx.defer()
-		person_id = self.person_adder.add_person(
+		person = self.person_adder.add_person(
 			first_name, last_name, extract_channel_mentions(channels), self.categoriser,
 		)
-		person = one(self.finder.get_people([person_id]))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	@cog_ext.cog_subcommand(
@@ -239,7 +239,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 	async def __add_remove_emails(
 		self,
 		ctx: SlashContext,
-		func,
+		func: Callable[[Person, str, SlashContext], Person],
 		name: str = None,
 		channel: discord.TextChannel = None,
 		email: str = None,
@@ -251,9 +251,7 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 			ctx, name, channel, None if (name or channel) is not None else email
 		)
 		# add/remove the emails to the database
-		func(person, email, ctx)
-		# update professors set from database
-		person = one(self.finder.get_people([person.id]))
+		person = func(person, email, ctx)
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	async def __link_unlink(
@@ -261,14 +259,11 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 		ctx: SlashContext,
 		name_or_email: str,
 		channel_mentions: str,
-		func: Callable[[int, Iterable[str]], str],
+		func: Callable[[SlashContext, Person, Iterable[str]], str],
 	):
 		await ctx.defer()
 		person = self.finder.search_one(ctx, name=name_or_email, email=name_or_email)
-		error_msg = func(person.id, extract_channel_mentions(channel_mentions))
-		if error_msg:
-			raise FriendlyError(error_msg, ctx, ctx.author)
-		person = one(self.finder.get_people([person.id]))
+		person = func(ctx, person, extract_channel_mentions(channel_mentions))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 

@@ -6,7 +6,7 @@ import config
 import psycopg2.extensions as sql
 from typing import Any, Iterable, Set, Optional, Union
 from modules.email_registry.weighted_set import WeightedSet
-from modules.email_registry.person import Person
+from database.person.person import Person
 from modules.error.friendly_error import FriendlyError
 from utils.sql_fetcher import SqlFetcher
 
@@ -29,22 +29,21 @@ class PersonFinder:
 
 		# add the people belonging to the category of the given channel (if any)
 		if channel:
-			for person_id in self.__search_people("search_channel.sql", channel.id):
-				weights[person_id] += self.search_weights["channel"]
+			for person in self.__search_people("search_channel.sql", channel.id):
+				weights[person] += self.search_weights["channel"]
 
 		# search their name
 		if name:
 			for word in name.split():
-				for person_id in self.__search_people("search_by_name.sql", word):
-					weights[person_id] += self.search_weights["word"]
+				for person in self.__search_people("search_by_name.sql", word):
+					weights[person] += self.search_weights["word"]
 
 		# add the people who have the email mentioned
 		if email:
-			for person_id in self.__search_people("search_email.sql", email):
-				weights[person_id] += self.search_weights["email"]
+			for person in self.__search_people("search_email.sql", email):
+				weights[person] += self.search_weights["email"]
 
-		people = self.get_people(weights.heaviest_items())
-		return people
+		return weights.heaviest_items()
 
 	def search_one(
 		self,
@@ -82,21 +81,6 @@ class PersonFinder:
 			)
 		return one(people)
 
-	def get_people(self, ids: Iterable[int]) -> Set[Person]:
-		"""searches the database for a person with a given id and returns a Person object"""
-		if not ids:
-			return set()
-		query = self.sql_fetcher.fetch(
-			"modules", "email_registry", "queries", "get_people.sql"
-		)
-		with self.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"ids": tuple(ids)})
-				people = {
-					Person(row[0], row[1], row[2], row[3]) for row in cursor.fetchall()
-				}
-		return people
-
 	def __search_people(self, sql_file: str, param: Any) -> Iterable[Person]:
 		"""
 		Searches the database using a given SQL file and returns a list of people found.
@@ -109,4 +93,4 @@ class PersonFinder:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"param": param})
 				ids = {row[0] for row in cursor.fetchall()}
-		return ids or {}
+		return {Person.get_person(person_id) for person_id in ids}

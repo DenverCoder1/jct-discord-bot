@@ -1,3 +1,6 @@
+from discord_slash.context import SlashContext
+from modules.error.friendly_error import FriendlyError
+from database.person.person import Person
 from typing import Iterable, Optional, Tuple
 from utils.sql_fetcher import SqlFetcher
 from utils.mention import decode_channel_mention
@@ -9,31 +12,41 @@ class Categoriser:
 		self.conn = conn
 		self.sql_fetcher = sql_fetcher
 
-	def categorise_person(self, person_id: int, channel_mentions: Iterable[str]) -> str:
+	def categorise_person(
+		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
+	) -> str:
 		"""Adds the person to the categories linked to the channels mentioned. Returns an error message (string) or an empty string."""
 		return self.__add_remove_categories(
-			"categorise_person.sql", person_id, channel_mentions
+			ctx, "categorise_person.sql", person, channel_mentions
 		)
 
 	def decategorise_person(
-		self, person_id: int, channel_mentions: Iterable[str]
+		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
 	) -> str:
 		"""Removes the person from the categories linked to the channels mentioned. Returns an error message (string) or an empty string."""
 		return self.__add_remove_categories(
-			"decategorise_person.sql", person_id, channel_mentions
+			ctx, "decategorise_person.sql", person, channel_mentions
 		)
 
 	def __add_remove_categories(
-		self, sql_file: str, person_id: int, channel_mentions: Iterable[str]
-	) -> str:
+		self,
+		ctx: SlashContext,
+		sql_file: str,
+		person: Person,
+		channel_mentions: Iterable[str],
+	) -> Person:
 		query = self.sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for channel in channel_mentions:
 					channel_id = decode_channel_mention(channel)
 					if channel_id is None:
-						return f'Expected a channel mention in place of "{channel}".'
+						raise FriendlyError(
+							f'Expected a channel mention in place of "{channel}".',
+							ctx,
+							ctx.author,
+						)
 					cursor.execute(
-						query, {"person_id": person_id, "channel_id": channel_id}
+						query, {"person_id": person.id, "channel_id": channel_id}
 					)
-				return ""
+				return Person.get_person(person.id)

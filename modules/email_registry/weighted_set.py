@@ -12,7 +12,7 @@ class WeightedSet:
 	def __setitem__(self, item: Any, weight: int) -> None:
 		self.weights[item] = weight
 
-	def heaviest_items(self) -> Set[int]:
+	def heaviest_items(self) -> Set[Any]:
 		"""Finds all the items with maximal weight"""
 		items = {}
 		max_weight = 0
