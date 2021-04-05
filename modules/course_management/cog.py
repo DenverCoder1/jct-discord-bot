@@ -13,8 +13,8 @@ import config
 
 class CourseManagerCog(commands.Cog):
 	def __init__(self):
-		self.adder = CourseAdder(config.conn, config.sql_fetcher)
-		self.deleter = CourseDeleter(config.conn, config.sql_fetcher)
+		self.adder = CourseAdder(config.conn)
+		self.deleter = CourseDeleter(config.conn)
 
 	@cog_ext.cog_subcommand(
 		base="course",

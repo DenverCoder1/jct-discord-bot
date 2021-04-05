@@ -8,16 +8,15 @@ from modules.email_registry.person_finder import PersonFinder
 from modules.error.friendly_error import FriendlyError
 from typing import Iterable
 from utils import embedder
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 from utils.utils import get_discord_obj
 
 
 class CourseAdder:
-	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher):
+	def __init__(self, conn: sql.connection):
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
-		self.categoriser = Categoriser(conn, sql_fetcher)
-		self.finder = PersonFinder(conn, sql_fetcher)
+		self.categoriser = Categoriser(conn)
+		self.finder = PersonFinder(conn)
 
 	async def add_course(
 		self,
@@ -59,7 +58,7 @@ class CourseAdder:
 	async def __add_to_database(
 		self, ctx: SlashContext, channel: discord.TextChannel, course_name: str
 	):
-		course_query = self.sql_fetcher.fetch(
+		course_query = sql_fetcher.fetch(
 			"modules", "course_management", "queries", "add_course.sql"
 		)
 		with self.conn as conn:

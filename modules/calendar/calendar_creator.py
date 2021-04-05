@@ -1,15 +1,12 @@
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 import psycopg2.extensions as sql
 from .calendar_service import CalendarService
 from database.campus.campus import Campus
 
 
 class CalendarCreator:
-	def __init__(
-		self, service: CalendarService, conn: sql.connection, sql_fetcher: SqlFetcher
-	):
+	def __init__(self, service: CalendarService, conn: sql.connection):
 		self.__conn = conn
-		self.__sql_fetcher = sql_fetcher
 		self.__service = service
 
 	def create_group_calendars(self, year: int):
@@ -24,9 +21,7 @@ class CalendarCreator:
 
 	def __add_calendar(self, calendar_id: str, campus_id: int, year: int):
 		"""Update the class entry in the database with the calendar id"""
-		query = self.__sql_fetcher.fetch(
-			"modules", "calendar", "queries", "add_calendar.sql"
-		)
+		query = sql_fetcher.fetch("modules", "calendar", "queries", "add_calendar.sql")
 		with self.__conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

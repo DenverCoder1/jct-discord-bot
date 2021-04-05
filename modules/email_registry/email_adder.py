@@ -2,17 +2,15 @@ from typing import Union
 import discord
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
-from utils.sql_fetcher import SqlFetcher
-from utils.utils import is_email
+from database import sql_fetcher
 from database.person.person import Person
 import psycopg2.extensions as sql
 from psycopg2.errors import UniqueViolation, CheckViolation
 
 
 class EmailAdder:
-	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
+	def __init__(self, conn: sql.connection) -> None:
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
 
 	def add_email(self, person: Person, email: str, ctx: SlashContext) -> Person:
 		return self.__add_remove_email("add_email.sql", person, email, ctx)
@@ -23,7 +21,7 @@ class EmailAdder:
 	def __add_remove_email(
 		self, sql_file: str, person: Person, email: str, ctx: SlashContext
 	) -> Person:
-		query = self.sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
+		query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				try:

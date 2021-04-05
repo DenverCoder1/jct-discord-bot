@@ -1,5 +1,6 @@
 from typing import Set
 import config
+from database import sql_fetcher
 
 
 class Person:
@@ -24,9 +25,7 @@ class Person:
 	@staticmethod
 	def get_person(person_id: int) -> "Person":
 		"""Searches the database for a person with a given id and returns a Person object."""
-		query = config.sql_fetcher.fetch(
-			"database", "person", "queries", "get_person.sql"
-		)
+		query = sql_fetcher.fetch("database", "person", "queries", "get_person.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"person_id": person_id})
@@ -35,9 +34,7 @@ class Person:
 	@staticmethod
 	def get_people() -> Set["Person"]:
 		"""Searches the database for all people and returns a set of Person objects."""
-		query = config.sql_fetcher.fetch(
-			"database", "person", "queries", "get_people.sql"
-		)
+		query = sql_fetcher.fetch("database", "person", "queries", "get_people.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)

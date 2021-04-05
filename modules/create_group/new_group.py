@@ -1,20 +1,17 @@
 from database.group.group import Group
 import discord
 import psycopg2.extensions as sql
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 from database.campus.campus import Campus
 from .group_channel_creator import GroupChannelCreator
 import config
 
 
 class NewGroup:
-	def __init__(
-		self, campus: Campus, year: int, conn: sql.connection, sql_fetcher: SqlFetcher,
-	):
+	def __init__(self, campus: Campus, year: int, conn: sql.connection):
 		self.campus = campus
 		self.year = year
 		self.__conn = conn
-		self.__sql_fetcher = sql_fetcher
 		self.role = None
 		self.channel = None
 
@@ -61,9 +58,7 @@ class NewGroup:
 		)
 
 	def __add_to_database(self):
-		query = self.__sql_fetcher.fetch(
-			"modules", "create_group", "queries", "add_group.sql"
-		)
+		query = sql_fetcher.fetch("modules", "create_group", "queries", "add_group.sql")
 		with self.__conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(

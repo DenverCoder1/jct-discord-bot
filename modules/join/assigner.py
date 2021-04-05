@@ -1,7 +1,7 @@
 import random
 from typing import Callable
 from utils import utils
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 import discord
 from pyluach.dates import HebrewDate
 import psycopg2.extensions as sql
@@ -12,18 +12,12 @@ class Assigner:
 	Assigns users their roles and name, and welcomes them once done.
 	"""
 
-	def __init__(
-		self,
-		guild: Callable[[], discord.Guild],
-		conn: sql.connection,
-		sql_fetcher: SqlFetcher,
-	):
+	def __init__(self, guild: Callable[[], discord.Guild], conn: sql.connection):
 		self.guild = guild
 		self.unassigned_role = guild().get_role(utils.get_id("UNASSIGNED_ROLE"))
 		self.student_role = guild().get_role(utils.get_id("STUDENT_ROLE"))
 		self.welcome_channel = guild().get_channel(utils.get_id("OFF_TOPIC_CHANNEL"))
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
 
 	async def assign(
 		self, member: discord.Member, name: str, campus_id: int, year: int
@@ -44,7 +38,7 @@ class Assigner:
 		base_year = last_elul.to_pydate().year
 		grad_year = base_year + 4 - year
 
-		query = self.sql_fetcher.fetch("modules", "join", "queries", "get_role.sql")
+		query = sql_fetcher.fetch("modules", "join", "queries", "get_role.sql")
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"campus_id": campus_id, "grad_year": grad_year})
