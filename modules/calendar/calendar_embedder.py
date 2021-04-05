@@ -56,12 +56,11 @@ class CalendarEmbedder:
 				# if only 1 page, break out of loop
 				if page_num is None:
 					break
-				# default emoji
-				next_emoji = "⏬"
-				# increment page number
-				page_num += 1
-				# change emoji and reset page if no more events
-				if start + results_per_page >= len(events):
+				# set emoji and page based on if no more events
+				if start + results_per_page < len(events):
+					next_emoji = "⏬"
+					page_num += 1
+				else:
 					next_emoji = "⤴️"
 					page_num = 1
 				# wait for author to respond to go to next page
