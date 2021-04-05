@@ -1,12 +1,12 @@
 import os
 import re
 import csv
-from datetime import datetime
-from itertools import product
-from typing import Dict, Iterable, Mapping, Optional, Tuple, Union
+import config
 import dateparser
 import asyncio
 import discord
+from datetime import datetime
+from typing import Any, Callable, Dict, Iterable, Optional, Union
 from discord.ext import commands
 from discord_slash.model import SlashMessage
 from modules.error.friendly_error import FriendlyError
@@ -165,6 +165,6 @@ async def wait_for_reaction(
 		return emoji_list.index(str(reaction.emoji))
 
 
-def one(iterable: Iterable):
-	"""Returns a single element from an iterable or throws an error if it was empty."""
-	return next(iter(iterable))
+def one(iterable: Iterable, condition: Callable[[Any], bool] = lambda x: True):
+	"""Returns a single element from an iterable or raises StopIteration if it was empty."""
+	return next(obj for obj in iterable if condition(obj))

@@ -52,7 +52,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	)
 	async def calendar_links(self, ctx: SlashContext, class_name: int = None):
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_name)
+		calendar = self.finder.get_calendar(ctx, self.groups, class_name)
 		# fetch links for calendar
 		links = self.service.get_links(calendar.id)
 		embed = self.embedder.embed_link(f"🔗 Calendar Links for {calendar.name}", links)
@@ -102,7 +102,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_name)
+		calendar = self.finder.get_calendar(ctx, self.groups, class_name)
 		# convert channel mentions to full names
 		full_query = self.course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
@@ -183,7 +183,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		description = self.course_mentions.replace_channel_mentions(description)
 		location = self.course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_name)
+		calendar = self.finder.get_calendar(ctx, self.groups, class_name)
 		try:
 			event = self.service.add_event(
 				calendar.id, title, start, end, location, description
@@ -273,7 +273,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_name)
+		calendar = self.finder.get_calendar(ctx, self.groups, class_name)
 		# get a list of upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
@@ -335,7 +335,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_name)
+		calendar = self.finder.get_calendar(ctx, self.groups, class_name)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
@@ -385,7 +385,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_name)
+		calendar = self.finder.get_calendar(ctx, self.groups, class_name)
 		# validate email address
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx.channel, ctx.author)

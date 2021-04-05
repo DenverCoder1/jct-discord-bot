@@ -1,3 +1,4 @@
+from utils.utils import one
 from database.group.group import Group
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
@@ -41,11 +42,13 @@ class CalendarFinder:
 		else:
 			raise ClassRoleError(f"Could not find a matching campus name.")
 
-	def get_calendar(self, ctx: SlashContext, group_id: int = None) -> Calendar:
+	def get_calendar(
+		self, ctx: SlashContext, groups: Iterable[Group], group_id: int = None
+	) -> Calendar:
 		"""Returns Calendar given a discord member or a string containing the name and id"""
 		# parse name and calendar id from selected choice
 		if group_id is not None:
-			group = Group.get_group(group_id)
+			group = one(groups, lambda group: group.id == group_id)
 			return Calendar(name=group.name, id=group.calendar)
 		# get calendar from user's role
 		else:
