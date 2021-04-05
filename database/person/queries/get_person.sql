@@ -6,5 +6,5 @@ FROM people
 LEFT JOIN person_category ON people.id = person_category.person
 LEFT JOIN categories ON person_category.category = categories.id
 LEFT JOIN emails ON people.id = emails.person
-WHERE people.id IN %(ids)s
+WHERE people.id = %(person_id)s
 GROUP BY people.id

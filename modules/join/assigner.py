@@ -1,4 +1,5 @@
 import random
+from typing import Callable
 from utils import utils
 from utils.sql_fetcher import SqlFetcher
 import discord
@@ -12,12 +13,15 @@ class Assigner:
 	"""
 
 	def __init__(
-		self, guild: discord.Guild, conn: sql.connection, sql_fetcher: SqlFetcher
+		self,
+		guild: Callable[[], discord.Guild],
+		conn: sql.connection,
+		sql_fetcher: SqlFetcher,
 	):
 		self.guild = guild
-		self.unassigned_role = guild.get_role(utils.get_id("UNASSIGNED_ROLE"))
-		self.student_role = guild.get_role(utils.get_id("STUDENT_ROLE"))
-		self.welcome_channel = guild.get_channel(utils.get_id("OFF_TOPIC_CHANNEL"))
+		self.unassigned_role = guild().get_role(utils.get_id("UNASSIGNED_ROLE"))
+		self.student_role = guild().get_role(utils.get_id("STUDENT_ROLE"))
+		self.welcome_channel = guild().get_channel(utils.get_id("OFF_TOPIC_CHANNEL"))
 		self.conn = conn
 		self.sql_fetcher = sql_fetcher
 
