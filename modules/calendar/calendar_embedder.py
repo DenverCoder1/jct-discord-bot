@@ -83,7 +83,7 @@ class CalendarEmbedder:
 		If there is one event, return it.
 		"""
 		# no events found
-		if len(events) == 0:
+		if not events:
 			raise FriendlyError(f"No events were found for '{query}'.", ctx, ctx.author)
 		# multiple events found
 		elif len(events) > 1:
