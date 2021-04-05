@@ -47,21 +47,7 @@ class ErrorHandler:
 
 	def __user_error_message(self, error: Exception):
 		"""Given an error, will return a user-friendly string, and whether or not to log the error in the channel"""
-		if isinstance(error, discord_err.CommandNotFound):
-			return (
-				"That command does not exist. Check your spelling or see all available"
-				f" commands with `{config.prefix}help`",
-				False,
-			)
-		elif isinstance(error, discord_err.MissingRequiredArgument):
-			return f"Argument {error.param} required.", True
-		elif isinstance(error, discord_err.TooManyArguments):
-			return f"Too many arguments given.", True
-		elif isinstance(error, discord_err.BadArgument):
-			return f"Bad argument: {error}", True
-		elif isinstance(error, discord_err.NoPrivateMessage):
-			return f"That command cannot be used in DMs.", False
-		elif isinstance(error, discord_err.MissingPermissions):
+		if isinstance(error, discord_err.MissingPermissions):
 			return (
 				"You are missing the following permissions required to run the"
 				f' command: {", ".join(error.missing_perms)}.',
@@ -69,8 +55,6 @@ class ErrorHandler:
 			)
 		elif isinstance(error, discord_err.MissingRole):
 			return f"You do not have the required role to run this command.", False
-		elif isinstance(error, discord_err.DisabledCommand):
-			return f"That command is disabled or under maintenance.", True
 		elif isinstance(error, discord_err.CommandInvokeError):
 			return f"Error while executing the command.", True
 		else:

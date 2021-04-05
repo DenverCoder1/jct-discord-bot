@@ -4,8 +4,6 @@ import psycopg2
 import discord
 
 
-prefix = "++"
-
 load_dotenv()
 
 # Discord setup

@@ -66,9 +66,9 @@ class PersonFinder:
 		people = self.search(name, channel, email)
 		if not people:
 			raise FriendlyError(
-				"Unable to find someone who matches your query. Check your"
-				" spelling or try a different query. If you still can't find them,"
-				f" You can add them with `{config.prefix}addperson`.",
+				f"Unable to find someone who matches your query. Check you"
+				f"r spelling or try a different query. If you still can't find the"
+				f"m, You can add them with `/email person add`.",
 				sender,
 			)
 		if len(people) > 1:
