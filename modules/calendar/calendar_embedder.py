@@ -1,4 +1,9 @@
 import re
+from discord.ext import commands
+from utils.utils import wait_for_reaction
+from discord_slash.context import SlashContext
+from modules.error.friendly_error import FriendlyError
+from .calendar import Calendar
 from .event import Event
 from typing import Iterable, Dict
 from functools import reduce
@@ -6,9 +11,106 @@ import discord
 
 
 class CalendarEmbedder:
-	def __init__(self):
+	def __init__(self, bot: commands.Bot):
+		self.bot = bot
 		self.timezone = "Asia/Jerusalem"
 		self.max_length = 2048
+		self.number_emoji = (
+			"0️⃣",
+			"1️⃣",
+			"2️⃣",
+			"3️⃣",
+			"4️⃣",
+			"5️⃣",
+			"6️⃣",
+			"7️⃣",
+			"8️⃣",
+			"9️⃣",
+		)
+
+	async def embed_event_pages(
+		self,
+		ctx: SlashContext,
+		events: Iterable[Event],
+		full_query: str,
+		results_per_page: int,
+		calendar: Calendar,
+	) -> None:
+		"""Embed page of events and wait for reactions to continue to new pages"""
+		# set start index
+		page_num = 1 if len(events) > results_per_page else None
+		while True:
+			try:
+				start = (page_num - 1) * results_per_page if page_num else 0
+				# create embed
+				embed = self.embed_event_list(
+					title=f"📅 Upcoming Events for {calendar.name}",
+					events=events[start : start + results_per_page],
+					description=f'Showing results for "{full_query}"'
+					if full_query
+					else "",
+					page_num=page_num,
+				)
+				sender = ctx.send if ctx.message is None else ctx.message.edit
+				await sender(embed=embed)
+				# if only 1 page, break out of loop
+				if page_num is None:
+					break
+				# set emoji and page based on if no more events
+				if start + results_per_page < len(events):
+					next_emoji = "⏬"
+					page_num += 1
+				else:
+					next_emoji = "⤴️"
+					page_num = 1
+				# wait for author to respond to go to next page
+				await wait_for_reaction(
+					bot=self.bot,
+					message=ctx.message,
+					emoji_list=[next_emoji],
+					allowed_users=[ctx.author],
+				)
+			# time window exceeded
+			except FriendlyError:
+				break
+
+	async def get_event_choice(
+		self, ctx: SlashContext, events: Iterable[Event], query: str, action: str
+	):
+		"""
+		If there are no events, throws an error.
+		If there are multiple events, embed list of events and wait for reaction to select an event.
+		If there is one event, return it.
+		"""
+		# no events found
+		if not events:
+			raise FriendlyError(f"No events were found for '{query}'.", ctx, ctx.author)
+		# multiple events found
+		elif len(events) > 1:
+			embed = self.embed_event_list(
+				title=f"⚠ Multiple events were found.",
+				events=events,
+				description=(
+					f"Please specify which event you would like to {action}."
+					f'\n\nShowing results for "{query}"'
+				),
+				colour=discord.Colour.gold(),
+				enumeration=self.number_emoji,
+			)
+			await ctx.send(embed=embed)
+			# ask user to pick an event with emojis
+			selection_index = await wait_for_reaction(
+				bot=self.bot,
+				message=ctx.message,
+				emoji_list=self.number_emoji[: len(events)],
+				allowed_users=[ctx.author],
+			)
+			# get the event selected by the user
+			return events[selection_index]
+		# only 1 event found
+		else:
+			# get the event at index 0
+			return events[0]
 
 	def embed_event_list(
 		self,
@@ -22,15 +124,16 @@ class CalendarEmbedder:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
 		Arguments:
-		<title> - title to display at the top
-		<events> - list of events to embed
-		[description] - description to embed below the title
-		[colour] - embed colour
-		[enumeration] - list of emojis to display alongside events (for reaction choices)
+
+		:param title: :class:`str` the title to display at the top
+		:param events: :class:`Iterable[Event]` the events to display
+		:param description: :class:`Optional[str]` the description to embed below the title
+		:param colour: :class:`Optional[discord.Colour]` the embed colour
+		:param enumeration: :class:`Optional[Iterable[str]]` list of emojis to display alongside events (for reaction choices)
 		"""
 		embed = discord.Embed(title=title, colour=colour)
 		# set initial description if available
-		embed.description = "" if description == "" else f"{description}\n\n"
+		embed.description = "" if description == "" else f"{description}\n"
 		if not events:
 			embed.description += "No events found"
 		else:

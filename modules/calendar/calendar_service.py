@@ -38,9 +38,9 @@ class CalendarService:
 	def fetch_upcoming(
 		self,
 		calendar_id: str,
-		max_results: int,
 		query: str = "",
 		page_token: str = None,
+		max_results: int = 100,
 	) -> Iterable[Event]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
@@ -58,8 +58,6 @@ class CalendarService:
 			)
 			.execute()
 		)
-		# get next page token
-		next_page_token = events_result.get("nextPageToken")
 		# return list of events
 		events = events_result.get("items", [])
 		# filter by search term
@@ -68,7 +66,7 @@ class CalendarService:
 		# convert dicts to Event objects
 		converted_events = tuple(map(lambda item: Event(item, self.timezone), filtered))
 		# return events and the next page's token
-		return converted_events, next_page_token
+		return converted_events
 
 	def add_event(
 		self,
@@ -76,8 +74,8 @@ class CalendarService:
 		summary: str,
 		start: str,
 		end: str,
-		location: str = "",
-		description: str = "",
+		location: str,
+		description: str,
 	) -> Event:
 		"""Add an event to the calendar given the id, summary, start time,
 		and optionally, the end time, location and description."""
@@ -155,28 +153,24 @@ class CalendarService:
 		if response != "":
 			raise ConnectionError("Couldn't delete event.", response)
 
-	def update_event(self, calendar_id: str, event: Event, **kwargs) -> Event:
+	def update_event(
+		self,
+		calendar_id: str,
+		event: Event,
+		new_summary: str = None,
+		new_start: str = None,
+		new_end: str = None,
+		new_desc: str = None,
+		new_location: str = None,
+	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
-		# parse new event title if provided
-		new_summary = (
-			kwargs.get("title", None)
-			or kwargs.get("summary", None)
-			or kwargs.get("name", None)
-		)
-		# get new location if provided
-		new_location = kwargs.get("location", None)
-		# get new description if provided
-		new_desc = kwargs.get("description", None)
 		# parse new start date if provided
 		new_start_date = parse_date(
-			kwargs.get("start", None),
-			from_tz=self.timezone,
-			to_tz=self.timezone,
-			base=event.start(),
+			new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start(),
 		)
 		# parse new end date if provided
 		new_end_date = parse_date(
-			kwargs.get("end", None),
+			new_end,
 			from_tz=self.timezone,
 			to_tz=self.timezone,
 			base=(new_start_date if new_start_date else event.end()),
