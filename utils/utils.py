@@ -51,21 +51,6 @@ def is_email(email: str) -> bool:
 	return bool(re.search(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", email))
 
 
-def build_aliases(
-	name: str,
-	prefix: Iterable[str],
-	suffix: Iterable[str],
-	more_aliases: Iterable[str] = (),
-	include_dots: bool = True,
-) -> Mapping:
-	dots = ("", ".") if include_dots else ("")
-	return {
-		"name": name,
-		"aliases": list(more_aliases)
-		+ [a + b + c for a, b, c in product(prefix, dots, suffix) if a + b + c != name],
-	}
-
-
 def parse_date(
 	date_str: str,
 	from_tz: str = None,

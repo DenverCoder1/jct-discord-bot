@@ -23,10 +23,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.bot = bot
 		self.embedder = CalendarEmbedder(bot)
 		self.service = CalendarService()
-		self.sql_fetcher = config.sql_fetcher
-		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
-		self.creator = CalendarCreator(self.service, config.conn, self.sql_fetcher)
-		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
+		self.finder = CalendarFinder(config.conn, config.sql_fetcher)
+		self.creator = CalendarCreator(self.service, config.conn, config.sql_fetcher)
+		self.course_mentions = CourseMentions(config.conn, config.sql_fetcher, bot)
 
 	@cog_ext.cog_subcommand(
 		base="calendar",
@@ -132,7 +131,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		options=[
 			create_option(
 				name="title",
-				description='Title of the event (eg. "HW 1 #linear-algebra-1")',
+				description='Title of the event (eg. "HW 1 #statistics")',
 				option_type=SlashCommandOptionType.STRING,
 				required=True,
 			),
@@ -230,7 +229,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			),
 			create_option(
 				name="title",
-				description='New title of the event (eg. "HW 1 #linear-algebra-1")',
+				description='New title of the event (eg. "HW 1 #statistics")',
 				option_type=SlashCommandOptionType.STRING,
 				required=False,
 			),
