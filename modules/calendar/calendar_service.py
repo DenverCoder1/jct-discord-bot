@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
 import config
+from fuzzywuzzy import fuzz
 
 
 class CalendarService:
@@ -61,8 +62,12 @@ class CalendarService:
 		# return list of events
 		events = events_result.get("items", [])
 		# filter by search term
-		query = query.lower()
-		filtered = filter(lambda item: query in item.get("summary").lower(), events)
+		clean_query = query.lower().replace(" ", "")
+		filtered = filter(
+			lambda item: clean_query in item.get("summary").lower().replace(" ", "")
+			or fuzz.token_set_ratio(query, item.get("summary")) > 75,
+			events,
+		)
 		# convert dicts to Event objects
 		converted_events = tuple(map(lambda item: Event(item, self.timezone), filtered))
 		# return events and the next page's token
