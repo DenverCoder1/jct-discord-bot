@@ -2,9 +2,8 @@ from utils.utils import one
 import discord
 from discord.channel import TextChannel
 from discord_slash.context import SlashContext
-import config
 import psycopg2.extensions as sql
-from typing import Any, Iterable, Set, Optional, Union
+from typing import Any, Iterable, Set, Union
 from modules.email_registry.weighted_set import WeightedSet
 from database.person.person import Person
 from modules.error.friendly_error import FriendlyError
