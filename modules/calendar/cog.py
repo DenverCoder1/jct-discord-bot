@@ -15,6 +15,8 @@ from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option, create_choice
 
+groups = Group.get_groups()
+
 
 class CalendarCog(commands.Cog, name="Calendar"):
 	"""Display and update Google Calendar events"""
@@ -26,6 +28,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.finder = CalendarFinder(config.conn)
 		self.creator = CalendarCreator(self.service, config.conn)
 		self.course_mentions = CourseMentions(config.conn, bot)
+		self.groups = groups
 
 	@cog_ext.cog_subcommand(
 		base="calendar",
@@ -34,29 +37,22 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		guild_ids=[config.guild_id],
 		options=[
 			create_option(
-				# option returns class_name and calendar as value
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Only necessary if you"
-					" have more than one class role."
+					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					" have only one class role."
 				),
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(
-						name=f"{group.campus().name} {group.grad_year}",
-						value=(
-							f"{group.campus().name} {group.grad_year} {group.calendar}"
-						),
-					)
-					for group in Group.get_groups()
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
 	)
-	async def calendar_links(self, ctx: SlashContext, class_role: str = None):
+	async def calendar_links(self, ctx: SlashContext, class_name: int = None):
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_role)
+		calendar = self.finder.get_calendar(ctx, class_name)
 		# fetch links for calendar
 		links = self.service.get_links(calendar.id)
 		embed = self.embedder.embed_link(f"🔗 Calendar Links for {calendar.name}", links)
@@ -84,22 +80,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 			),
 			create_option(
-				# option returns class role and calendar as value
-				name="class_role",
+				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Only necessary if you"
-					" have more than one class role."
+					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					" have only one class role."
 				),
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(
-						name=f"{group.campus().name} {group.grad_year}",
-						value=(
-							f"{group.campus().name} {group.grad_year} {group.calendar}"
-						),
-					)
-					for group in Group.get_groups()
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -109,11 +98,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		ctx: SlashContext,
 		query: str = "",
 		results_per_page: int = 5,
-		class_role: str = None,
+		class_name: int = None,
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_role)
+		calendar = self.finder.get_calendar(ctx, class_name)
 		# convert channel mentions to full names
 		full_query = self.course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
@@ -165,22 +154,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 			),
 			create_option(
-				# option returns class role and calendar as value
-				name="class_role",
+				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Only necessary if you"
-					" have more than one class role."
+					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					" have only one class role."
 				),
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(
-						name=f"{group.campus().name} {group.grad_year}",
-						value=(
-							f"{group.campus().name} {group.grad_year} {group.calendar}"
-						),
-					)
-					for group in Group.get_groups()
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -193,7 +175,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		end: str = None,
 		description: str = "",
 		location: str = "",
-		class_role: str = None,
+		class_name: int = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
@@ -201,7 +183,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		description = self.course_mentions.replace_channel_mentions(description)
 		location = self.course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_role)
+		calendar = self.finder.get_calendar(ctx, class_name)
 		try:
 			event = self.service.add_event(
 				calendar.id, title, start, end, location, description
@@ -263,22 +245,15 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=False,
 			),
 			create_option(
-				# option returns class role and calendar as value
-				name="class_role",
+				name="class_name",
 				description=(
-					"Calendar to look for events in (eg. Lev 2023). Only necessary if"
-					" you have more than one class role."
+					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					" have only one class role."
 				),
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(
-						name=f"{group.campus().name} {group.grad_year}",
-						value=(
-							f"{group.campus().name} {group.grad_year} {group.calendar}"
-						),
-					)
-					for group in Group.get_groups()
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -292,13 +267,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		end: str = None,
 		description=None,
 		location=None,
-		class_role: str = None,
+		class_name: int = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_role)
+		calendar = self.finder.get_calendar(ctx, class_name)
 		# get a list of upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
@@ -340,34 +315,27 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=True,
 			),
 			create_option(
-				# option returns class role and calendar as value
-				name="class_role",
+				name="class_name",
 				description=(
-					"Calendar to look for events in (eg. Lev 2023). Only necessary if"
-					" you have more than one class role."
+					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					" have only one class role."
 				),
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(
-						name=f"{group.campus().name} {group.grad_year}",
-						value=(
-							f"{group.campus().name} {group.grad_year} {group.calendar}"
-						),
-					)
-					for group in Group.get_groups()
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
 	)
 	async def event_delete(
-		self, ctx: SlashContext, query: str, class_role: str = None,
+		self, ctx: SlashContext, query: str, class_name: int = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_role)
+		calendar = self.finder.get_calendar(ctx, class_name)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
@@ -399,32 +367,25 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				required=True,
 			),
 			create_option(
-				# option returns class role and calendar as value
-				name="class_role",
+				name="class_name",
 				description=(
-					"Calendar to look for events in (eg. Lev 2023). Only necessary if"
-					" you have more than one class role."
+					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					" have only one class role."
 				),
-				option_type=SlashCommandOptionType.STRING,
+				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(
-						name=f"{group.campus().name} {group.grad_year}",
-						value=(
-							f"{group.campus().name} {group.grad_year} {group.calendar}"
-						),
-					)
-					for group in Group.get_groups()
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
 	)
 	async def calendar_grant(
-		self, ctx: SlashContext, email: str, class_role: str = None,
+		self, ctx: SlashContext, email: str, class_name: int = None,
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = self.finder.get_calendar(ctx, class_role)
+		calendar = self.finder.get_calendar(ctx, class_name)
 		# validate email address
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx.channel, ctx.author)

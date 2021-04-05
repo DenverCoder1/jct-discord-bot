@@ -18,7 +18,7 @@ class JoinCog(commands.Cog, name="Join"):
 
 	@commands.Cog.listener()
 	async def on_ready(self):
-		self.assigner = Assigner(config.guild(), config.conn)
+		self.assigner = Assigner(config.guild, config.conn)
 
 	@cog_ext.cog_slash(
 		name="join",
