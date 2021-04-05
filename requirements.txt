@@ -9,3 +9,5 @@ google-auth-httplib2==0.0.4
 google-auth-oauthlib==0.4.2
 dateparser==1.0.0
 pyluach==1.2.1
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.12.2
