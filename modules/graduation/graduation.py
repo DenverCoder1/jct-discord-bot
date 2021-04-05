@@ -15,8 +15,8 @@ def get_graduating_groups() -> Iterable[Group]:
 async def add_alumni_role(groups: Iterable[Group]):
 	"""Add the alumni role to all members of the given groups only if they have no other group roles"""
 	alumni_role = get_discord_obj(config.guild().roles, "ALUMNI_ROLE")
-	group_roles = {group.role() for group in Group.get_groups()}
+	group_roles = {group.role for group in Group.get_groups()}
 	for group in groups:
-		for member in group.role().members:
+		for member in group.role.members:
 			if len(group_roles.intersection(member.roles)) == 1:
 				await member.add_roles(alumni_role)

@@ -66,7 +66,7 @@ class Person:
 		return people
 
 	def __eq__(self, other):
-		"""Overrides the default implementation"""
+		"""Compares them by ID"""
 		if isinstance(other, self.__class__):
 			return self.__id == other.__id
 		return False

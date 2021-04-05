@@ -45,7 +45,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.id) for group in groups
+					create_choice(name=group.name, value=group.group_id)
+					for group in groups
 				],
 			),
 		],
@@ -88,7 +89,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.id) for group in groups
+					create_choice(name=group.name, value=group.group_id)
+					for group in groups
 				],
 			),
 		],
@@ -162,7 +164,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.id) for group in groups
+					create_choice(name=group.name, value=group.group_id)
+					for group in groups
 				],
 			),
 		],
@@ -253,7 +256,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.id) for group in groups
+					create_choice(name=group.name, value=group.group_id)
+					for group in groups
 				],
 			),
 		],
@@ -323,7 +327,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.id) for group in groups
+					create_choice(name=group.name, value=group.group_id)
+					for group in groups
 				],
 			),
 		],
@@ -375,7 +380,8 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.id) for group in groups
+					create_choice(name=group.name, value=group.group_id)
+					for group in groups
 				],
 			),
 		],
