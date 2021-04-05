@@ -2,7 +2,6 @@ from dotenv.main import load_dotenv
 import os
 import psycopg2
 import discord
-from utils.sql_fetcher import SqlFetcher
 
 
 prefix = "++"
@@ -18,7 +17,6 @@ guild = lambda: _guild
 
 # Connect to database
 conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
-sql_fetcher = SqlFetcher()
 
 # Google client configuration
 google_config = {

@@ -1,5 +1,5 @@
 from database.person.person import Person
-from typing import Callable, Iterable, Tuple
+from typing import Callable, Iterable
 import config
 import discord
 from discord.ext import commands
@@ -13,7 +13,6 @@ from modules.email_registry.email_adder import EmailAdder
 from modules.email_registry.person_adder import PersonAdder
 from modules.error.friendly_error import FriendlyError
 from utils.mention import extract_channel_mentions
-from utils.utils import one
 
 
 class EmailRegistryCog(commands.Cog, name="Email Registry"):
@@ -21,10 +20,10 @@ class EmailRegistryCog(commands.Cog, name="Email Registry"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.finder = PersonFinder(config.conn, config.sql_fetcher)
-		self.email_adder = EmailAdder(config.conn, config.sql_fetcher)
-		self.person_adder = PersonAdder(config.conn, config.sql_fetcher)
-		self.categoriser = Categoriser(config.conn, config.sql_fetcher)
+		self.finder = PersonFinder(config.conn)
+		self.email_adder = EmailAdder(config.conn)
+		self.person_adder = PersonAdder(config.conn)
+		self.categoriser = Categoriser(config.conn)
 
 	@cog_ext.cog_subcommand(
 		base="email",

@@ -3,6 +3,7 @@ import discord
 import config
 from typing import Iterable
 from functools import cache
+from database import sql_fetcher
 
 
 class Group:
@@ -26,9 +27,7 @@ class Group:
 	@staticmethod
 	def get_groups() -> Iterable["Group"]:
 		"""Fetch a list of groups from the database"""
-		query = config.sql_fetcher.fetch(
-			"database", "group", "queries", "get_groups.sql"
-		)
+		query = sql_fetcher.fetch("database", "group", "queries", "get_groups.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)

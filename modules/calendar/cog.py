@@ -9,7 +9,6 @@ from .calendar_embedder import CalendarEmbedder
 from .calendar_finder import CalendarFinder
 from .calendar_creator import CalendarCreator
 from .course_mentions import CourseMentions
-from utils.sql_fetcher import SqlFetcher
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
 from modules.error.friendly_error import FriendlyError
@@ -25,10 +24,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.bot = bot
 		self.calendar_service = CalendarService()
 		self.calendar_embedder = CalendarEmbedder()
-		self.sql_fetcher = config.sql_fetcher
-		self.finder = CalendarFinder(config.conn, self.sql_fetcher)
-		self.calendar_creator = CalendarCreator(self.calendar_service, config.conn, self.sql_fetcher)
-		self.course_mentions = CourseMentions(config.conn, self.sql_fetcher, bot)
+		self.finder = CalendarFinder(config.conn)
+		self.calendar_creator = CalendarCreator(self.calendar_service, config.conn)
+		self.course_mentions = CourseMentions(config.conn, bot)
 		self.number_emoji = ("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
 
 	@commands.command(
@@ -92,10 +90,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		"""
 		try:
 			# get last occurrence of "in" to split at calendar name if it is provided
-			last_occurence = max(loc for loc, val in enumerate(args) if val == "in") if "in" in args else len(args)
-			calendar_name = " ".join(args[last_occurence+1:])
+			last_occurrence = max(loc for loc, val in enumerate(args) if val == "in") if "in" in args else len(args)
+			calendar_name = " ".join(args[last_occurrence+1:])
 			calendar = self.finder.get_calendar(ctx.author, calendar_name)
-			args = args[:last_occurence]
+			args = args[:last_occurrence]
 		except (ClassRoleError, ClassParseError) as error:
 			raise FriendlyError(error.args[0], ctx.channel, ctx.author)
 		# all arguments are query if last argument is not a number

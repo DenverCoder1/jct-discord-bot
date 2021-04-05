@@ -1,20 +1,17 @@
 from discord.ext import commands
 import psycopg2.extensions as sql
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 from utils.mention import decode_mention
 
 
 class CourseMentions:
-	def __init__(
-		self, conn: sql.connection, sql_fetcher: SqlFetcher, bot: commands.Bot
-	) -> None:
+	def __init__(self, conn: sql.connection, bot: commands.Bot) -> None:
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
 		self.bot = bot
 
 	def get_channel_full_name(self, channel_id: int) -> str:
 		"""Searches the database for the course name given the channel id"""
-		query = self.sql_fetcher.fetch(
+		query = sql_fetcher.fetch(
 			"modules", "calendar", "queries", "search_category_name.sql"
 		)
 		with self.conn as conn:

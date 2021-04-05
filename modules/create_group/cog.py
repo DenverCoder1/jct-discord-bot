@@ -10,7 +10,7 @@ class CreateGroupCog(commands.Cog, name="Year Roles"):
 	"""Creates roles for each year and campus."""
 
 	def __init__(self):
-		self.groups_creator = groups_creator(config.conn, config.sql_fetcher)
+		self.groups_creator = groups_creator(config.conn)
 
 	@Scheduler.schedule()
 	async def on_new_academic_year(self):

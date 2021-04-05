@@ -4,18 +4,17 @@ import psycopg2.extensions as sql
 from typing import Iterable
 from .class_role_error import ClassRoleError
 from .class_parse_error import ClassParseError
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 import re
 
 
 class CalendarFinder:
-	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
+	def __init__(self, conn: sql.connection) -> None:
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
 
 	def get_calendar_id(self, grad_year: int, campus: str) -> str:
 		"""Searches the database the calendar id for a given graduation year and campus"""
-		query = self.sql_fetcher.fetch(
+		query = sql_fetcher.fetch(
 			"modules", "calendar", "queries", "search_calendar.sql"
 		)
 		with self.conn as conn:
@@ -29,9 +28,7 @@ class CalendarFinder:
 
 	def get_campus(self, text: str) -> str:
 		"""Searches the database the campus matching the user's string"""
-		query = self.sql_fetcher.fetch(
-			"modules", "calendar", "queries", "search_campus.sql"
-		)
+		query = sql_fetcher.fetch("modules", "calendar", "queries", "search_campus.sql")
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"text": text})
@@ -74,7 +71,7 @@ class CalendarFinder:
 
 	def __get_group_roles(self, member: discord.Member) -> Iterable[tuple]:
 		"""Returns a list of (grad_year, campus) pairs found in a member's roles"""
-		query = self.sql_fetcher.fetch(
+		query = sql_fetcher.fetch(
 			"modules", "calendar", "queries", "get_group_roles.sql"
 		)
 		with self.conn as conn:

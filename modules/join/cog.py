@@ -15,11 +15,10 @@ class JoinCog(commands.Cog, name="Join"):
 		self.bot = bot
 		self.assigner = None
 		self.attempts = {}
-		self.sql_fetcher = config.sql_fetcher
 
 	@commands.Cog.listener()
 	async def on_ready(self):
-		self.assigner = Assigner(config.guild, config.conn, self.sql_fetcher)
+		self.assigner = Assigner(config.guild, config.conn)
 
 	@cog_ext.cog_slash(
 		name="join",

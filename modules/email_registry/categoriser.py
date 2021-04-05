@@ -1,16 +1,15 @@
+from typing import Iterable
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from database.person.person import Person
-from typing import Iterable, Optional, Tuple
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 from utils.mention import decode_channel_mention
 import psycopg2.extensions as sql
 
 
 class Categoriser:
-	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
+	def __init__(self, conn: sql.connection) -> None:
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
 
 	def categorise_person(
 		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
@@ -35,7 +34,7 @@ class Categoriser:
 		person: Person,
 		channel_mentions: Iterable[str],
 	) -> Person:
-		query = self.sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
+		query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				for channel in channel_mentions:

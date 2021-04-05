@@ -8,18 +8,17 @@ from typing import Any, Iterable, Set, Optional, Union
 from modules.email_registry.weighted_set import WeightedSet
 from database.person.person import Person
 from modules.error.friendly_error import FriendlyError
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 
 
 class PersonFinder:
-	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher) -> None:
+	def __init__(self, conn: sql.connection) -> None:
 		self.conn = conn
 		self.search_weights = {
 			"word": 2,
 			"channel": 1,
 			"email": 5,
 		}
-		self.sql_fetcher = sql_fetcher
 
 	def search(
 		self, name: str = None, channel: discord.TextChannel = None, email: str = None
@@ -88,7 +87,7 @@ class PersonFinder:
 		:param sql_file: The SQL file name to use for the search. Must contain a only `%(param)s`.
 		:param param: The parameter to replace %s with in the sql file
 		"""
-		query = self.sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
+		query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"param": param})

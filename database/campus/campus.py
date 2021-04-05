@@ -2,6 +2,7 @@ import discord
 import config
 from functools import cache
 from typing import Iterable
+from database import sql_fetcher
 
 
 class Campus:
@@ -17,9 +18,7 @@ class Campus:
 	@staticmethod
 	def get_campus(campus_id: int) -> "Campus":
 		"""Fetch a single campus from the database with the specified id."""
-		query = config.sql_fetcher.fetch(
-			"database", "campus", "queries", "get_campus.sql"
-		)
+		query = sql_fetcher.fetch("database", "campus", "queries", "get_campus.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"campus_id": campus_id})
@@ -28,9 +27,7 @@ class Campus:
 	@staticmethod
 	def get_campuses() -> Iterable["Campus"]:
 		"""Fetch a list of campuses from the database."""
-		query = config.sql_fetcher.fetch(
-			"database", "campus", "queries", "get_campuses.sql"
-		)
+		query = sql_fetcher.fetch("database", "campus", "queries", "get_campuses.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)

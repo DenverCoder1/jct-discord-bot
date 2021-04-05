@@ -2,14 +2,13 @@ import discord
 from modules.error.friendly_error import FriendlyError
 from utils.utils import get_discord_obj
 from discord.ext import commands
-from utils.sql_fetcher import SqlFetcher
+from database import sql_fetcher
 import psycopg2.extensions as sql
 
 
 class CourseDeleter:
-	def __init__(self, conn: sql.connection, sql_fetcher: SqlFetcher):
+	def __init__(self, conn: sql.connection):
 		self.conn = conn
-		self.sql_fetcher = sql_fetcher
 
 	async def delete_course(self, ctx: commands.Context, channel_id: int):
 		await self.__delete_channel(ctx, channel_id)
@@ -29,7 +28,7 @@ class CourseDeleter:
 			)
 
 	def __delete_from_database(self, channel_id: int):
-		query = self.sql_fetcher.fetch(
+		query = sql_fetcher.fetch(
 			"modules", "course_management", "queries", "delete_course.sql"
 		)
 		with self.conn as conn:
