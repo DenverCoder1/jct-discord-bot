@@ -3,11 +3,12 @@ import re
 import csv
 from datetime import datetime
 from itertools import product
-from typing import Dict, Iterable, Mapping, Optional, Tuple
+from typing import Dict, Iterable, Mapping, Optional, Tuple, Union
 import dateparser
 import asyncio
 import discord
 from discord.ext import commands
+from discord_slash.model import SlashMessage
 from modules.error.friendly_error import FriendlyError
 
 
@@ -48,21 +49,6 @@ def ordinal(n: int):
 
 def is_email(email: str) -> bool:
 	return bool(re.search(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", email))
-
-
-def build_aliases(
-	name: str,
-	prefix: Iterable[str],
-	suffix: Iterable[str],
-	more_aliases: Iterable[str] = (),
-	include_dots: bool = True,
-) -> Mapping:
-	dots = ("", ".") if include_dots else ("")
-	return {
-		"name": name,
-		"aliases": list(more_aliases)
-		+ [a + b + c for a, b, c in product(prefix, dots, suffix) if a + b + c != name],
-	}
 
 
 def parse_date(
@@ -123,7 +109,7 @@ def format_date(
 
 async def wait_for_reaction(
 	bot: commands.Bot,
-	message: discord.Message,
+	message: Union[discord.Message, SlashMessage],
 	emoji_list: Iterable[str],
 	allowed_users: Iterable[discord.Member] = None,
 	timeout: int = 60,
@@ -147,7 +133,7 @@ async def wait_for_reaction(
 		- The user who reacted is one of the allowed users
 		"""
 		return (
-			reaction.message == message
+			reaction.message.id == message.id
 			and str(reaction.emoji) in emoji_list
 			and user != bot.user
 			and (allowed_users is None or user in allowed_users)

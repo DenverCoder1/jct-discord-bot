@@ -1,3 +1,5 @@
+from discord_slash.context import SlashContext
+from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 import discord
 import psycopg2.extensions as sql
@@ -38,28 +40,18 @@ class CalendarFinder:
 		else:
 			raise ClassRoleError(f"Could not find a matching campus name.")
 
-	def get_calendar(self, member: discord.Member, text: str = None) -> Calendar:
-		# get calendar specified in arguments
-		try:
-			if text:
-				return self.__calendar_from_str(member, text)
-		except ClassParseError:
-			pass
-		# get calendar from user's roles
-		return self.__calendar_from_role(member)
-
-	def __calendar_from_str(self, member: discord.Member, text: str) -> Calendar:
-		# parse text for grad_year and campus
-		grad_year, campus = self.__extract_year_and_campus(text)
-		# check that specified calendar is one of the user's roles
-		if (grad_year, campus) not in self.__get_group_roles(member):
-			raise ClassRoleError(
-				"You don't have the required role to access the requested calendar."
-			)
-		# get and return calendar info
-		return Calendar(
-			id=self.get_calendar_id(grad_year, campus), name=f"{campus} {grad_year}",
-		)
+	def get_calendar(self, ctx: SlashContext, class_role: str = None) -> Calendar:
+		"""Returns Calendar given a discord member or a string containing the name and id"""
+		# parse name and calendar id from selected choice
+		if class_role is not None:
+			calendar_name, calendar_id = class_role.rsplit(" ", 1)
+			return Calendar(name=calendar_name, id=calendar_id)
+		# get calendar from user's role
+		else:
+			try:
+				return self.__calendar_from_role(ctx.author)
+			except (ClassRoleError, ClassParseError) as error:
+				raise FriendlyError(error.args[0], ctx, ctx.author, error)
 
 	def __calendar_from_role(self, member: discord.Member) -> Calendar:
 		# get grad_year and campus for member
@@ -80,17 +72,6 @@ class CalendarFinder:
 					query, {"roles": tuple(role.id for role in member.roles)}
 				)
 				return cursor.fetchall()
-
-	def __extract_year_and_campus(self, text: str):
-		"""Extract campus name and graduation year from input text"""
-		try:
-			# TODO: fix in 22nd century
-			grad_year = int(re.search(r"20\d\d", text).group(0))
-		except AttributeError:
-			raise ClassParseError("Could not parse graduation year")
-		# parse campus name in text
-		campus = self.get_campus(text)
-		return grad_year, campus
 
 	def __get_year_campus_from_role(self, member: discord.Member) -> tuple:
 		"""Returns the grad_year and campus for a member who has only one class role"""
