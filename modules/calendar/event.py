@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Any, Dict
 from utils.utils import format_date, parse_date
 
 
