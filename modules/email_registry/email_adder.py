@@ -25,7 +25,9 @@ class EmailAdder:
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				try:
-					cursor.execute(query, {"person_id": person.id, "email": email})
+					cursor.execute(
+						query, {"person_id": person.person_id, "email": email}
+					)
 				except UniqueViolation as e:
 					raise FriendlyError(
 						f"Ignoring request to add {email} to {person.name}; it"
@@ -37,4 +39,4 @@ class EmailAdder:
 					raise FriendlyError(
 						f'"{email}" is not a valid email address.', sender=ctx, inner=e,
 					)
-		return Person.get_person(person.id)
+		return Person.get_person(person.person_id)

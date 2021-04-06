@@ -46,6 +46,6 @@ class Categoriser:
 							ctx.author,
 						)
 					cursor.execute(
-						query, {"person_id": person.id, "channel_id": channel_id}
+						query, {"person_id": person.person_id, "channel_id": channel_id}
 					)
-				return Person.get_person(person.id)
+				return Person.get_person(person.person_id)

@@ -1,34 +1,54 @@
 import discord
 import config
-from functools import cache
+from functools import cached_property
 from typing import Iterable
 from database import sql_fetcher
 
 
 class Campus:
 	def __init__(self, id: int, name: str, channel_id: int):
-		self.id = id
-		self.name = name
-		self.channel_id = channel_id
+		self.__id = id
+		self.__name = name
+		self.__channel_id = channel_id
 
-	@cache
+	@property
+	def campus_id(self) -> int:
+		"""The ID of the campus as stored in the database."""
+		return self.__id
+
+	@property
+	def name(self) -> str:
+		"""The name of the Campus. (eg Lev)"""
+		return self.__name
+
+	@cached_property
 	def channel(self) -> discord.TextChannel:
-		return discord.utils.get(config.guild().text_channels, id=self.channel_id)
+		"""The channel associated with this Campus."""
+		return discord.utils.get(config.guild().text_channels, id=self.__channel_id)
 
-	@staticmethod
-	def get_campus(campus_id: int) -> "Campus":
+	@classmethod
+	def get_campus(cls, campus_id: int) -> "Campus":
 		"""Fetch a single campus from the database with the specified id."""
 		query = sql_fetcher.fetch("database", "campus", "queries", "get_campus.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query, {"campus_id": campus_id})
-				return Campus(*cursor.fetchone())
+				return cls(*cursor.fetchone())
 
-	@staticmethod
-	def get_campuses() -> Iterable["Campus"]:
+	@classmethod
+	def get_campuses(cls) -> Iterable["Campus"]:
 		"""Fetch a list of campuses from the database."""
 		query = sql_fetcher.fetch("database", "campus", "queries", "get_campuses.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)
-				return [Campus(*tup) for tup in cursor.fetchall()]
+				return [cls(*tup) for tup in cursor.fetchall()]
+
+	def __eq__(self, other):
+		"""Compares them by ID"""
+		if isinstance(other, self.__class__):
+			return self.__id == other.__id
+		return False
+
+	def __hash__(self):
+		return hash(self.__id)
