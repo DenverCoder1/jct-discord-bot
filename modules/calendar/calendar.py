@@ -55,4 +55,4 @@ class Calendar:
 			# only one group found
 			group = group_roles[0]
 		# return calendar for the group
-		return Calendar(id=group.calendar, name=group.name)
+		return cls(id=group.calendar, name=group.name)
