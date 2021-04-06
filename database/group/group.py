@@ -64,17 +64,6 @@ class Group:
 				cursor.execute(query)
 				return [cls(*tup) for tup in cursor.fetchall()]
 
-	@classmethod
-	def get_member_groups(cls, member: discord.Member) -> Collection["Group"]:
-		"""Fetch a list of groups which a member belongs to from the database"""
-		query = sql_fetcher.fetch(
-			"database", "group", "queries", "get_member_groups.sql"
-		)
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"roles": (role.id for role in member.roles)})
-				return [cls(*tup) for tup in cursor.fetchall()]
-
 	def __eq__(self, other):
 		"""Compares them by ID"""
 		if isinstance(other, self.__class__):
