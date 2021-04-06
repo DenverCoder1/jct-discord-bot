@@ -30,7 +30,7 @@ class ChannelMessage:
 		return self.__get_channel(self.__host_channel_id)
 
 	@staticmethod
-	def __get_channel(cls, channel_id: int) -> discord.TextChannel:
+	def __get_channel(channel_id: int) -> discord.TextChannel:
 		return discord.utils.get(config.guild().text_channels, id=channel_id)
 
 	@classmethod
