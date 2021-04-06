@@ -191,7 +191,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		try:
 			event = self.service.add_event(
-				calendar.id, title, start, end, location, description
+				calendar.id, title, start, end, description, location
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)

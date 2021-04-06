@@ -79,8 +79,8 @@ class CalendarService:
 		summary: str,
 		start: str,
 		end: str,
-		location: str,
 		description: str,
+		location: str,
 	) -> Event:
 		"""Add an event to the calendar given the id, summary, start time,
 		and optionally, the end time, location and description."""
@@ -165,7 +165,7 @@ class CalendarService:
 		new_summary: str = None,
 		new_start: str = None,
 		new_end: str = None,
-		new_desc: str = None,
+		new_description: str = None,
 		new_location: str = None,
 	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
@@ -193,7 +193,9 @@ class CalendarService:
 		event_details = {
 			"summary": new_summary if new_summary is not None else event.title,
 			"location": new_location if new_location is not None else event.location,
-			"description": new_desc if new_desc is not None else event.description,
+			"description": new_description
+			if new_description is not None
+			else event.description,
 			"start": {
 				"timeZone": self.timezone,
 				"dateTime": new_start_date.isoformat("T", "seconds"),
