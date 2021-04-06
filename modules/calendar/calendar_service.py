@@ -10,29 +10,29 @@ from fuzzywuzzy import fuzz
 
 
 class CalendarService:
-	def __init__(self):
+	def __init__(self, timezone: str):
 		SCOPES = ["https://www.googleapis.com/auth/calendar"]
 		self.creds = service_account.Credentials.from_service_account_info(
 			config.google_config, scopes=SCOPES
 		)
 		self.service = build("calendar", "v3", credentials=self.creds)
-		self.timezone = "Asia/Jerusalem"
+		self.timezone = timezone
 
-	def get_links(self, calendar_id: str) -> Dict[str, str]:
+	def get_links(self, calendar: Calendar) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
 		return {
 			"Add to Google Calendar": (
 				"https://calendar.google.com/calendar/render"
-				f"?cid=https://www.google.com/calendar/feeds/{calendar_id}"
+				f"?cid=https://www.google.com/calendar/feeds/{calendar.id}"
 				"/public/basic"
 			),
 			"View the Events": (
 				"https://calendar.google.com/calendar/u/0/embed"
-				f"?src={calendar_id}&ctz=Asia/Jerusalem"
+				f"?src={calendar.id}&ctz={self.timezone}"
 			),
 			"iCal Format": (
 				"https://calendar.google.com/calendar/ical"
-				f"/{calendar_id.replace('@','%40')}/public/basic.ics"
+				f"/{calendar.id.replace('@','%40')}/public/basic.ics"
 			),
 		}
 
@@ -69,7 +69,7 @@ class CalendarService:
 			events,
 		)
 		# convert dicts to Event objects
-		converted_events = tuple(map(lambda item: Event(item, self.timezone), filtered))
+		converted_events = tuple(map(lambda item: Event.from_dict(item), filtered))
 		# return events and the next page's token
 		return converted_events
 
@@ -144,14 +144,14 @@ class CalendarService:
 			.insert(calendarId=calendar_id, body=event_details)
 			.execute()
 		)
-		return Event(event, self.timezone)
+		return Event.from_dict(event)
 
 	def delete_event(self, calendar_id: str, event: Event) -> None:
 		"""Delete an event from a calendar given the calendar id and event object"""
 		# delete event
 		response = (
 			self.service.events()
-			.delete(calendarId=calendar_id, eventId=event.id())
+			.delete(calendarId=calendar_id, eventId=event.id)
 			.execute()
 		)
 		# response should be empty if successful
@@ -170,55 +170,53 @@ class CalendarService:
 	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new start date if provided
-		new_start_date = parse_date(
-			new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start(),
+		new_start_date = (
+			parse_date(
+				new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start,
+			)
+			or event.start
 		)
 		# parse new end date if provided
-		new_end_date = parse_date(
-			new_end,
-			from_tz=self.timezone,
-			to_tz=self.timezone,
-			base=(new_start_date if new_start_date else event.end()),
+		new_end_date = (
+			parse_date(
+				new_end,
+				from_tz=self.timezone,
+				to_tz=self.timezone,
+				base=(new_start_date if new_start_date else event.end),
+			)
+			or event.end
 		)
+		# check that new time range is valid
+		if new_end_date.replace(tzinfo=None) < new_start_date.replace(tzinfo=None):
+			raise ValueError("The start time must come before the end time.")
 		# create request body
 		event_details = {
-			**event.details,
-			**({"summary": new_summary} if type(new_summary) == str else {}),
-			**({"location": new_location} if type(new_location) == str else {}),
-			**({"description": new_desc} if type(new_desc) == str else {}),
+			"summary": new_summary if new_summary is not None else event.title,
+			"location": new_location if new_location is not None else event.location,
+			"description": new_desc if new_desc is not None else event.description,
 			"start": {
 				"timeZone": self.timezone,
-				"dateTime": (
-					new_start_date if new_start_date is not None else event.start()
-				).isoformat("T", "seconds"),
+				"dateTime": new_start_date.isoformat("T", "seconds"),
 			},
 			"end": {
 				"timeZone": self.timezone,
-				"dateTime": (
-					new_end_date if new_end_date is not None else event.end()
-				).isoformat("T", "seconds"),
+				"dateTime": new_end_date.isoformat("T", "seconds"),
 			},
 		}
-		# check that new time range is valid
-		new_event = Event(event_details)
-		new_start_date = new_event.start().replace(tzinfo=None)
-		new_end_date = new_event.end().replace(tzinfo=None)
-		if new_end_date < new_start_date:
-			raise ValueError("The start time must come before the end time.")
 		# update the event
 		updated_event = (
 			self.service.events()
-			.update(calendarId=calendar_id, eventId=event.id(), body=event_details)
+			.update(calendarId=calendar_id, eventId=event.id, body=event_details)
 			.execute()
 		)
-		return Event(updated_event)
+		return Event.from_dict(updated_event)
 
 	def create_calendar(self, summary: str) -> Calendar:
 		"""Creates a new public calendar on the service account given the name
 		Returns the calendar object"""
 		# create the calendar
 		calendar = {"summary": summary, "timeZone": self.timezone}
-		created_calendar = Calendar(
+		created_calendar = Calendar.from_dict(
 			self.service.calendars().insert(body=calendar).execute()
 		)
 		# make calendar public
@@ -226,20 +224,6 @@ class CalendarService:
 		self.service.acl().insert(calendarId=created_calendar.id, body=rule).execute()
 		# return the calendar object
 		return created_calendar
-
-	def get_calendar_list(self) -> Iterable[Calendar]:
-		"""Returns a complete list of calendars on the service account"""
-		page_token = None
-		calendars = []
-		while True:
-			calendar_list = (
-				self.service.calendarList().list(pageToken=page_token).execute()
-			)
-			calendars += map(lambda item: Calendar(item), calendar_list["items"])
-			page_token = calendar_list.get("nextPageToken")
-			if not page_token:
-				break
-		return calendars
 
 	def add_manager(self, calendar_id: str, email: str) -> bool:
 		"""Gives write access to a user for a calendar given an email address"""
