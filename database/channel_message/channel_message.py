@@ -15,6 +15,11 @@ class ChannelMessage:
 		self.__referenced_channel_id = referenced_channel_id
 		self.__host_channel_id = host_channel_id
 
+	@property
+	def message_id(self) -> int:
+		"""The discord ID of the message."""
+		return self.__message_id
+
 	@cached_property
 	async def message(self) -> discord.Message:
 		"""The message that controls another channel by reacting to it."""
@@ -36,9 +41,36 @@ class ChannelMessage:
 	@classmethod
 	def get_channel_messages(cls) -> Iterable["ChannelMessage"]:
 		query = sql_fetcher.fetch(
-			"database", "channel_messages", "queries", "get_channel_messages.sql"
+			"database", "channel_message", "queries", "get_channel_messages.sql"
 		)
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)
 				return [cls(*tup) for tup in cursor.fetchall()]
+
+	@classmethod
+	def add_to_database(
+		cls, message_id: int, referenced_channel_id: int, host_channel_id: int
+	) -> "ChannelMessage":
+		query = sql_fetcher.fetch(
+			"database", "channel_message", "queries", "add_channel_message.sql"
+		)
+		with config.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(
+					query,
+					{
+						"message_id": message_id,
+						"referenced_channel_id": referenced_channel_id,
+						"host_channel_id": host_channel_id,
+					},
+				)
+		return cls(message_id, referenced_channel_id, host_channel_id)
+
+	def delete_from_database(self):
+		query = sql_fetcher.fetch(
+			"database", "channel_message", "queries", "delete_channel_message.sql"
+		)
+		with config.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"message_id", self.message.id})

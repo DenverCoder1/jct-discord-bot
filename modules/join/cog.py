@@ -46,7 +46,7 @@ class JoinCog(commands.Cog, name="Join"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=True,
 				choices=[
-					create_choice(name=campus.name, value=str(campus.campus_id))
+					create_choice(name=campus.name, value=campus.campus_id)
 					for campus in Campus.get_campuses()
 				],
 			),
@@ -56,10 +56,10 @@ class JoinCog(commands.Cog, name="Join"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=True,
 				choices=[
-					create_choice(name="Year 1", value="1"),
-					create_choice(name="Year 2", value="2"),
-					create_choice(name="Year 3", value="3"),
-					create_choice(name="Year 4", value="4"),
+					create_choice(name="Year 1", value=1),
+					create_choice(name="Year 2", value=2),
+					create_choice(name="Year 3", value=3),
+					create_choice(name="Year 4", value=4),
 				],
 			),
 		],
