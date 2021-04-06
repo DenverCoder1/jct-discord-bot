@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Optional
 import config
 from discord.ext import commands
+from .calendar import Calendar
 from .calendar_service import CalendarService
 from .calendar_embedder import CalendarEmbedder
-from .calendar_finder import get_calendar
 from .calendar_creator import CalendarCreator
 from .course_mentions import CourseMentions
 from modules.error.friendly_error import FriendlyError
@@ -24,8 +24,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		self.embedder = CalendarEmbedder(bot)
-		self.service = CalendarService()
+		timezone = "Asia/Jerusalem"
+		self.embedder = CalendarEmbedder(bot, timezone)
+		self.service = CalendarService(timezone)
 		self.creator = CalendarCreator(self.service, config.conn)
 		self.course_mentions = CourseMentions(config.conn, bot)
 		self.groups = groups
@@ -53,10 +54,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	)
 	async def calendar_links(self, ctx: SlashContext, class_name: Optional[int] = None):
 		# get calendar from selected class_role or author
-		calendar = get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# fetch links for calendar
-		links = self.service.get_links(calendar.id)
-		embed = self.embedder.embed_link(f"🔗 Calendar Links for {calendar.name}", links)
+		links = self.service.get_links(calendar)
+		embed = self.embedder.embed_links(
+			f"🔗 Calendar Links for {calendar.name}", links
+		)
 		await ctx.send(embed=embed)
 
 	@cog_ext.cog_subcommand(
@@ -104,11 +107,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# convert channel mentions to full names
 		full_query = self.course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
-		events = self.service.fetch_upcoming(calendar.id, full_query)
+		events = self.service.fetch_upcoming(calendar.calendar_id, full_query)
 		# display events and allow showing more with reactions
 		await self.embedder.embed_event_pages(
 			ctx, events, full_query, results_per_page, calendar
@@ -186,10 +189,10 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		description = self.course_mentions.replace_channel_mentions(description)
 		location = self.course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
-		calendar = get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		try:
 			event = self.service.add_event(
-				calendar.id, title, start, end, location, description
+				calendar.calendar_id, title, start, end, description, location
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -277,9 +280,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# get a list of upcoming events
-		events = self.service.fetch_upcoming(calendar.id, query)
+		events = self.service.fetch_upcoming(calendar.calendar_id, query)
 		# get event to update
 		event_to_update = await self.embedder.get_event_choice(
 			ctx, events, query, "update"
@@ -293,7 +296,13 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			location = self.course_mentions.replace_channel_mentions(location)
 		try:
 			event = self.service.update_event(
-				calendar.id, event_to_update, title, start, end, description, location
+				calendar.calendar_id,
+				event_to_update,
+				title,
+				start,
+				end,
+				description,
+				location,
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -340,16 +349,16 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# replace channel mentions with course names
 		query = self.course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# fetch upcoming events
-		events = self.service.fetch_upcoming(calendar.id, query)
+		events = self.service.fetch_upcoming(calendar.calendar_id, query)
 		# get event to delete
 		event_to_delete = await self.embedder.get_event_choice(
 			ctx, events, query, "delete"
 		)
 		# delete event
 		try:
-			self.service.delete_event(calendar.id, event_to_delete)
+			self.service.delete_event(calendar.calendar_id, event_to_delete)
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
@@ -391,12 +400,12 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# validate email address
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx, ctx.author)
 		# add manager to calendar
-		if self.service.add_manager(calendar.id, email):
+		if self.service.add_manager(calendar.calendar_id, email):
 			embed = embed_success(
 				f":office_worker: Successfully added manager to {calendar.name}."
 			)
