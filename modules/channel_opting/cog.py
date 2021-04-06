@@ -19,10 +19,6 @@ class ChannelOptingCog(commands.Cog, name="CHannel Opting In/Out"):
 			get_discord_obj(config.guild().text_channels, "CHANNEL_DIRECTORY_CHANNEL"),
 			self.__emoji,
 		)
-		for channel in config.guild().text_channels:
-			await self.__manager.create_channel_message(
-				self.__channel_messages, channel
-			)
 
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, reaction: discord.RawReactionActionEvent):
