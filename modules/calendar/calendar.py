@@ -28,9 +28,9 @@ class Calendar:
 		"""Create a calendar from a JSON object as returned by the Calendar API"""
 		return cls(id=details.get("id"), name=details.get("summary"))
 
-	@staticmethod
+	@classmethod
 	def get_calendar(
-		ctx: SlashContext, groups: Iterable[Group], group_id: int = None
+		cls, ctx: SlashContext, groups: Iterable[Group], group_id: int = None
 	) -> "Calendar":
 		"""Returns Calendar given a Discord member or a specified group id"""
 		if group_id is not None:
