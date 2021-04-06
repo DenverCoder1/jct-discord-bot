@@ -101,7 +101,7 @@ class Event:
 		return format_date(end_date, all_day=self.all_day, base=base)
 
 	@classmethod
-	def from_dict(cls, details: Dict[str, str]) -> "Event":
+	def from_dict(cls, details: Dict[str, Any]) -> "Event":
 		"""Create an event from a JSON object as returned by the Calendar API"""
 		return cls(
 			event_id=details.get("id"),
