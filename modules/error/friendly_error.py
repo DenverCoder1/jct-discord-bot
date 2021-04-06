@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 import discord
 from discord_slash.context import SlashContext
 import utils.embedder
@@ -27,9 +27,9 @@ class FriendlyError(Exception):
 		self,
 		msg: str,
 		sender: Union[discord.TextChannel, SlashContext],
-		member: discord.Member = None,
-		inner: Exception = None,
-		description: str = None,
+		member: Optional[discord.Member] = None,
+		inner: Optional[Exception] = None,
+		description: Optional[str] = None,
 	):
 		self.sender = sender
 		self.member = member
@@ -38,7 +38,7 @@ class FriendlyError(Exception):
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
-		return f"Sorry {self.member.display_name}, " if self.member is not None else ""
+		return f"Sorry {self.member.display_name}, " if self.member else ""
 
 	async def reply(self):
 		await self.sender.send(

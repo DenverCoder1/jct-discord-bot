@@ -1,10 +1,10 @@
+from typing import Optional
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
 from .xkcd_fetcher import XKCDFetcher
 from .xkcd_embedder import XKCDEmbedder
-from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
 import config
 
@@ -34,7 +34,7 @@ class XKCDCog(commands.Cog, name="xkcd Comics"):
 			)
 		],
 	)
-	async def xkcd(self, ctx: SlashContext, comic_id: int = None):
+	async def xkcd(self, ctx: SlashContext, comic_id: Optional[int] = None):
 		await ctx.defer()
 		comic = (
 			self.xkcd_fetcher.get_comic_by_id(comic_id)

@@ -1,4 +1,4 @@
-class ClassRoleError(Exception):
+class GroupRoleError(Exception):
 	"""Exception raised when a class role is missing
 	or there are more class roles than expected."""
 

@@ -1,7 +1,7 @@
 import discord
 import config
 from functools import cached_property
-from typing import Iterable
+from typing import Iterable, Optional
 from database import sql_fetcher
 
 

@@ -1,11 +1,11 @@
 import re
 from discord.ext import commands
-from utils.utils import wait_for_reaction
+from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 from .event import Event
-from typing import Iterable, Dict
+from typing import Iterable, Dict, List, Optional, Tuple, Union
 from functools import reduce
 import discord
 
@@ -31,7 +31,7 @@ class CalendarEmbedder:
 	async def embed_event_pages(
 		self,
 		ctx: SlashContext,
-		events: Iterable[Event],
+		events: Union[List[Event], Tuple],
 		full_query: str,
 		results_per_page: int,
 		calendar: Calendar,
@@ -75,7 +75,11 @@ class CalendarEmbedder:
 				break
 
 	async def get_event_choice(
-		self, ctx: SlashContext, events: Iterable[Event], query: str, action: str
+		self,
+		ctx: SlashContext,
+		events: Union[List[Event], Tuple],
+		query: str,
+		action: str,
 	):
 		"""
 		If there are no events, throws an error.
@@ -110,7 +114,7 @@ class CalendarEmbedder:
 		# only 1 event found
 		else:
 			# get the event at index 0
-			return events[0]
+			return one(events)
 
 	def embed_event_list(
 		self,
@@ -118,8 +122,8 @@ class CalendarEmbedder:
 		events: Iterable[Event],
 		description: str = "",
 		colour: discord.Colour = discord.Colour.blue(),
-		enumeration: Iterable[str] = [],
-		page_num: int = None,
+		enumeration: Union[List[str], Tuple] = (),
+		page_num: Optional[int] = None,
 	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
@@ -211,7 +215,7 @@ class CalendarEmbedder:
 			info += f":round_pushpin: {self.__trim_text_links_preserved(event.location())}\n"
 		return info
 
-	def __footer_text(self, page_num: int = None) -> str:
+	def __footer_text(self, page_num: Optional[int] = None) -> str:
 		"""Return text about timezone to display at end of embeds with dates"""
 		page_num_text = f"Page {page_num} | " if page_num is not None else ""
 		timezone_text = f"Times are shown for {self.timezone}"

@@ -124,6 +124,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .pyre_configuration
+.watchmanconfig
 
 # IDE stuff
 .vscode/

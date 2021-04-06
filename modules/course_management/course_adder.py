@@ -1,7 +1,8 @@
-from discord_slash.context import SlashContext
 import psycopg2.extensions as sql
 import discord
 import discord.utils
+import config
+from discord_slash.context import SlashContext
 from psycopg2.errors import UniqueViolation
 from modules.email_registry.categoriser import Categoriser
 from modules.email_registry.person_finder import PersonFinder
@@ -34,7 +35,7 @@ class CourseAdder:
 		self, ctx: SlashContext, channel_name: str
 	) -> discord.TextChannel:
 		# find courses category
-		category = get_discord_obj(ctx.guild.categories, "COURSES_CATEGORY")
+		category = get_discord_obj(config.guild.categories, "COURSES_CATEGORY")
 
 		# make sure the channel doesn't already exist
 		if discord.utils.get(category.text_channels, name=channel_name) is not None:
@@ -93,17 +94,17 @@ class CourseAdder:
 		channel: discord.TextChannel,
 		professors: Iterable[str],
 	):
-		for professor in professors:
-			professor = professor.strip()
+		for professor_name in professors:
+			professor_name = professor_name.strip()
 			try:
-				professor_id = self.finder.search_one(ctx, professor).person_id
-				self.categoriser.categorise_person(professor_id, (channel.mention,))
+				professor = self.finder.search_one(ctx, professor_name)
+				self.categoriser.categorise_person(ctx, professor, (channel.mention,))
 			except FriendlyError:
 				await ctx.send(
 					embed=embedder.embed_warning(
 						title=(
-							f'Unable to determine who you meant by "{professor}". I'
-							" will skip linking this professor to the course."
+							f'Unable to determine who you meant by "{professor_name}".'
+							" I will skip linking this professor to the course."
 						),
 						description=(
 							"To link the professor yourself, first add them with"

@@ -34,7 +34,7 @@ class SearchCog(commands.Cog, name="Search"):
 
 		links = search(query)
 		if not links:
-			raise FriendlyError("We searched far and wide, but nothing turned up.")
+			raise FriendlyError("We searched far and wide, but nothing turned up.", ctx)
 		link = links[0]
 
 		wiki_links = [link for link in links if "wikipedia.org" in link[:30]]

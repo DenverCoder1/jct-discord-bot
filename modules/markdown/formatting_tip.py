@@ -1,3 +1,4 @@
+from typing import Optional
 from utils.utils import blockquote
 
 
@@ -7,8 +8,8 @@ class Tip:
 		name: str,
 		preview: str,
 		escaped: str,
-		header: str = None,
-		footer: str = None,
+		header: Optional[str] = None,
+		footer: Optional[str] = None,
 	):
 		self.name = name
 		self.preview = preview

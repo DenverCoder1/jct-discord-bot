@@ -1,7 +1,7 @@
 from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
-from typing import Iterable, Dict
+from typing import Iterable, Dict, List, Optional, Tuple, Union
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
@@ -40,9 +40,9 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		query: str = "",
-		page_token: str = None,
+		page_token: Optional[str] = None,
 		max_results: int = 100,
-	) -> Iterable[Event]:
+	) -> Union[List[Event], Tuple]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
 		now = datetime.utcnow().isoformat() + "Z"
@@ -151,7 +151,7 @@ class CalendarService:
 		# delete event
 		response = (
 			self.service.events()
-			.delete(calendarId=calendar_id, eventId=event.id())
+			.delete(calendarId=calendar_id, eventId=event.event_id)
 			.execute()
 		)
 		# response should be empty if successful
@@ -162,53 +162,53 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		event: Event,
-		new_summary: str = None,
-		new_start: str = None,
-		new_end: str = None,
-		new_desc: str = None,
-		new_location: str = None,
+		new_summary: Optional[str] = None,
+		new_start: Optional[str] = None,
+		new_end: Optional[str] = None,
+		new_desc: Optional[str] = None,
+		new_location: Optional[str] = None,
 	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new start date if provided
 		new_start_date = parse_date(
-			new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start(),
+			new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start,
 		)
 		# parse new end date if provided
 		new_end_date = parse_date(
 			new_end,
 			from_tz=self.timezone,
 			to_tz=self.timezone,
-			base=(new_start_date if new_start_date else event.end()),
+			base=(new_start_date if new_start_date else event.end),
 		)
 		# create request body
 		event_details = {
-			**event.details,
+			**event.__details,
 			**({"summary": new_summary} if type(new_summary) == str else {}),
 			**({"location": new_location} if type(new_location) == str else {}),
 			**({"description": new_desc} if type(new_desc) == str else {}),
 			"start": {
 				"timeZone": self.timezone,
 				"dateTime": (
-					new_start_date if new_start_date is not None else event.start()
+					new_start_date if new_start_date is not None else event.start
 				).isoformat("T", "seconds"),
 			},
 			"end": {
 				"timeZone": self.timezone,
 				"dateTime": (
-					new_end_date if new_end_date is not None else event.end()
+					new_end_date if new_end_date is not None else event.end
 				).isoformat("T", "seconds"),
 			},
 		}
 		# check that new time range is valid
 		new_event = Event(event_details)
-		new_start_date = new_event.start().replace(tzinfo=None)
-		new_end_date = new_event.end().replace(tzinfo=None)
+		new_start_date = new_event.start.replace(tzinfo=None)
+		new_end_date = new_event.end.replace(tzinfo=None)
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# update the event
 		updated_event = (
 			self.service.events()
-			.update(calendarId=calendar_id, eventId=event.id(), body=event_details)
+			.update(calendarId=calendar_id, eventId=event.event_id, body=event_details)
 			.execute()
 		)
 		return Event(updated_event)

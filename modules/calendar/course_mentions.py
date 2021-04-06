@@ -1,7 +1,7 @@
 from discord.ext import commands
 import psycopg2.extensions as sql
 from database import sql_fetcher
-from utils.mention import decode_mention
+from utils.mention import decode_channel_mention
 
 
 class CourseMentions:
@@ -29,9 +29,9 @@ class CourseMentions:
 	def map_channel_mention(self, word: str):
 		"""given a word in a string, return the channel name
 		if it is a channel mention, otherwise return the original word"""
-		mention_type, channel_id = decode_mention(word)
+		channel_id = decode_channel_mention(word)
 		# convert mention to full name if word is a mention
-		if mention_type == "channel":
+		if channel_id:
 			return self.get_channel_full_name(channel_id)
 		# not a channel mention
 		return word

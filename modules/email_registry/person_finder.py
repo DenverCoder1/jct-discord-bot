@@ -3,7 +3,7 @@ import discord
 from discord.channel import TextChannel
 from discord_slash.context import SlashContext
 import psycopg2.extensions as sql
-from typing import Any, Iterable, Set, Union
+from typing import Any, Iterable, Optional, Set, Union
 from modules.email_registry.weighted_set import WeightedSet
 from database.person.person import Person
 from modules.error.friendly_error import FriendlyError
@@ -20,7 +20,10 @@ class PersonFinder:
 		}
 
 	def search(
-		self, name: str = None, channel: discord.TextChannel = None, email: str = None
+		self,
+		name: Optional[str] = None,
+		channel: Optional[discord.TextChannel] = None,
+		email: Optional[str] = None,
 	) -> Set[Person]:
 		"""returns a list of people who best match the name and channel"""
 		weights = WeightedSet()
@@ -46,9 +49,9 @@ class PersonFinder:
 	def search_one(
 		self,
 		sender: Union[TextChannel, SlashContext],
-		name: str = None,
-		channel: discord.TextChannel = None,
-		email: str = None,
+		name: Optional[str] = None,
+		channel: Optional[discord.TextChannel] = None,
+		email: Optional[str] = None,
 	) -> Person:
 		"""
 		Returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one.

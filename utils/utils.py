@@ -1,12 +1,20 @@
 import os
 import re
 import csv
-import config
 import dateparser
 import asyncio
 import discord
 from datetime import datetime
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import (
+	Any,
+	Callable,
+	Collection,
+	Dict,
+	Iterable,
+	List,
+	Optional,
+	Union,
+)
 from discord.ext import commands
 from discord_slash.model import SlashMessage
 from modules.error.friendly_error import FriendlyError
@@ -17,8 +25,11 @@ class IdNotFoundError(Exception):
 		super().__init__(*args)
 
 
-def get_discord_obj(iterable, label: str):
-	return discord.utils.get(iterable, id=get_id(label))
+def get_discord_obj(iterable, label: str) -> Any:
+	obj = discord.utils.get(iterable, id=get_id(label))
+	if obj:
+		return obj
+	raise IdNotFoundError()
 
 
 def get_id(label: str) -> int:
@@ -52,11 +63,11 @@ def is_email(email: str) -> bool:
 
 
 def parse_date(
-	date_str: str,
-	from_tz: str = None,
-	to_tz: str = None,
-	future: bool = None,
-	base: datetime = None,
+	date_str: Optional[str] = None,
+	from_tz: Optional[str] = None,
+	to_tz: Optional[str] = None,
+	future: Optional[bool] = None,
+	base: Optional[datetime] = None,
 	settings: Dict[str, str] = {},
 ) -> Optional[datetime]:
 	"""Returns datetime object for given date string
@@ -110,8 +121,8 @@ def format_date(
 async def wait_for_reaction(
 	bot: commands.Bot,
 	message: Union[discord.Message, SlashMessage],
-	emoji_list: Iterable[str],
-	allowed_users: Iterable[discord.Member] = None,
+	emoji_list: List[str],
+	allowed_users: Optional[Collection[discord.Member]] = None,
 	timeout: int = 60,
 ) -> int:
 	"""Add reactions to message and wait for user to react with one.
@@ -155,7 +166,7 @@ async def wait_for_reaction(
 		raise FriendlyError(
 			f"You did not react within {timeout} seconds",
 			message.channel,
-			allowed_users[0] if len(allowed_users) == 1 else None,
+			one(allowed_users) if allowed_users and len(allowed_users) == 1 else None,
 			error,
 		)
 	else:

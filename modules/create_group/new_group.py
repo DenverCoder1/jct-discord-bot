@@ -31,7 +31,7 @@ class NewGroup:
 		]
 		return colours[self.year % len(colours)]
 
-	async def __create_role(self) -> discord.Role:
+	async def __create_role(self):
 		self.role = await config.guild().create_role(
 			name=f"{self.campus.name} {self.year}",
 			permissions=discord.Permissions.none(),

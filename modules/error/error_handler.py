@@ -1,3 +1,4 @@
+from typing import Optional
 from modules.error.quiet_warning import QuietWarning
 import discord
 import config
@@ -14,7 +15,7 @@ class ErrorHandler:
 	def __init__(self, error_logger: ErrorLogger) -> None:
 		self.logger = error_logger
 
-	async def handle(self, error: Exception, message: discord.Message = None):
+	async def handle(self, error: Exception, message: Optional[discord.Message] = None):
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
 
@@ -36,9 +37,9 @@ class ErrorHandler:
 				await self.handle(friendly_err, message)
 
 	async def __handle_friendly(
-		self, error: FriendlyError, message: discord.Message = None
+		self, error: FriendlyError, message: Optional[discord.Message] = None
 	):
-		if error.inner is not None:
+		if error.inner:
 			self.logger.log_to_file(error.inner, message)
 		await error.reply()
 

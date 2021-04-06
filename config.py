@@ -1,3 +1,4 @@
+from typing import Optional
 from dotenv.main import load_dotenv
 import os
 import psycopg2
@@ -10,7 +11,7 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
 guild_id = int(os.getenv("DISCORD_GUILD"))
-_guild: discord.Guild = None  # To be loaded on ready
+_guild: Optional[discord.Guild] = None  # To be loaded on ready
 guild = lambda: _guild
 
 # Connect to database

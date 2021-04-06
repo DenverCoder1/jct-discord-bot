@@ -1,7 +1,7 @@
 from database.campus.campus import Campus
 import discord
 import config
-from typing import Iterable
+from typing import Collection
 from functools import cached_property
 from database import sql_fetcher
 
@@ -56,12 +56,23 @@ class Group:
 				return cls(*cursor.fetchone())
 
 	@classmethod
-	def get_groups(cls) -> Iterable["Group"]:
+	def get_groups(cls) -> Collection["Group"]:
 		"""Fetch a list of groups from the database"""
 		query = sql_fetcher.fetch("database", "group", "queries", "get_groups.sql")
 		with config.conn as conn:
 			with conn.cursor() as cursor:
 				cursor.execute(query)
+				return [cls(*tup) for tup in cursor.fetchall()]
+
+	@classmethod
+	def get_member_groups(cls, member: discord.Member) -> Collection["Group"]:
+		"""Fetch a list of groups which a member belongs to from the database"""
+		query = sql_fetcher.fetch(
+			"database", "group", "queries", "get_member_groups.sql"
+		)
+		with config.conn as conn:
+			with conn.cursor() as cursor:
+				cursor.execute(query, {"roles": (role.id for role in member.roles)})
 				return [cls(*tup) for tup in cursor.fetchall()]
 
 	def __eq__(self, other):

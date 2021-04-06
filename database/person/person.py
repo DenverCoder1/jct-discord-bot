@@ -4,7 +4,7 @@ from database import sql_fetcher
 
 
 class Person:
-	def __init__(self, id: id, name: str, emails: str, categories: str) -> None:
+	def __init__(self, id: int, name: str, emails: str, categories: str) -> None:
 		self.__id = id
 		self.__name = name
 		self.__emails = self.__no_duplicates(emails)
