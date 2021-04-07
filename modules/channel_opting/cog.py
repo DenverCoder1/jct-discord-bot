@@ -6,7 +6,7 @@ import discord
 import config
 
 
-class ChannelOptingCog(commands.Cog, name="Channel Opting In/Out"):
+class ChannelOptingCog(commands.Cog):
 	"""Allows users to opt in/out of channels."""
 
 	def __init__(self):

@@ -17,15 +17,13 @@ class CourseDeleter:
 
 	async def __delete_channel(self, ctx: SlashContext, channel_id: int):
 		# find courses category
-		category = get_discord_obj(config.guild.categories, "COURSES_CATEGORY")
-		try:
-			await discord.utils.get(category.text_channels, id=channel_id).delete()
-		except AttributeError as e:
+		category = get_discord_obj(config.guild().categories, "COURSES_CATEGORY")
+		channel = discord.utils.get(category.text_channels, id=channel_id)
+		if channel:
+			await channel.delete()
+		else:
 			raise FriendlyError(
-				"You must provide a channel in the courses category.",
-				ctx,
-				ctx.author,
-				e,
+				"You must provide a channel in the courses category.", ctx, ctx.author
 			)
 
 	def __delete_from_database(self, channel_id: int):

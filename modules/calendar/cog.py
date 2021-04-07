@@ -6,7 +6,7 @@ from .calendar import Calendar
 from .calendar_service import CalendarService
 from .calendar_embedder import CalendarEmbedder
 from .calendar_creator import CalendarCreator
-from .course_mentions import CourseMentions
+from . import course_mentions
 from modules.error.friendly_error import FriendlyError
 from utils.embedder import embed_success
 from utils.utils import is_email
@@ -19,7 +19,7 @@ from discord_slash.utils.manage_commands import create_option, create_choice
 groups = Group.get_groups()
 
 
-class CalendarCog(commands.Cog, name="Calendar"):
+class CalendarCog(commands.Cog):
 	"""Display and update Google Calendar events"""
 
 	def __init__(self, bot: commands.Bot):
@@ -28,7 +28,6 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		self.embedder = CalendarEmbedder(bot, timezone)
 		self.service = CalendarService(timezone)
 		self.creator = CalendarCreator(self.service, config.conn)
-		self.course_mentions = CourseMentions(config.conn, bot)
 		self.groups = groups
 
 	@cog_ext.cog_subcommand(
@@ -107,7 +106,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# convert channel mentions to full names
-		full_query = self.course_mentions.replace_channel_mentions(query)
+		full_query = course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, full_query)
 		# display events and allow showing more with reactions
@@ -182,9 +181,9 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
-		title = self.course_mentions.replace_channel_mentions(title)
-		description = self.course_mentions.replace_channel_mentions(description)
-		location = self.course_mentions.replace_channel_mentions(location)
+		title = course_mentions.replace_channel_mentions(title)
+		description = course_mentions.replace_channel_mentions(description)
+		location = course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		try:
@@ -274,7 +273,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
-		query = self.course_mentions.replace_channel_mentions(query)
+		query = course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# get a list of upcoming events
@@ -285,11 +284,11 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		)
 		# replace channel mentions
 		if title is not None:
-			title = self.course_mentions.replace_channel_mentions(title)
+			title = course_mentions.replace_channel_mentions(title)
 		if description is not None:
-			description = self.course_mentions.replace_channel_mentions(description)
+			description = course_mentions.replace_channel_mentions(description)
 		if location is not None:
-			location = self.course_mentions.replace_channel_mentions(location)
+			location = course_mentions.replace_channel_mentions(location)
 		try:
 			event = self.service.update_event(
 				calendar.id, event_to_update, title, start, end, description, location,
@@ -336,7 +335,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
-		query = self.course_mentions.replace_channel_mentions(query)
+		query = course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# fetch upcoming events
@@ -407,7 +406,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 	async def on_new_academic_year(self):
 		"""Create calendars for each campus and update the database"""
 		year = datetime.now().year + 3
-		self.creator.create_class_calendars(year)
+		self.creator.create_group_calendars(year)
 
 
 # setup functions for bot

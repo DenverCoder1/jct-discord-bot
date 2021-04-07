@@ -64,8 +64,8 @@ class CalendarService:
 		# filter by search term
 		clean_query = query.lower().replace(" ", "")
 		filtered = filter(
-			lambda item: clean_query in item.get("summary").lower().replace(" ", "")
-			or fuzz.token_set_ratio(query, item.get("summary")) > 75,
+			lambda item: clean_query in item["summary"].lower().replace(" ", "")
+			or fuzz.token_set_ratio(query, item["summary"]) > 75,
 			events,
 		)
 		# convert dicts to Event objects
@@ -77,8 +77,8 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		summary: str,
-		start: str,
-		end: str,
+		start: Optional[str],
+		end: Optional[str],
 		description: str,
 		location: str,
 	) -> Event:

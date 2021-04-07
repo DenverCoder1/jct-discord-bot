@@ -8,7 +8,7 @@ from modules.markdown import tip_formatter
 import config
 
 
-class FormattingCog(commands.Cog, name="Formatting Tips"):
+class FormattingCog(commands.Cog):
 	"""Display markdown tips for Discord messages"""
 
 	def __init__(self, bot):

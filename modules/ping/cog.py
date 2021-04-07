@@ -5,7 +5,7 @@ import config
 import random
 
 
-class PingCog(commands.Cog, name="Ping"):
+class PingCog(commands.Cog):
 	"""A command which simply acknowledges the user's ping"""
 
 	def __init__(self, bot: commands.Bot):

@@ -26,7 +26,7 @@ class Calendar:
 	@classmethod
 	def from_dict(cls, details: Dict[str, str]) -> "Calendar":
 		"""Create a calendar from a JSON object as returned by the Calendar API"""
-		return cls(id=details.get("id"), name=details.get("summary"))
+		return cls(id=details["id"], name=details["summary"])
 
 	@classmethod
 	def get_calendar(
@@ -36,8 +36,8 @@ class Calendar:
 		group_id: int = None,
 	) -> "Calendar":
 		"""Returns Calendar given a Discord member or a specified group id"""
+		groups = groups or Group.get_groups()
 		if group_id:
-			groups = groups or Group.get_groups()
 			# get the group specified by the user given the group id
 			group = one(group for group in groups if group.id == group_id)
 		else:

@@ -24,7 +24,9 @@ class Campus:
 	@cached_property
 	def channel(self) -> discord.TextChannel:
 		"""The channel associated with this Campus."""
-		return discord.utils.get(config.guild().text_channels, id=self.__channel_id)
+		channel = discord.utils.get(config.guild().text_channels, id=self.__channel_id)
+		assert channel is not None
+		return channel
 
 	@classmethod
 	def get_campus(cls, campus_id: int) -> "Campus":

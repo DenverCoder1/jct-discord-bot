@@ -10,12 +10,11 @@ from .error_handler import ErrorHandler
 from .error_logger import ErrorLogger
 
 
-class ErrorLogCog(commands.Cog, name="Error Logs"):
+class ErrorLogCog(commands.Cog):
 	"""Show recent error logs"""
 
-	def __init__(self, bot: commands.Bot):
-		self.bot = bot
-		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL"), bot)
+	def __init__(self):
+		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL"))
 		self.handler = ErrorHandler(self.logger)
 
 	@cog_ext.cog_slash(
@@ -49,11 +48,12 @@ class ErrorLogCog(commands.Cog, name="Error Logs"):
 		"""When an exception is raised, log it in err.log and bot log channel"""
 
 		_, error, _ = sys.exc_info()
-		await self.handler.handle(error)
+		if error:
+			await self.handler.handle(error)
 
 
 # setup functions for bot
 def setup(bot: commands.Bot):
-	cog = ErrorLogCog(bot)
+	cog = ErrorLogCog()
 	bot.add_cog(cog)
-	bot.on_error = cog.on_error
+	setattr(bot, "on_error", cog.on_error)

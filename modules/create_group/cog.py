@@ -6,7 +6,7 @@ import datetime
 import config
 
 
-class CreateGroupCog(commands.Cog, name="Year Roles"):
+class CreateGroupCog(commands.Cog):
 	"""Creates roles for each year and campus."""
 
 	def __init__(self):

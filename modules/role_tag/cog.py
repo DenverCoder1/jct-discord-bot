@@ -4,7 +4,7 @@ from discord.ext import commands
 import discord
 
 
-class RoleTagsCog(commands.Cog, name="Role Tags"):
+class RoleTagsCog(commands.Cog):
 	"""Changes nicknames to include tags represented by the user's roles"""
 
 	def __init__(self, bot: commands.Bot):

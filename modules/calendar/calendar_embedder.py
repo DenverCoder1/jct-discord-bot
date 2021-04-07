@@ -215,7 +215,9 @@ class CalendarEmbedder:
 		# replace full urls and titles with placeholders to not include them when trimming
 		trimmed = self.FULL_URLS_REGEX.sub("({})", shortened_links)
 		# shift 'max' to the index of the next word in the text or the end of the text if none
-		max += re.search(r"(\b\s|$)", trimmed[max:]).start()
+		match = re.search(r"(\b\s|$)", trimmed[max:])
+		assert match is not None
+		max += match.start()
 		# trim the text normally
 		trimmed = trimmed[:max].strip() + "..." if len(trimmed) > max else trimmed
 		# get full urls to replace placeholders

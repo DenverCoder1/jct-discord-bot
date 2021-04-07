@@ -36,7 +36,9 @@ class ChannelMessage:
 
 	@staticmethod
 	def __get_channel(channel_id: int) -> discord.TextChannel:
-		return discord.utils.get(config.guild().text_channels, id=channel_id)
+		channel = discord.utils.get(config.guild().text_channels, id=channel_id)
+		assert channel is not None
+		return channel
 
 	@classmethod
 	def get_channel_messages(cls) -> Iterable["ChannelMessage"]:
@@ -73,4 +75,4 @@ class ChannelMessage:
 		)
 		with config.conn as conn:
 			with conn.cursor() as cursor:
-				cursor.execute(query, {"message_id", self.message.id})
+				cursor.execute(query, {"message_id", self.message_id})

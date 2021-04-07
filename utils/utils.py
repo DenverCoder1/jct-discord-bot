@@ -5,7 +5,7 @@ import dateparser
 import asyncio
 import discord
 from datetime import datetime
-from typing import Any, Collection, Dict, Iterable, List, Optional
+from typing import Any, Collection, Dict, Iterable, Optional, Sequence
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
 
@@ -58,7 +58,7 @@ def parse_date(
 	to_tz: Optional[str] = None,
 	future: Optional[bool] = None,
 	base: Optional[datetime] = None,
-	settings: Dict[str, str] = {},
+	settings: Dict[str, Any] = {},
 ) -> Optional[datetime]:
 	"""Returns datetime object for given date string
 	Arguments:
@@ -111,7 +111,7 @@ def format_date(
 async def wait_for_reaction(
 	bot: commands.Bot,
 	message: discord.Message,
-	emoji_list: List[str],
+	emoji_list: Sequence[str],
 	allowed_users: Optional[Collection[discord.Member]] = None,
 	timeout: int = 60,
 ) -> int:

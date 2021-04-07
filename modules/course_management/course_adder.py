@@ -35,7 +35,7 @@ class CourseAdder:
 		self, ctx: SlashContext, channel_name: str
 	) -> discord.TextChannel:
 		# find courses category
-		category = get_discord_obj(config.guild.categories, "COURSES_CATEGORY")
+		category = get_discord_obj(config.guild().categories, "COURSES_CATEGORY")
 
 		# make sure the channel doesn't already exist
 		if discord.utils.get(category.text_channels, name=channel_name) is not None:

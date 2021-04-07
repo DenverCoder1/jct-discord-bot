@@ -1,10 +1,10 @@
 from collections import defaultdict
-from typing import Any, Set
+from typing import Any, DefaultDict, Set
 
 
 class WeightedSet:
 	def __init__(self) -> None:
-		self.weights = defaultdict(int)
+		self.weights: DefaultDict[Any, int] = defaultdict(int)
 
 	def __getitem__(self, item: Any) -> int:
 		return self.weights[item]

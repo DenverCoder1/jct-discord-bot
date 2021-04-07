@@ -34,8 +34,8 @@ class Member:
 		roles = sorted(
 			self.inner_member.roles, key=lambda role: role.position, reverse=True
 		)
-		roles = [Role(role) for role in roles]
-		return [role.tag.strip() for role in roles if role.has_tag()]
+		_roles = [Role(role) for role in roles]
+		return [role.tag.strip() for role in _roles if role.tag]
 
 	def tags_str(self) -> str:
 		"""Gets a string to append to a member's name to represent their tags"""

@@ -9,7 +9,7 @@ import modules.search.search_functions as sf
 import config
 
 
-class SearchCog(commands.Cog, name="Search"):
+class SearchCog(commands.Cog):
 	"""Searches Google for links and includes summaries from Wikipedia when relevant"""
 
 	def __init__(self, bot):

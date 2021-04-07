@@ -34,7 +34,9 @@ class Group:
 	@cached_property
 	def role(self) -> discord.Role:
 		"""The Role associated with this Group."""
-		return discord.utils.get(config.guild().roles, id=self.__role_id)
+		role = discord.utils.get(config.guild().roles, id=self.__role_id)
+		assert role is not None
+		return role
 
 	@property
 	def calendar(self) -> str:

@@ -15,7 +15,7 @@ from ..error.friendly_error import FriendlyError
 from utils.mention import extract_channel_mentions
 
 
-class EmailRegistryCog(commands.Cog, name="Email Registry"):
+class EmailRegistryCog(commands.Cog):
 	"""Update and retrieve faculty emails from the registry"""
 
 	def __init__(self, bot: commands.Bot):

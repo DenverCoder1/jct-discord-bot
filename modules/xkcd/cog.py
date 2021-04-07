@@ -9,7 +9,7 @@ from discord.ext import commands
 import config
 
 
-class XKCDCog(commands.Cog, name="xkcd Comics"):
+class XKCDCog(commands.Cog):
 	"""Displays the latest xkcd comic, random comics, or comics for your search terms"""
 
 	def __init__(self, bot: commands.Bot):

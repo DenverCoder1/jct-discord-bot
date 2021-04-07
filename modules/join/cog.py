@@ -1,6 +1,6 @@
 from database.campus import Campus
 from utils import embedder, utils
-from .assigner import Assigner
+from . import assigner
 from discord.ext import commands
 import config
 from discord_slash import cog_ext, SlashContext
@@ -8,17 +8,12 @@ from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option, create_choice
 
 
-class JoinCog(commands.Cog, name="Join"):
+class JoinCog(commands.Cog):
 	"""Join command to get new users information and place them in the right roles"""
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 		self.assigner = None
-		self.attempts = {}
-
-	@commands.Cog.listener()
-	async def on_ready(self):
-		self.assigner = Assigner(config.guild, config.conn)
 
 	@cog_ext.cog_slash(
 		name="join",
@@ -73,7 +68,7 @@ class JoinCog(commands.Cog, name="Join"):
 		campus_id: int,
 		year: int,
 	):
-		await self.assigner.assign(
+		await assigner.assign(
 			ctx.author, f"{first_name.title()} {last_name.title()}", campus_id, year
 		)
 		await ctx.send(

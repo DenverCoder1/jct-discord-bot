@@ -27,8 +27,8 @@ class FriendlyError(Exception):
 		self,
 		msg: str,
 		sender: Union[discord.TextChannel, SlashContext],
-		member: Optional[discord.Member] = None,
-		inner: Optional[Exception] = None,
+		member: Union[discord.Member, discord.User, None] = None,
+		inner: Optional[BaseException] = None,
 		description: Optional[str] = None,
 	):
 		self.sender = sender

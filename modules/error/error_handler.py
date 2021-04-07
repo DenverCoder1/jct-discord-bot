@@ -14,7 +14,9 @@ class ErrorHandler:
 	def __init__(self, error_logger: ErrorLogger) -> None:
 		self.logger = error_logger
 
-	async def handle(self, error: Exception, message: Optional[discord.Message] = None):
+	async def handle(
+		self, error: BaseException, message: Optional[discord.Message] = None
+	):
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
 
@@ -45,12 +47,12 @@ class ErrorHandler:
 	def __handle_quiet_warning(self, warning: QuietWarning):
 		self.logger.log_to_file(warning)
 
-	def __user_error_message(self, error: Exception):
+	def __user_error_message(self, error: BaseException):
 		"""Given an error, will return a user-friendly string, and whether or not to log the error in the channel"""
 		if isinstance(error, discord_err.MissingPermissions):
 			return (
 				"You are missing the following permissions required to run the"
-				f' command: {", ".join(error.missing_perms)}.',
+				f' command: {", ".join(str(perm) for perm in error.missing_perms)}.',
 				False,
 			)
 		elif isinstance(error, discord_err.MissingRole):
