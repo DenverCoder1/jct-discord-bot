@@ -39,7 +39,7 @@ class Calendar:
 		if group_id:
 			groups = groups or Group.get_groups()
 			# get the group specified by the user given the group id
-			group = one(groups, lambda group: group.id == group_id)
+			group = one(group for group in groups if group.id == group_id)
 		else:
 			# get the group from the user's role
 			member_groups = [

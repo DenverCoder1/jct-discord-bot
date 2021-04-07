@@ -17,7 +17,9 @@ class ChannelMessageManager:
 		if reaction.emoji.name == self.__emoji:
 			try:
 				channel_message = one(
-					channel_messages, lambda cm: cm.message_id == reaction.message_id,
+					cm
+					for cm in channel_messages
+					if cm.message_id == reaction.message_id
 				)
 				if reaction.event_type == "REACTION_ADD":
 					member = reaction.member
@@ -54,7 +56,7 @@ class ChannelMessageManager:
 			return
 		try:
 			channel_message = one(
-				channel_messages, lambda cm: cm.referenced_channel == channel
+				cm for cm in channel_messages if cm.referenced_channel == channel
 			)
 			await channel_message.message.delete()
 			channel_message.delete_from_database()

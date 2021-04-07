@@ -5,18 +5,8 @@ import dateparser
 import asyncio
 import discord
 from datetime import datetime
-from typing import (
-	Any,
-	Callable,
-	Collection,
-	Dict,
-	Iterable,
-	List,
-	Optional,
-	Union,
-)
+from typing import Any, Callable, Collection, Dict, Iterable, List, Optional
 from discord.ext import commands
-from discord_slash.model import SlashMessage
 from modules.error.friendly_error import FriendlyError
 
 
@@ -120,7 +110,7 @@ def format_date(
 
 async def wait_for_reaction(
 	bot: commands.Bot,
-	message: Union[discord.Message, SlashMessage],
+	message: discord.Message,
 	emoji_list: List[str],
 	allowed_users: Optional[Collection[discord.Member]] = None,
 	timeout: int = 60,
@@ -176,6 +166,6 @@ async def wait_for_reaction(
 		return emoji_list.index(str(reaction.emoji))
 
 
-def one(iterable: Iterable, condition: Callable[[Any], bool] = lambda x: True):
+def one(iterable: Iterable):
 	"""Returns a single element from an iterable or raises StopIteration if it was empty."""
-	return next(obj for obj in iterable if condition(obj))
+	return next(iter(iterable))
