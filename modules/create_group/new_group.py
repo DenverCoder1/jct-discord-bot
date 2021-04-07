@@ -1,19 +1,43 @@
-from database.group.group import Group
+from database.group import Group
 import discord
 import psycopg2.extensions as sql
 from database import sql_fetcher
-from database.campus.campus import Campus
+from database.campus import Campus
 from .group_channel_creator import GroupChannelCreator
 import config
 
 
 class NewGroup:
 	def __init__(self, campus: Campus, year: int, conn: sql.connection):
-		self.campus = campus
-		self.year = year
+		self.__campus = campus
+		self.__year = year
 		self.__conn = conn
-		self.role = None
-		self.channel = None
+		self.__role: discord.Role
+		self.__channel: discord.TextChannel
+
+	@property
+	def campus(self) -> Campus:
+		"""The campus that this new group belongs to."""
+		return self.__campus
+
+	@property
+	def year(self) -> int:
+		"""The new group's graduation year'."""
+		return self.__year
+
+	@property
+	def role(self) -> discord.Role:
+		"""The new group's newly created role."""
+		if not self.__role:
+			raise AttributeError()
+		return self.__role
+
+	@property
+	def channel(self) -> discord.TextChannel:
+		"""The new group's newly created role."""
+		if not self.__channel:
+			raise AttributeError()
+		return self.__channel
 
 	async def add_to_system(self):
 		await self.__create_role()
@@ -29,11 +53,11 @@ class NewGroup:
 			discord.Colour.from_rgb(75, 147, 213),
 			discord.Colour.from_rgb(110, 213, 144),
 		]
-		return colours[self.year % len(colours)]
+		return colours[self.__year % len(colours)]
 
-	async def __create_role(self) -> discord.Role:
-		self.role = await config.guild().create_role(
-			name=f"{self.campus.name} {self.year}",
+	async def __create_role(self):
+		self.__role = await config.guild().create_role(
+			name=f"{self.__campus.name} {self.__year}",
 			permissions=discord.Permissions.none(),
 			colour=self.__get_colour(),
 			hoist=True,
@@ -41,20 +65,20 @@ class NewGroup:
 		)
 
 	async def __move_role(self):
-		roles = [group.role() for group in Group.get_groups()]
-		positions = [config.guild().get_role(role).position for role in roles]
+		roles = [group.role for group in Group.get_groups()]
+		positions = [role.position for role in roles]
 		new_position = min(positions) - 1
-		positions = {self.role: new_position}
-		await config.guild().edit_role_positions(positions)
+		position_dict = {self.role: new_position}
+		await config.guild().edit_role_positions(position_dict)
 
 	async def __create_group_channel(self):
-		self.channel = await GroupChannelCreator.create_group_channel(
-			f"📚{self.year}-{self.campus.name.lower()}", [self.role]
+		self.__channel = await GroupChannelCreator.create_group_channel(
+			f"📚{self.__year}-{self.__campus.name.lower()}", [self.__role]
 		)
 
 	async def __add_to_campus_channel(self):
-		self.campus.channel().set_permissions(
-			target=self.role, view_channel=True,
+		self.__campus.channel.set_permissions(
+			target=self.__role, view_channel=True,
 		)
 
 	def __add_to_database(self):
@@ -64,8 +88,8 @@ class NewGroup:
 				cursor.execute(
 					query,
 					{
-						"year": self.year,
-						"campus_id": self.campus.campus_id,
-						"role_id": self.role.id,
+						"year": self.__year,
+						"campus_id": self.__campus.id,
+						"role_id": self.__role.id,
 					},
 				)

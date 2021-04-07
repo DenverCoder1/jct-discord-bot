@@ -1,6 +1,6 @@
-from database.campus.campus import Campus
+from database.campus import Campus
 from typing import Iterable
-from modules.create_group.new_group import NewGroup
+from .new_group import NewGroup
 import psycopg2.extensions as sql
 
 

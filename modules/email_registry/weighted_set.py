@@ -1,10 +1,10 @@
 from collections import defaultdict
-from typing import Any, Set
+from typing import Any, DefaultDict, Set
 
 
 class WeightedSet:
 	def __init__(self) -> None:
-		self.weights = defaultdict(int)
+		self.weights: DefaultDict[Any, int] = defaultdict(int)
 
 	def __getitem__(self, item: Any) -> int:
 		return self.weights[item]
@@ -14,7 +14,7 @@ class WeightedSet:
 
 	def heaviest_items(self) -> Set[Any]:
 		"""Finds all the items with maximal weight"""
-		items = {}
+		items = set()
 		max_weight = 0
 		for item, weight in self.weights.items():
 			if weight > max_weight:

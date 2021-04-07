@@ -1,9 +1,9 @@
-from modules.error.quiet_warning import QuietWarning
-import discord
-import config
-from modules.error.error_logger import ErrorLogger
-from modules.error.friendly_error import FriendlyError
+from typing import Optional
+from .quiet_warning import QuietWarning
+from .error_logger import ErrorLogger
+from .friendly_error import FriendlyError
 import discord.ext.commands.errors as discord_err
+import discord
 
 
 class ErrorHandler:
@@ -14,7 +14,9 @@ class ErrorHandler:
 	def __init__(self, error_logger: ErrorLogger) -> None:
 		self.logger = error_logger
 
-	async def handle(self, error: Exception, message: discord.Message = None):
+	async def handle(
+		self, error: BaseException, message: Optional[discord.Message] = None
+	):
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
 
@@ -36,21 +38,21 @@ class ErrorHandler:
 				await self.handle(friendly_err, message)
 
 	async def __handle_friendly(
-		self, error: FriendlyError, message: discord.Message = None
+		self, error: FriendlyError, message: Optional[discord.Message] = None
 	):
-		if error.inner is not None:
+		if error.inner:
 			self.logger.log_to_file(error.inner, message)
 		await error.reply()
 
 	def __handle_quiet_warning(self, warning: QuietWarning):
 		self.logger.log_to_file(warning)
 
-	def __user_error_message(self, error: Exception):
+	def __user_error_message(self, error: BaseException):
 		"""Given an error, will return a user-friendly string, and whether or not to log the error in the channel"""
 		if isinstance(error, discord_err.MissingPermissions):
 			return (
 				"You are missing the following permissions required to run the"
-				f' command: {", ".join(error.missing_perms)}.',
+				f' command: {", ".join(str(perm) for perm in error.missing_perms)}.',
 				False,
 			)
 		elif isinstance(error, discord_err.MissingRole):

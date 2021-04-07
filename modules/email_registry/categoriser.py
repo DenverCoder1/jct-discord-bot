@@ -1,7 +1,7 @@
 from typing import Iterable
 from discord_slash.context import SlashContext
-from modules.error.friendly_error import FriendlyError
-from database.person.person import Person
+from ..error.friendly_error import FriendlyError
+from database.person import Person
 from database import sql_fetcher
 from utils.mention import decode_channel_mention
 import psycopg2.extensions as sql
@@ -13,16 +13,16 @@ class Categoriser:
 
 	def categorise_person(
 		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
-	) -> str:
-		"""Adds the person to the categories linked to the channels mentioned. Returns an error message (string) or an empty string."""
+	) -> Person:
+		"""Adds the person to the categories linked to the channels mentioned. Returns the updated person."""
 		return self.__add_remove_categories(
 			ctx, "categorise_person.sql", person, channel_mentions
 		)
 
 	def decategorise_person(
 		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
-	) -> str:
-		"""Removes the person from the categories linked to the channels mentioned. Returns an error message (string) or an empty string."""
+	) -> Person:
+		"""Removes the person from the categories linked to the channels mentioned. Returns the updated person."""
 		return self.__add_remove_categories(
 			ctx, "decategorise_person.sql", person, channel_mentions
 		)
@@ -46,6 +46,6 @@ class Categoriser:
 							ctx.author,
 						)
 					cursor.execute(
-						query, {"person_id": person.person_id, "channel_id": channel_id}
+						query, {"person_id": person.id, "channel_id": channel_id}
 					)
-				return Person.get_person(person.person_id)
+				return Person.get_person(person.id)

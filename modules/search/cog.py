@@ -1,4 +1,4 @@
-from modules.error.friendly_error import FriendlyError
+from ..error.friendly_error import FriendlyError
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
@@ -9,7 +9,7 @@ import modules.search.search_functions as sf
 import config
 
 
-class SearchCog(commands.Cog, name="Search"):
+class SearchCog(commands.Cog):
 	"""Searches Google for links and includes summaries from Wikipedia when relevant"""
 
 	def __init__(self, bot):
@@ -34,7 +34,7 @@ class SearchCog(commands.Cog, name="Search"):
 
 		links = search(query)
 		if not links:
-			raise FriendlyError("We searched far and wide, but nothing turned up.")
+			raise FriendlyError("We searched far and wide, but nothing turned up.", ctx)
 		link = links[0]
 
 		wiki_links = [link for link in links if "wikipedia.org" in link[:30]]

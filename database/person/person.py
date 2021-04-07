@@ -4,14 +4,14 @@ from database import sql_fetcher
 
 
 class Person:
-	def __init__(self, id: id, name: str, emails: str, categories: str) -> None:
+	def __init__(self, id: int, name: str, emails: str, categories: str) -> None:
 		self.__id = id
 		self.__name = name
 		self.__emails = self.__no_duplicates(emails)
 		self.__categories = self.__no_duplicates(categories)
 
 	@property
-	def person_id(self) -> int:
+	def id(self) -> int:
 		"""The ID of this person as stored in the database."""
 		return self.__id
 

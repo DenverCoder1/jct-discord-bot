@@ -1,12 +1,12 @@
 from .group_channel_creator import GroupChannelCreator
 from .group_creator import groups_creator
-from utils.scheduler.scheduler import Scheduler
+from utils.scheduler import Scheduler
 from discord.ext import commands
 import datetime
 import config
 
 
-class CreateGroupCog(commands.Cog, name="Year Roles"):
+class CreateGroupCog(commands.Cog):
 	"""Creates roles for each year and campus."""
 
 	def __init__(self):

@@ -1,7 +1,8 @@
-from database.person.person import Person
+from discord_slash.context import SlashContext
+from database.person import Person
 import psycopg2.extensions as sql
 from typing import Iterable
-from modules.email_registry.categoriser import Categoriser
+from .categoriser import Categoriser
 from database import sql_fetcher
 
 
@@ -15,6 +16,7 @@ class PersonAdder:
 		surname: str,
 		channel_mentions: Iterable[str],
 		categoriser: Categoriser,
+		ctx: SlashContext,
 	) -> Person:
 		query = sql_fetcher.fetch(
 			"modules", "email_registry", "queries", "add_person.sql"
@@ -25,5 +27,5 @@ class PersonAdder:
 					query, {"name": name.capitalize(), "surname": surname.capitalize()}
 				)
 				person_id = cursor.fetchone()[0]
-		categoriser.categorise_person(person_id, channel_mentions)
+		categoriser.categorise_person(ctx, person_id, channel_mentions)
 		return Person.get_person(person_id)

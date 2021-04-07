@@ -1,3 +1,4 @@
+from typing import Optional
 import discord
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
@@ -6,8 +7,8 @@ from discord_slash.utils.manage_commands import create_option
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
-from modules.course_management.course_adder import CourseAdder
-from modules.course_management.course_deleter import CourseDeleter
+from .course_adder import CourseAdder
+from .course_deleter import CourseDeleter
 import config
 
 
@@ -57,14 +58,14 @@ class CourseManagerCog(commands.Cog):
 		ctx: SlashContext,
 		course_name: str,
 		professors: str = "",
-		channel_name: str = None,
+		channel_name: Optional[str] = None,
 	):
 		await ctx.defer()
-		professors = [professor.strip() for professor in professors.split(",")]
+		professors_split = [professor.strip() for professor in professors.split(",")]
 		if not channel_name:
 			channel_name = course_name
 		channel = await self.adder.add_course(
-			ctx, course_name, professors, channel_name
+			ctx, course_name, professors_split, channel_name
 		)
 		await ctx.send(
 			embed=embed_success("Nice! You created a course channel.", channel.mention)

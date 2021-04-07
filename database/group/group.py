@@ -1,7 +1,7 @@
-from database.campus.campus import Campus
+from database.campus import Campus
 import discord
 import config
-from typing import Iterable
+from typing import Collection
 from functools import cached_property
 from database import sql_fetcher
 
@@ -17,7 +17,7 @@ class Group:
 		self.__calendar = calendar
 
 	@property
-	def group_id(self) -> int:
+	def id(self) -> int:
 		"""The ID of the group as stored in the database."""
 		return self.__id
 
@@ -34,7 +34,9 @@ class Group:
 	@cached_property
 	def role(self) -> discord.Role:
 		"""The Role associated with this Group."""
-		return discord.utils.get(config.guild().roles, id=self.__role_id)
+		role = discord.utils.get(config.guild().roles, id=self.__role_id)
+		assert role is not None
+		return role
 
 	@property
 	def calendar(self) -> str:
@@ -56,7 +58,7 @@ class Group:
 				return cls(*cursor.fetchone())
 
 	@classmethod
-	def get_groups(cls) -> Iterable["Group"]:
+	def get_groups(cls) -> Collection["Group"]:
 		"""Fetch a list of groups from the database"""
 		query = sql_fetcher.fetch("database", "group", "queries", "get_groups.sql")
 		with config.conn as conn:

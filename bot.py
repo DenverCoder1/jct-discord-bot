@@ -3,7 +3,7 @@ import discord
 from discord_slash import SlashCommand
 import config
 from discord.ext import commands
-from utils.scheduler.scheduler import Scheduler
+from utils.scheduler import Scheduler
 
 
 def main():

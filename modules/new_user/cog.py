@@ -1,10 +1,9 @@
-from modules.new_user.greeter import Greeter
+from .greeter import Greeter
 import discord
-from utils import utils
 from discord.ext import commands
 
 
-class NewUserCog(commands.Cog, name="New User"):
+class NewUserCog(commands.Cog):
 	"""Ask members who join to use the join command"""
 
 	def __init__(self, bot: commands.Bot):

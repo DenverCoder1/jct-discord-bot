@@ -1,10 +1,10 @@
-from modules.role_tag.role import Role
-from modules.role_tag.member import Member
+from .role import Role
+from .member import Member
 from discord.ext import commands
 import discord
 
 
-class RoleTagsCog(commands.Cog, name="Role Tags"):
+class RoleTagsCog(commands.Cog):
 	"""Changes nicknames to include tags represented by the user's roles"""
 
 	def __init__(self, bot: commands.Bot):
@@ -12,24 +12,24 @@ class RoleTagsCog(commands.Cog, name="Role Tags"):
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before: discord.Member, after: discord.Member):
-		before = Member(before)
-		after = Member(after)
-		if after.current_tags() != after.tags():
-			await after.apply_tags()
+		_before = Member(before)
+		_after = Member(after)
+		if _after.current_tags() != _after.tags():
+			await _after.apply_tags()
 			print(
 				"Renamed",
-				before.inner_member.display_name,
+				_before.inner_member.display_name,
 				"to",
-				after.inner_member.display_name,
+				_after.inner_member.display_name,
 			)
 
 	@commands.Cog.listener()
 	async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
-		before = Role(before)
-		after = Role(after)
-		if before.tag != after.tag:
-			print(before.inner_role.name, "changed to", after.inner_role.name)
-			for member in after.inner_role.members:
+		_before = Role(before)
+		_after = Role(after)
+		if _before.tag != _after.tag:
+			print(_before.inner_role.name, "changed to", _after.inner_role.name)
+			for member in _after.inner_role.members:
 				await Member(member).apply_tags()
 
 

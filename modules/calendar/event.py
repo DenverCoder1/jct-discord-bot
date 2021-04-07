@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from utils.utils import format_date, parse_date
 
 
@@ -104,22 +104,24 @@ class Event:
 	def from_dict(cls, details: Dict[str, Any]) -> "Event":
 		"""Create an event from a JSON object as returned by the Calendar API"""
 		return cls(
-			event_id=details.get("id"),
-			link=details.get("htmlLink"),
-			title=details.get("summary"),
-			all_day=("date" in details.get("start")),
-			location=details.get("location"),
-			description=details.get("description"),
+			event_id=details["id"],
+			link=details["htmlLink"],
+			title=details["summary"],
+			all_day=("date" in details["start"]),
+			location=details["location"],
+			description=details["description"],
 			start=cls.get_endpoint_datetime(details, "start"),
 			end=cls.get_endpoint_datetime(details, "end"),
 			timezone=details["start"].get("timeZone", None),
 		)
 
 	@staticmethod
-	def get_endpoint_datetime(details: Dict[str, str], endpoint: str) -> datetime:
+	def get_endpoint_datetime(details: Dict[str, Any], endpoint: str) -> datetime:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
-		return parse_date(
-			details[endpoint].get("dateTime", details[endpoint].get("date")),
-			from_tz=details[endpoint].get("timeZone"),
-			to_tz=details[endpoint].get("timeZone"),
+		dt = parse_date(
+			details[endpoint].get("dateTime", details[endpoint]["date"]),
+			from_tz=details[endpoint]["timeZone"],
+			to_tz=details[endpoint]["timeZone"],
 		)
+		assert dt is not None
+		return dt

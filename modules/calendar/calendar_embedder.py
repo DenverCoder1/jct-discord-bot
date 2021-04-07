@@ -1,11 +1,11 @@
 import re
 from discord.ext import commands
-from utils.utils import wait_for_reaction
+from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 from .event import Event
-from typing import Iterable, Dict
+from typing import Iterable, Dict, Optional, Sequence
 from functools import reduce
 import discord
 
@@ -45,7 +45,7 @@ class CalendarEmbedder:
 	async def embed_event_pages(
 		self,
 		ctx: SlashContext,
-		events: Iterable[Event],
+		events: Sequence[Event],
 		query: str,
 		results_per_page: int,
 		calendar: Calendar,
@@ -88,9 +88,10 @@ class CalendarEmbedder:
 				break
 
 	async def get_event_choice(
-		self, ctx: SlashContext, events: Iterable[Event], query: str, action: str
+		self, ctx: SlashContext, events: Sequence[Event], query: str, action: str,
 	) -> Event:
-		"""If there are no events, throws an error.
+		"""
+		If there are no events, throws an error.
 		If there are multiple events, embed list of events and wait for reaction to select an event.
 		If there is one event, return it.
 		"""
@@ -99,7 +100,7 @@ class CalendarEmbedder:
 			raise FriendlyError(f'No events were found for "{query}".', ctx, ctx.author)
 		# if only 1 event found, get the event at index 0
 		if len(events) == 1:
-			return events[0]
+			return one(events)
 		# multiple events found
 		embed = self.embed_event_list(
 			title=f"⚠ Multiple events were found.",
@@ -128,8 +129,8 @@ class CalendarEmbedder:
 		events: Iterable[Event],
 		description: str = "",
 		colour: discord.Colour = discord.Colour.blue(),
-		enumeration: Iterable[str] = [],
-		page_num: int = None,
+		enumeration: Sequence[str] = (),
+		page_num: Optional[int] = None,
 	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
@@ -214,7 +215,9 @@ class CalendarEmbedder:
 		# replace full urls and titles with placeholders to not include them when trimming
 		trimmed = self.FULL_URLS_REGEX.sub("({})", shortened_links)
 		# shift 'max' to the index of the next word in the text or the end of the text if none
-		max += re.search(r"(\b\s|$)", trimmed[max:]).start()
+		match = re.search(r"(\b\s|$)", trimmed[max:])
+		assert match is not None
+		max += match.start()
 		# trim the text normally
 		trimmed = trimmed[:max].strip() + "..." if len(trimmed) > max else trimmed
 		# get full urls to replace placeholders
@@ -234,7 +237,7 @@ class CalendarEmbedder:
 			info += f":round_pushpin: {self.__format_paragraph(event.location)}\n"
 		return info
 
-	def __footer_text(self, page_num: int = None) -> str:
+	def __footer_text(self, page_num: Optional[int] = None) -> str:
 		"""Return text about timezone to display at end of embeds with dates"""
 		page_num_text = f"Page {page_num} | " if page_num is not None else ""
 		timezone_text = f"Times are shown for {self.timezone}"

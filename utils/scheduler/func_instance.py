@@ -1,4 +1,4 @@
-from typing import Mapping, Tuple
+from typing import Mapping, Optional, Tuple
 from discord.ext import commands
 
 
@@ -7,7 +7,9 @@ class FuncInstance:
 	Represents an instance of a function call. I.e. a function with its arguments
 	"""
 
-	def __init__(self, func, args: Tuple = (), kwargs: Mapping = None) -> None:
+	def __init__(
+		self, func, args: Tuple = (), kwargs: Optional[Mapping] = None
+	) -> None:
 		self.func = func
 		self.args = args
 		self.kwargs = kwargs or {}

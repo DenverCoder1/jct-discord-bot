@@ -1,7 +1,7 @@
 from modules.error.friendly_error import FriendlyError
 from utils.utils import one
-from database.group.group import Group
-from typing import Dict, Iterable
+from database.group import Group
+from typing import Dict, Iterable, Optional
 from discord_slash.context import SlashContext
 
 
@@ -14,7 +14,7 @@ class Calendar:
 		self.__name = name
 
 	@property
-	def id(self) -> int:
+	def id(self) -> str:
 		"""The ID of the Google calendar"""
 		return self.__id
 
@@ -26,26 +26,32 @@ class Calendar:
 	@classmethod
 	def from_dict(cls, details: Dict[str, str]) -> "Calendar":
 		"""Create a calendar from a JSON object as returned by the Calendar API"""
-		return cls(id=details.get("id"), name=details.get("summary"))
+		return cls(id=details["id"], name=details["summary"])
 
 	@classmethod
 	def get_calendar(
-		cls, ctx: SlashContext, groups: Iterable[Group], group_id: int = None
+		cls,
+		ctx: SlashContext,
+		groups: Optional[Iterable[Group]] = None,
+		group_id: int = None,
 	) -> "Calendar":
 		"""Returns Calendar given a Discord member or a specified group id"""
-		if group_id is not None:
+		groups = groups or Group.get_groups()
+		if group_id:
 			# get the group specified by the user given the group id
-			group = one(groups, lambda group: group.group_id == group_id)
+			group = one(group for group in groups if group.id == group_id)
 		else:
 			# get the group from the user's role
-			group_roles = [group for group in groups if group.role in ctx.author.roles]
+			member_groups = [
+				group for group in groups if group.role in ctx.author.roles
+			]
 			# no group roles found
-			if not group_roles:
+			if not member_groups:
 				raise FriendlyError(
 					"Could not find your class role.", ctx, ctx.author,
 				)
 			# multiple group roles found
-			if len(group_roles) > 1:
+			if len(member_groups) > 1:
 				raise FriendlyError(
 					"You must specify which calendar since you have multiple class"
 					" roles.",
@@ -53,6 +59,6 @@ class Calendar:
 					ctx.author,
 				)
 			# only one group found
-			group = group_roles[0]
+			group = one(member_groups)
 		# return calendar for the group
 		return cls(id=group.calendar, name=group.name)

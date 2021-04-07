@@ -1,3 +1,5 @@
+from typing import Optional
+from bs4.element import ResultSet
 import requests
 from bs4 import BeautifulSoup
 from utils.utils import remove_tabs
@@ -19,7 +21,7 @@ def remove_citations(wiki_paragraph):
 	return wiki_paragraph
 
 
-def get_wiki(url: str) -> str:
+def get_wiki(url: str) -> ResultSet:
 	"""Does basic setup and formatting of a given wiki page. Returns the plain text of the article."""
 	wiki_info = requests.get(url)
 	page = BeautifulSoup(wiki_info.content, "html.parser")
@@ -46,7 +48,7 @@ def get_wiki_intro(wiki_link: str) -> str:
 	return ""
 
 
-def format_message(query: str, url: str, wiki_string: str = None) -> str:
+def format_message(query: str, url: str, wiki_string: Optional[str] = None) -> str:
 	"""formats the message"""
 	return remove_tabs(
 		f"Search results for: {query}"

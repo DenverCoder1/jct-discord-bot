@@ -1,5 +1,5 @@
 from typing import Iterable
-from database.person.person import Person
+from database.person import Person
 import discord
 
 

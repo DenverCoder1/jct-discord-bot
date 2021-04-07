@@ -1,5 +1,5 @@
 from utils.utils import get_discord_obj
-from database.group.group import Group
+from database.group import Group
 from typing import Iterable
 from datetime import datetime
 import config

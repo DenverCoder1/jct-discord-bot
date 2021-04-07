@@ -1,14 +1,12 @@
 import os
 import re
 import csv
-import config
 import dateparser
 import asyncio
 import discord
 from datetime import datetime
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Any, Collection, Dict, Iterable, Optional, Sequence
 from discord.ext import commands
-from discord_slash.model import SlashMessage
 from modules.error.friendly_error import FriendlyError
 
 
@@ -17,8 +15,11 @@ class IdNotFoundError(Exception):
 		super().__init__(*args)
 
 
-def get_discord_obj(iterable, label: str):
-	return discord.utils.get(iterable, id=get_id(label))
+def get_discord_obj(iterable, label: str) -> Any:
+	obj = discord.utils.get(iterable, id=get_id(label))
+	if not obj:
+		raise IdNotFoundError()
+	return obj
 
 
 def get_id(label: str) -> int:
@@ -52,12 +53,12 @@ def is_email(email: str) -> bool:
 
 
 def parse_date(
-	date_str: str,
-	from_tz: str = None,
-	to_tz: str = None,
-	future: bool = None,
-	base: datetime = None,
-	settings: Dict[str, str] = {},
+	date_str: Optional[str] = None,
+	from_tz: Optional[str] = None,
+	to_tz: Optional[str] = None,
+	future: Optional[bool] = None,
+	base: Optional[datetime] = None,
+	settings: Dict[str, Any] = {},
 ) -> Optional[datetime]:
 	"""Returns datetime object for given date string
 	Arguments:
@@ -109,9 +110,9 @@ def format_date(
 
 async def wait_for_reaction(
 	bot: commands.Bot,
-	message: Union[discord.Message, SlashMessage],
-	emoji_list: Iterable[str],
-	allowed_users: Iterable[discord.Member] = None,
+	message: discord.Message,
+	emoji_list: Sequence[str],
+	allowed_users: Optional[Collection[discord.Member]] = None,
 	timeout: int = 60,
 ) -> int:
 	"""Add reactions to message and wait for user to react with one.
@@ -155,7 +156,7 @@ async def wait_for_reaction(
 		raise FriendlyError(
 			f"You did not react within {timeout} seconds",
 			message.channel,
-			allowed_users[0] if len(allowed_users) == 1 else None,
+			one(allowed_users) if allowed_users and len(allowed_users) == 1 else None,
 			error,
 		)
 	else:
@@ -165,6 +166,6 @@ async def wait_for_reaction(
 		return emoji_list.index(str(reaction.emoji))
 
 
-def one(iterable: Iterable, condition: Callable[[Any], bool] = lambda x: True):
+def one(iterable: Iterable):
 	"""Returns a single element from an iterable or raises StopIteration if it was empty."""
-	return next(obj for obj in iterable if condition(obj))
+	return next(iter(iterable))

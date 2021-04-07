@@ -1,7 +1,7 @@
 from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
-from typing import Iterable, Dict
+from typing import Dict, Optional, Sequence
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
@@ -40,9 +40,9 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		query: str = "",
-		page_token: str = None,
+		page_token: Optional[str] = None,
 		max_results: int = 100,
-	) -> Iterable[Event]:
+	) -> Sequence[Event]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
 		now = datetime.utcnow().isoformat() + "Z"
@@ -64,8 +64,8 @@ class CalendarService:
 		# filter by search term
 		clean_query = query.lower().replace(" ", "")
 		filtered = filter(
-			lambda item: clean_query in item.get("summary").lower().replace(" ", "")
-			or fuzz.token_set_ratio(query, item.get("summary")) > 75,
+			lambda item: clean_query in item["summary"].lower().replace(" ", "")
+			or fuzz.token_set_ratio(query, item["summary"]) > 75,
 			events,
 		)
 		# convert dicts to Event objects
@@ -77,8 +77,8 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		summary: str,
-		start: str,
-		end: str,
+		start: Optional[str],
+		end: Optional[str],
 		description: str,
 		location: str,
 	) -> Event:
@@ -162,11 +162,11 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		event: Event,
-		new_summary: str = None,
-		new_start: str = None,
-		new_end: str = None,
-		new_description: str = None,
-		new_location: str = None,
+		new_summary: Optional[str] = None,
+		new_start: Optional[str] = None,
+		new_end: Optional[str] = None,
+		new_description: Optional[str] = None,
+		new_location: Optional[str] = None,
 	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new start date if provided

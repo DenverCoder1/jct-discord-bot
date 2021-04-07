@@ -1,17 +1,19 @@
 from datetime import datetime
-from discord.channel import TextChannel
+from typing import Optional
 from discord.ext import commands
 import traceback
 import discord
+import config
 
 
 class ErrorLogger:
-	def __init__(self, log_file: str, log_channel_id: int, bot: commands.Bot) -> None:
+	def __init__(self, log_file: str, log_channel_id: int) -> None:
 		self.log_file = log_file
 		self.log_channel_id = log_channel_id
-		self.bot = bot
 
-	def log_to_file(self, error: Exception, message: discord.Message = None):
+	def log_to_file(
+		self, error: BaseException, message: Optional[discord.Message] = None
+	):
 		"""appends the date and logs text to a file"""
 		with open(self.log_file, "a", encoding="utf-8") as f:
 			# write the current time and log text at end of file
@@ -19,8 +21,11 @@ class ErrorLogger:
 			f.write(self.__get_err_text(error, message) + "\n")
 			f.write("--------------------------\n")
 
-	async def log_to_channel(self, error: Exception, message: discord.Message = None):
-		log_channel = self.bot.get_channel(self.log_channel_id)
+	async def log_to_channel(
+		self, error: BaseException, message: Optional[discord.Message] = None
+	):
+		log_channel = config.guild().get_channel(self.log_channel_id)
+		assert isinstance(log_channel, discord.TextChannel)
 		if message is None:
 			await log_channel.send(f"```{self.__get_err_text(error)}```")
 		else:
@@ -34,7 +39,9 @@ class ErrorLogger:
 				f" {channel}\n```{self.__get_err_text(error, message)}```"
 			)
 
-	def __get_err_text(self, error: Exception, message: discord.Message = None):
+	def __get_err_text(
+		self, error: BaseException, message: Optional[discord.Message] = None
+	):
 		description = "".join(
 			traceback.format_exception(error.__class__, error, error.__traceback__)
 		)
