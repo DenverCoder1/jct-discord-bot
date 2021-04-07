@@ -27,9 +27,9 @@ class IdNotFoundError(Exception):
 
 def get_discord_obj(iterable, label: str) -> Any:
 	obj = discord.utils.get(iterable, id=get_id(label))
-	if obj:
-		return obj
-	raise IdNotFoundError()
+	if not obj:
+		raise IdNotFoundError()
+	return obj
 
 
 def get_id(label: str) -> int:
