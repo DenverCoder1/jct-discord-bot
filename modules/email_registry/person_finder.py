@@ -1,9 +1,8 @@
 from utils.utils import one
 import discord
-from discord.channel import TextChannel
 from discord_slash.context import SlashContext
 import psycopg2.extensions as sql
-from typing import Any, Iterable, Optional, Set, Union
+from typing import Any, Iterable, Optional, Set
 from modules.email_registry.weighted_set import WeightedSet
 from database.person.person import Person
 from modules.error.friendly_error import FriendlyError
@@ -48,7 +47,7 @@ class PersonFinder:
 
 	def search_one(
 		self,
-		sender: Union[TextChannel, SlashContext],
+		sender: SlashContext,
 		name: Optional[str] = None,
 		channel: Optional[discord.TextChannel] = None,
 		email: Optional[str] = None,
