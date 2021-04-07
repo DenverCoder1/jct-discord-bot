@@ -5,7 +5,7 @@ from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 from .event import Event
-from typing import Iterable, Dict, List, Optional, Tuple, Union
+from typing import Iterable, Dict, Optional, Sequence
 from functools import reduce
 import discord
 
@@ -45,7 +45,7 @@ class CalendarEmbedder:
 	async def embed_event_pages(
 		self,
 		ctx: SlashContext,
-		events: Union[List[Event], Tuple],
+		events: Sequence[Event],
 		query: str,
 		results_per_page: int,
 		calendar: Calendar,
@@ -88,11 +88,7 @@ class CalendarEmbedder:
 				break
 
 	async def get_event_choice(
-		self,
-		ctx: SlashContext,
-		events: Union[List[Event], Tuple],
-		query: str,
-		action: str,
+		self, ctx: SlashContext, events: Sequence[Event], query: str, action: str,
 	) -> Event:
 		"""
 		If there are no events, throws an error.
@@ -133,7 +129,7 @@ class CalendarEmbedder:
 		events: Iterable[Event],
 		description: str = "",
 		colour: discord.Colour = discord.Colour.blue(),
-		enumeration: Union[List[str], Tuple] = (),
+		enumeration: Sequence[str] = (),
 		page_num: Optional[int] = None,
 	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list

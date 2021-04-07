@@ -1,7 +1,7 @@
 from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, Optional, Sequence
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
@@ -42,7 +42,7 @@ class CalendarService:
 		query: str = "",
 		page_token: Optional[str] = None,
 		max_results: int = 100,
-	) -> Union[List[Event], Tuple]:
+	) -> Sequence[Event]:
 		"""Fetch upcoming events from the calendar"""
 		# get the current date and time ('Z' indicates UTC time)
 		now = datetime.utcnow().isoformat() + "Z"
