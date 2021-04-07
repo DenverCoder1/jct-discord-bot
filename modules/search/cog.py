@@ -1,4 +1,4 @@
-from modules.error.friendly_error import FriendlyError
+from ..error.friendly_error import FriendlyError
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext

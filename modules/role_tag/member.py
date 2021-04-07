@@ -1,4 +1,4 @@
-from modules.role_tag.role import Role
+from .role import Role
 import discord
 from typing import List
 

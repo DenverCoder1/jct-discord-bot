@@ -1,8 +1,8 @@
-from database.group.group import Group
+from database.group import Group
 import discord
 import psycopg2.extensions as sql
 from database import sql_fetcher
-from database.campus.campus import Campus
+from database.campus import Campus
 from .group_channel_creator import GroupChannelCreator
 import config
 

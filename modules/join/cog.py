@@ -1,6 +1,6 @@
-from database.campus.campus import Campus
+from database.campus import Campus
 from utils import embedder, utils
-from modules.join.assigner import Assigner
+from .assigner import Assigner
 from discord.ext import commands
 import config
 from discord_slash import cog_ext, SlashContext

@@ -1,6 +1,6 @@
-from modules.channel_opting.channel_message_manager import ChannelMessageManager
+from .channel_message_manager import ChannelMessageManager
 from utils.utils import get_discord_obj
-from database.channel_message.channel_message import ChannelMessage
+from database.channel_message import ChannelMessage
 from discord.ext import commands
 import discord
 import config

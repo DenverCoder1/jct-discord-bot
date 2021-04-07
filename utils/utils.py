@@ -5,7 +5,7 @@ import dateparser
 import asyncio
 import discord
 from datetime import datetime
-from typing import Any, Callable, Collection, Dict, Iterable, List, Optional
+from typing import Any, Collection, Dict, Iterable, List, Optional
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
 

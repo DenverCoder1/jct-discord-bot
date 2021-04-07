@@ -1,5 +1,5 @@
-from modules.role_tag.role import Role
-from modules.role_tag.member import Member
+from .role import Role
+from .member import Member
 from discord.ext import commands
 import discord
 

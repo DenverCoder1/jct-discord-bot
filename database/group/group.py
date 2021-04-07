@@ -1,4 +1,4 @@
-from database.campus.campus import Campus
+from database.campus import Campus
 import discord
 import config
 from typing import Collection

@@ -1,6 +1,6 @@
 from modules.error.friendly_error import FriendlyError
 from utils.utils import one
-from database.group.group import Group
+from database.group import Group
 from typing import Dict, Iterable, Optional
 from discord_slash.context import SlashContext
 

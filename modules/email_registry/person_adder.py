@@ -1,8 +1,8 @@
 from discord_slash.context import SlashContext
-from database.person.person import Person
+from database.person import Person
 import psycopg2.extensions as sql
 from typing import Iterable
-from modules.email_registry.categoriser import Categoriser
+from .categoriser import Categoriser
 from database import sql_fetcher
 
 

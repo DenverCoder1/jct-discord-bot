@@ -3,9 +3,9 @@ import discord
 from discord_slash.context import SlashContext
 import psycopg2.extensions as sql
 from typing import Any, Iterable, Optional, Set
-from modules.email_registry.weighted_set import WeightedSet
-from database.person.person import Person
-from modules.error.friendly_error import FriendlyError
+from .weighted_set import WeightedSet
+from database.person import Person
+from ..error.friendly_error import FriendlyError
 from database import sql_fetcher
 
 

@@ -1,5 +1,5 @@
-from typing import Optional
 import discord
+from typing import Optional
 
 
 def embed_success(

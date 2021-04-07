@@ -1,7 +1,7 @@
 from discord_slash.context import SlashContext
-from modules.error.friendly_error import FriendlyError
+from ..error.friendly_error import FriendlyError
 from database import sql_fetcher
-from database.person.person import Person
+from database.person import Person
 import psycopg2.extensions as sql
 from psycopg2.errors import UniqueViolation, CheckViolation
 

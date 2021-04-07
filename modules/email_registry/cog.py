@@ -1,17 +1,17 @@
-from database.person.person import Person
-from typing import Callable, Iterable, Optional
 import config
 import discord
+from database.person import Person
+from typing import Callable, Iterable, Optional
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
-from modules.email_registry import person_embedder
-from modules.email_registry.categoriser import Categoriser
-from modules.email_registry.person_finder import PersonFinder
-from modules.email_registry.email_adder import EmailAdder
-from modules.email_registry.person_adder import PersonAdder
-from modules.error.friendly_error import FriendlyError
+from . import person_embedder
+from .categoriser import Categoriser
+from .person_finder import PersonFinder
+from .email_adder import EmailAdder
+from .person_adder import PersonAdder
+from ..error.friendly_error import FriendlyError
 from utils.mention import extract_channel_mentions
 
 

@@ -1,7 +1,6 @@
 from modules.graduation import graduation
 from discord.ext import commands
-from utils.scheduler.scheduler import Scheduler
-import config
+from utils.scheduler import Scheduler
 
 
 class GraduationCog(commands.Cog, name="Graduation"):

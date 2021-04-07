@@ -1,7 +1,7 @@
 from database import sql_fetcher
 import psycopg2.extensions as sql
 from .calendar_service import CalendarService
-from database.campus.campus import Campus
+from database.campus import Campus
 
 
 class CalendarCreator:

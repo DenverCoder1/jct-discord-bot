@@ -1,6 +1,6 @@
 from .group_channel_creator import GroupChannelCreator
 from .group_creator import groups_creator
-from utils.scheduler.scheduler import Scheduler
+from utils.scheduler import Scheduler
 from discord.ext import commands
 import datetime
 import config

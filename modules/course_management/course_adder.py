@@ -4,9 +4,9 @@ import discord.utils
 import config
 from discord_slash.context import SlashContext
 from psycopg2.errors import UniqueViolation
-from modules.email_registry.categoriser import Categoriser
-from modules.email_registry.person_finder import PersonFinder
-from modules.error.friendly_error import FriendlyError
+from ..email_registry.categoriser import Categoriser
+from ..email_registry.person_finder import PersonFinder
+from ..error.friendly_error import FriendlyError
 from typing import Iterable
 from utils import embedder
 from database import sql_fetcher

@@ -10,8 +10,8 @@ from .course_mentions import CourseMentions
 from modules.error.friendly_error import FriendlyError
 from utils.embedder import embed_success
 from utils.utils import is_email
-from utils.scheduler.scheduler import Scheduler
-from database.group.group import Group
+from utils.scheduler import Scheduler
+from database.group import Group
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option, create_choice

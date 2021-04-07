@@ -1,10 +1,9 @@
 from typing import Optional
-from modules.error.quiet_warning import QuietWarning
-import discord
-import config
-from modules.error.error_logger import ErrorLogger
-from modules.error.friendly_error import FriendlyError
+from .quiet_warning import QuietWarning
+from .error_logger import ErrorLogger
+from .friendly_error import FriendlyError
 import discord.ext.commands.errors as discord_err
+import discord
 
 
 class ErrorHandler:

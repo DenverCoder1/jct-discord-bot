@@ -7,8 +7,8 @@ from discord_slash.utils.manage_commands import create_option
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
-from modules.course_management.course_adder import CourseAdder
-from modules.course_management.course_deleter import CourseDeleter
+from .course_adder import CourseAdder
+from .course_deleter import CourseDeleter
 import config
 
 

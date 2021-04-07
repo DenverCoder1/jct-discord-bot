@@ -1,7 +1,7 @@
 import discord
 import config
 from discord_slash.context import SlashContext
-from modules.error.friendly_error import FriendlyError
+from ..error.friendly_error import FriendlyError
 from utils.utils import get_discord_obj
 from database import sql_fetcher
 import psycopg2.extensions as sql

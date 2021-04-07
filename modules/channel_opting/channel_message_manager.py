@@ -1,6 +1,6 @@
 from typing import List, Optional
 from utils.utils import one
-from database.channel_message.channel_message import ChannelMessage
+from database.channel_message import ChannelMessage
 import discord
 
 
