@@ -17,7 +17,7 @@ class Group:
 		self.__calendar = calendar
 
 	@property
-	def group_id(self) -> int:
+	def id(self) -> int:
 		"""The ID of the group as stored in the database."""
 		return self.__id
 

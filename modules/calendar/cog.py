@@ -46,8 +46,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.group_id)
-					for group in groups
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -92,8 +91,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.group_id)
-					for group in groups
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -111,7 +109,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# convert channel mentions to full names
 		full_query = self.course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
-		events = self.service.fetch_upcoming(calendar.calendar_id, full_query)
+		events = self.service.fetch_upcoming(calendar.id, full_query)
 		# display events and allow showing more with reactions
 		await self.embedder.embed_event_pages(
 			ctx, events, full_query, results_per_page, calendar
@@ -167,8 +165,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.group_id)
-					for group in groups
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -192,7 +189,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		try:
 			event = self.service.add_event(
-				calendar.calendar_id, title, start, end, description, location
+				calendar.id, title, start, end, description, location
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -259,8 +256,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.group_id)
-					for group in groups
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -282,7 +278,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# get a list of upcoming events
-		events = self.service.fetch_upcoming(calendar.calendar_id, query)
+		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
 		event_to_update = await self.embedder.get_event_choice(
 			ctx, events, query, "update"
@@ -296,13 +292,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 			location = self.course_mentions.replace_channel_mentions(location)
 		try:
 			event = self.service.update_event(
-				calendar.calendar_id,
-				event_to_update,
-				title,
-				start,
-				end,
-				description,
-				location,
+				calendar.id, event_to_update, title, start, end, description, location,
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -336,8 +326,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.group_id)
-					for group in groups
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -351,14 +340,14 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# fetch upcoming events
-		events = self.service.fetch_upcoming(calendar.calendar_id, query)
+		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
 		event_to_delete = await self.embedder.get_event_choice(
 			ctx, events, query, "delete"
 		)
 		# delete event
 		try:
-			self.service.delete_event(calendar.calendar_id, event_to_delete)
+			self.service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
@@ -389,8 +378,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=group.name, value=group.group_id)
-					for group in groups
+					create_choice(name=group.name, value=group.id) for group in groups
 				],
 			),
 		],
@@ -405,7 +393,7 @@ class CalendarCog(commands.Cog, name="Calendar"):
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx, ctx.author)
 		# add manager to calendar
-		if self.service.add_manager(calendar.calendar_id, email):
+		if self.service.add_manager(calendar.id, email):
 			embed = embed_success(
 				f":office_worker: Successfully added manager to {calendar.name}."
 			)

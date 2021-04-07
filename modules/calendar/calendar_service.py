@@ -1,7 +1,7 @@
 from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
-from typing import Iterable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
@@ -23,16 +23,16 @@ class CalendarService:
 		return {
 			"Add to Google Calendar": (
 				"https://calendar.google.com/calendar/render"
-				f"?cid=https://www.google.com/calendar/feeds/{calendar.calendar_id}"
+				f"?cid=https://www.google.com/calendar/feeds/{calendar.id}"
 				"/public/basic"
 			),
 			"View the Events": (
 				"https://calendar.google.com/calendar/u/0/embed"
-				f"?src={calendar.calendar_id}&ctz={self.timezone}"
+				f"?src={calendar.id}&ctz={self.timezone}"
 			),
 			"iCal Format": (
 				"https://calendar.google.com/calendar/ical"
-				f"/{calendar.calendar_id.replace('@','%40')}/public/basic.ics"
+				f"/{calendar.id.replace('@','%40')}/public/basic.ics"
 			),
 		}
 
@@ -151,7 +151,7 @@ class CalendarService:
 		# delete event
 		response = (
 			self.service.events()
-			.delete(calendarId=calendar_id, eventId=event.event_id)
+			.delete(calendarId=calendar_id, eventId=event.id)
 			.execute()
 		)
 		# response should be empty if successful
@@ -208,7 +208,7 @@ class CalendarService:
 		# update the event
 		updated_event = (
 			self.service.events()
-			.update(calendarId=calendar_id, eventId=event.event_id, body=event_details)
+			.update(calendarId=calendar_id, eventId=event.id, body=event_details)
 			.execute()
 		)
 		return Event.from_dict(updated_event)

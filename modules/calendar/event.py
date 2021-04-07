@@ -29,7 +29,7 @@ class Event:
 		self.__timezone = timezone
 
 	@property
-	def event_id(self) -> str:
+	def id(self) -> str:
 		"""Returns the event id"""
 		return self.__id
 

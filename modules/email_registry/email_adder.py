@@ -1,5 +1,3 @@
-from typing import Union
-import discord
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from database import sql_fetcher
@@ -25,9 +23,7 @@ class EmailAdder:
 		with self.conn as conn:
 			with conn.cursor() as cursor:
 				try:
-					cursor.execute(
-						query, {"person_id": person.person_id, "email": email}
-					)
+					cursor.execute(query, {"person_id": person.id, "email": email})
 				except UniqueViolation as e:
 					raise FriendlyError(
 						f"Ignoring request to add {email} to {person.name}; it"
@@ -39,4 +35,4 @@ class EmailAdder:
 					raise FriendlyError(
 						f'"{email}" is not a valid email address.', sender=ctx, inner=e,
 					)
-		return Person.get_person(person.person_id)
+		return Person.get_person(person.id)

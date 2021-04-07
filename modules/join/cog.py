@@ -46,7 +46,7 @@ class JoinCog(commands.Cog, name="Join"):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=True,
 				choices=[
-					create_choice(name=campus.name, value=campus.campus_id)
+					create_choice(name=campus.name, value=campus.id)
 					for campus in Campus.get_campuses()
 				],
 			),

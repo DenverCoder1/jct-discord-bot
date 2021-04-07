@@ -12,7 +12,7 @@ class Campus:
 		self.__channel_id = channel_id
 
 	@property
-	def campus_id(self) -> int:
+	def id(self) -> int:
 		"""The ID of the campus as stored in the database."""
 		return self.__id
 

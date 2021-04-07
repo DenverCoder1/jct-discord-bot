@@ -65,7 +65,7 @@ class NewGroup:
 					query,
 					{
 						"year": self.year,
-						"campus_id": self.campus.campus_id,
+						"campus_id": self.campus.id,
 						"role_id": self.role.id,
 					},
 				)

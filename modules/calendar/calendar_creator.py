@@ -17,7 +17,7 @@ class CalendarCreator:
 				f"JCT CompSci {campus.name} {year}"
 			)
 			# update class in database
-			self.__add_calendar(calendar.id, campus.campus_id, year)
+			self.__add_calendar(calendar.id, campus.id, year)
 
 	def __add_calendar(self, calendar_id: str, campus_id: int, year: int):
 		"""Update the class entry in the database with the calendar id"""

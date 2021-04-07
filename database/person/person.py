@@ -11,7 +11,7 @@ class Person:
 		self.__categories = self.__no_duplicates(categories)
 
 	@property
-	def person_id(self) -> int:
+	def id(self) -> int:
 		"""The ID of this person as stored in the database."""
 		return self.__id
 
