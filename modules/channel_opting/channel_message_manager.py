@@ -66,7 +66,7 @@ class ChannelMessageManager:
 		self, channel: discord.TextChannel
 	) -> discord.Message:
 		embed = discord.Embed(
-			title=channel.name.replace("-", " ").capitalize(),
+			title=channel.name.replace("-", " ").title(),
 			description=channel.mention,
 			colour=discord.Colour.dark_purple(),
 		)
