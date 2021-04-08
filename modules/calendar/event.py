@@ -24,8 +24,8 @@ class Event:
 		self.__location = location
 		self.__description = description
 		self.__all_day = all_day
-		self.__start = start
-		self.__end = end
+		self.__start = start.replace(tzinfo=None)
+		self.__end = end.replace(tzinfo=None)
 		self.__timezone = timezone
 
 	@property
