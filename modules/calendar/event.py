@@ -11,8 +11,8 @@ class Event:
 		event_id: str,
 		link: str,
 		title: str,
-		location: str,
-		description: str,
+		location: Optional[str],
+		description: Optional[str],
 		all_day: bool,
 		start: datetime,
 		end: datetime,
@@ -44,12 +44,12 @@ class Event:
 		return self.__title
 
 	@property
-	def location(self) -> str:
+	def location(self) -> Optional[str]:
 		"""Returns the location of the event"""
 		return self.__location
 
 	@property
-	def description(self) -> str:
+	def description(self) -> Optional[str]:
 		"""Returns the description of the event"""
 		return self.__description
 
@@ -70,7 +70,7 @@ class Event:
 
 	@property
 	def timezone(self) -> str:
-		"""Returns the timezone passed to the constructor or the event's timezone if not specified. If neither are present, returns None."""
+		"""Returns the timezone passed to the constructor or the calendar's timezone if not specified."""
 		return self.__timezone
 
 	@property
@@ -108,18 +108,18 @@ class Event:
 			link=details["htmlLink"],
 			title=details["summary"],
 			all_day=("date" in details["start"]),
-			location=details["location"],
-			description=details["description"],
+			location=details.get("location"),
+			description=details.get("description"),
 			start=cls.get_endpoint_datetime(details, "start"),
 			end=cls.get_endpoint_datetime(details, "end"),
-			timezone=details["start"].get("timeZone", None),
+			timezone=details["start"]["timeZone"],
 		)
 
 	@staticmethod
 	def get_endpoint_datetime(details: Dict[str, Any], endpoint: str) -> datetime:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
 		dt = parse_date(
-			details[endpoint].get("dateTime", details[endpoint]["date"]),
+			details[endpoint].get("dateTime") or details[endpoint]["date"],
 			from_tz=details[endpoint]["timeZone"],
 			to_tz=details[endpoint]["timeZone"],
 		)
