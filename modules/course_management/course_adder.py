@@ -98,7 +98,7 @@ class CourseAdder:
 			professor_name = professor_name.strip()
 			try:
 				professor = self.finder.search_one(ctx, professor_name)
-				self.categoriser.categorise_person(ctx, professor, (channel.mention,))
+				self.categoriser.categorise_person(ctx, professor.id, (channel.mention,))
 			except FriendlyError:
 				await ctx.send(
 					embed=embedder.embed_warning(
