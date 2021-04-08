@@ -12,26 +12,26 @@ class Categoriser:
 		self.conn = conn
 
 	def categorise_person(
-		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
+		self, ctx: SlashContext, person_id: int, channel_mentions: Iterable[str]
 	) -> Person:
 		"""Adds the person to the categories linked to the channels mentioned. Returns the updated person."""
 		return self.__add_remove_categories(
-			ctx, "categorise_person.sql", person, channel_mentions
+			ctx, "categorise_person.sql", person_id, channel_mentions
 		)
 
 	def decategorise_person(
-		self, ctx: SlashContext, person: Person, channel_mentions: Iterable[str]
+		self, ctx: SlashContext, person_id: int, channel_mentions: Iterable[str]
 	) -> Person:
 		"""Removes the person from the categories linked to the channels mentioned. Returns the updated person."""
 		return self.__add_remove_categories(
-			ctx, "decategorise_person.sql", person, channel_mentions
+			ctx, "decategorise_person.sql", person_id, channel_mentions
 		)
 
 	def __add_remove_categories(
 		self,
 		ctx: SlashContext,
 		sql_file: str,
-		person: Person,
+		person_id: int,
 		channel_mentions: Iterable[str],
 	) -> Person:
 		query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
@@ -46,6 +46,6 @@ class Categoriser:
 							ctx.author,
 						)
 					cursor.execute(
-						query, {"person_id": person.id, "channel_id": channel_id}
+						query, {"person_id": person_id, "channel_id": channel_id}
 					)
-				return Person.get_person(person.id)
+				return Person.get_person(person_id)
