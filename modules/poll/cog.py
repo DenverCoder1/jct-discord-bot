@@ -26,12 +26,14 @@ class PollCog(commands.Cog):
 		# delete the triggering message
 		await ctx.message.delete()
 
+	# TODO: This will have to be changed to on_raw_reaction_add because on_reaction_add only triggers for messages in the bot's cache
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction: discord.Reaction, member: discord.Member):
 		if reaction.message in self.polls and not member.bot:
 			# print(member.display_name + "added reaction")
 			await self.polls[reaction.message].vote(reaction, member)
 
+	# TODO: change to on_raw_reaction_remove, same reason as above
 	@commands.Cog.listener()
 	async def on_reaction_remove(
 		self, reaction: discord.Reaction, member: discord.Member
