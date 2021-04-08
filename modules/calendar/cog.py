@@ -1,13 +1,13 @@
+import config
 from datetime import datetime
 from typing import Optional
-import config
 from discord.ext import commands
 from .calendar import Calendar
 from .calendar_service import CalendarService
 from .calendar_embedder import CalendarEmbedder
 from .calendar_creator import CalendarCreator
 from . import course_mentions
-from modules.error.friendly_error import FriendlyError
+from ..error.friendly_error import FriendlyError
 from utils.embedder import embed_success
 from utils.utils import is_email
 from utils.scheduler import Scheduler
@@ -191,7 +191,7 @@ class CalendarCog(commands.Cog):
 				calendar.id, title, start, end, description, location
 			)
 		except ValueError as error:
-			raise FriendlyError(error.args[0], ctx, ctx.author, error)
+			raise FriendlyError(str(error), ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
 			":white_check_mark: Event created successfully", event
 		)

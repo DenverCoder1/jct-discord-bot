@@ -77,7 +77,7 @@ class CalendarService:
 		self,
 		calendar_id: str,
 		summary: str,
-		start: Optional[str],
+		start: str,
 		end: Optional[str],
 		description: str,
 		location: str,
@@ -192,7 +192,9 @@ class CalendarService:
 		# create request body
 		event_details = {
 			"summary": new_summary if new_summary is not None else event.title,
-			"location": new_location if new_location is not None else event.location,
+			"location": new_location
+			if new_location is not None
+			else event.location or "",
 			"description": new_description
 			if new_description is not None
 			else event.description,

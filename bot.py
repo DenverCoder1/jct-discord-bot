@@ -8,11 +8,10 @@ from utils.scheduler import Scheduler
 
 def main():
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
-	intents = discord.Intents.default()
-	intents.guilds = True
-	intents.members = True
+	intents = discord.Intents(guilds=True, members=True)
 
-	bot = commands.Bot("/", intents=intents)  # bot command prefix
+	# empty space effectively disables prefix since discord strips trailing spaces
+	bot = commands.Bot(" ", intents=intents)
 	setattr(bot, "slash", SlashCommand(bot, override_type=True, sync_commands=True))
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
