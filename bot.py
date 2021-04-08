@@ -13,7 +13,7 @@ def main():
 	intents.members = True
 
 	bot = commands.Bot("/", intents=intents)  # bot command prefix
-	bot.slash = SlashCommand(bot, override_type=True, sync_commands=True)
+	setattr(bot, "slash", SlashCommand(bot, override_type=True, sync_commands=True))
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
 	for folder in os.listdir("modules"):
