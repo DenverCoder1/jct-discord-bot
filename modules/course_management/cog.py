@@ -7,16 +7,12 @@ from discord_slash.utils.manage_commands import create_option
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
-from .course_adder import CourseAdder
-from .course_deleter import CourseDeleter
+from . import course_adder
+from . import course_deleter
 import config
 
 
 class CourseManagerCog(commands.Cog):
-	def __init__(self):
-		self.adder = CourseAdder(config.conn)
-		self.deleter = CourseDeleter(config.conn)
-
 	@cog_ext.cog_subcommand(
 		base="course",
 		name="add",
@@ -64,7 +60,7 @@ class CourseManagerCog(commands.Cog):
 		professors_split = [professor.strip() for professor in professors.split(",")]
 		if not channel_name:
 			channel_name = course_name
-		channel = await self.adder.add_course(
+		channel = await course_adder.add_course(
 			ctx, course_name, professors_split, channel_name
 		)
 		await ctx.send(
@@ -90,7 +86,7 @@ class CourseManagerCog(commands.Cog):
 	)
 	@has_permissions(manage_channels=True)
 	async def delete_course(self, ctx: SlashContext, channel: discord.TextChannel):
-		await self.deleter.delete_course(ctx, channel.id)
+		await course_deleter.delete_course(ctx, channel.id)
 		await ctx.send(
 			embed=embed_success(
 				"Well done... All evidence of that course has been deleted from the"
