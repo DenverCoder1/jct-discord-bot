@@ -56,7 +56,7 @@ class PersonFinder:
 		Returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one.
 
 		:param sender: An object with the send method where friendly errors will be sent to.
-		:type sender: discord.TextChannel | commands.Context | SlashContext
+		:type sender: SlashContext
 		:param name: The name of the person you want to search for (first, last, or both).
 		:type name: Optional[str]
 		:param channel: A channel the person is linked to.
