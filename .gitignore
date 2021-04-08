@@ -120,9 +120,18 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+mypy.ini
+.mypy.ini
 
 # Pyre type checker
 .pyre/
+.pyre_configuration
+.watchmanconfig
 
-# VS Code stuff
+# IDE stuff
 .vscode/
+.idea/
+.DS_Store
+
+# Google OAUTH
+jct-compsci-esp-*.json

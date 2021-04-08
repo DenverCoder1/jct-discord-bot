@@ -11,6 +11,3 @@ class Role:
 		self.sep = sep
 		split = self.inner_role.name.rsplit(sep, 1)
 		self.tag = split[1] if len(split) == 2 else None
-
-	def has_tag(self):
-		return self.tag is not None

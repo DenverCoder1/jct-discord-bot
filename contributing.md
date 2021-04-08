@@ -30,23 +30,35 @@ Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of yo
 from discord.ext import commands
 
 class MyFeatureCog(commands.Cog):
+	"""A cog which has no features and does nothing"""
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
 ```
 
 Then as methods to that class, add any functions you need for the bot. For example:
 
-```py
+````py
 	@commands.command(name='my_feature')
-	async def my_feature(self, ctx: commands.Context):
-		"""A simple command which replies to '++my_feature'."""
+	async def my_feature(self, ctx: commands.Context, n: int, word: str):
+		"""A command which takes two arguments and does nothing
+
+		Usage:
+		```
+		++my_feature num, word
+		```
+		Arguments:
+
+			> **num**: A number with no meaning
+			> **word**: Any word you like
+
+		"""
 
 		# log in console that a ping was received
 		print('Executing command "my_feature".')
 
 		# reply with a message
-		await ctx.send('Command received.')
-```
+		await ctx.send(f"Command received with num {n} and word {word}.")
+````
 
 Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
 

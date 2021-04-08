@@ -1,20 +1,27 @@
 from discord.ext import commands
+from discord_slash import cog_ext
+from discord_slash.context import SlashContext
+import config
 import random
 
 
 class PingCog(commands.Cog):
+	"""A command which simply acknowledges the user's ping"""
+
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
+		with open("modules/ping/responses.txt") as responses:
+			self.lines = responses.readlines()
 
-	@commands.command(name="ping")
-	async def ping(self, ctx: commands.Context):
-		"""A simple command which acknowledges the user's ping."""
-
+	@cog_ext.cog_slash(
+		name="ping",
+		description="A command which simply acknowledges the user's ping.",
+		guild_ids=[config.guild_id],
+	)
+	async def ping(self, ctx: SlashContext):
 		# log in console that a ping was received
 		print("Received ping")
-
-		with open("modules/ping/responses.txt") as responses:
-			await ctx.send(random.choice(responses.readlines()))
+		await ctx.send(random.choice(self.lines))
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
