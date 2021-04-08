@@ -27,5 +27,4 @@ class PersonAdder:
 					query, {"name": name.capitalize(), "surname": surname.capitalize()}
 				)
 				person_id = cursor.fetchone()[0]
-		categoriser.categorise_person(ctx, person_id, channel_mentions)
-		return Person.get_person(person_id)
+		return categoriser.categorise_person(ctx, person_id, channel_mentions)
