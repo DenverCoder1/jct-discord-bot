@@ -176,16 +176,17 @@ class CalendarService:
 			)
 			or event.start
 		)
-		# parse new end date if provided
-		new_end_date = (
-			parse_date(
-				new_end,
-				from_tz=self.timezone,
-				to_tz=self.timezone,
-				base=(new_start_date if new_start_date else event.end),
-			)
-			or event.end
+		# if the start time is changed, the end time will move with it if it's not specified
+		start_offset = new_start_date.replace(tzinfo=None) - event.start.replace(
+			tzinfo=None
 		)
+		# parse new end date if provided
+		new_end_date = parse_date(
+			new_end,
+			from_tz=self.timezone,
+			to_tz=self.timezone,
+			base=(new_start_date if new_start_date else event.end),
+		) or (event.end + start_offset)
 		# check that new time range is valid
 		if new_end_date.replace(tzinfo=None) < new_start_date.replace(tzinfo=None):
 			raise ValueError("The start time must come before the end time.")
