@@ -16,7 +16,6 @@ class Event:
 		all_day: bool,
 		start: datetime,
 		end: datetime,
-		timezone: str,
 	):
 		self.__id = event_id
 		self.__link = link
@@ -26,7 +25,6 @@ class Event:
 		self.__all_day = all_day
 		self.__start = start.replace(tzinfo=None)
 		self.__end = end.replace(tzinfo=None)
-		self.__timezone = timezone
 
 	@property
 	def id(self) -> str:
@@ -69,11 +67,6 @@ class Event:
 		return self.__end
 
 	@property
-	def timezone(self) -> str:
-		"""Returns the timezone passed to the constructor or the calendar's timezone if not specified."""
-		return self.__timezone
-
-	@property
 	def __one_day(self) -> bool:
 		"""Returns whether or not the event is a one day event"""
 		return self.all_day and self.end - self.start <= timedelta(days=1)
@@ -101,7 +94,7 @@ class Event:
 		return format_date(end_date, all_day=self.all_day, base=base)
 
 	@classmethod
-	def from_dict(cls, details: Dict[str, Any]) -> "Event":
+	def from_dict(cls, details: Dict[str, Any], target_timezone: str) -> "Event":
 		"""Create an event from a JSON object as returned by the Calendar API"""
 		return cls(
 			event_id=details["id"],
@@ -110,18 +103,19 @@ class Event:
 			all_day=("date" in details["start"]),
 			location=details.get("location"),
 			description=details.get("description"),
-			start=cls.get_endpoint_datetime(details, "start"),
-			end=cls.get_endpoint_datetime(details, "end"),
-			timezone=details["start"]["timeZone"],
+			start=cls.get_endpoint_datetime(details, "start", target_timezone),
+			end=cls.get_endpoint_datetime(details, "end", target_timezone),
 		)
 
 	@staticmethod
-	def get_endpoint_datetime(details: Dict[str, Any], endpoint: str) -> datetime:
+	def get_endpoint_datetime(
+		details: Dict[str, Any], endpoint: str, target_timezone: str
+	) -> datetime:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
 		dt = parse_date(
 			details[endpoint].get("dateTime") or details[endpoint]["date"],
 			from_tz=details[endpoint]["timeZone"],
-			to_tz=details[endpoint]["timeZone"],
+			to_tz=target_timezone,
 		)
 		assert dt is not None
 		return dt
