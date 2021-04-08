@@ -1,3 +1,4 @@
+from modules.error.friendly_error import FriendlyError
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
@@ -22,6 +23,12 @@ class PingCog(commands.Cog):
 		# log in console that a ping was received
 		print("Received ping")
 		await ctx.send(random.choice(self.lines))
+		raise FriendlyError(
+			"this is a friendly error. do not be afraid.",
+			ctx,
+			ctx.author,
+			description="here goes nothing",
+		)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.

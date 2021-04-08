@@ -41,6 +41,10 @@ class FriendlyError(Exception):
 		return f"Sorry {self.member.display_name}, " if self.member else ""
 
 	async def reply(self):
-		await self.sender.send(
+		if isinstance(self.sender, SlashContext) and self.sender.message is not None:
+			sender = self.sender.channel  # slash command has already been answered
+		else:
+			sender = self.sender
+		await sender.send(
 			embed=utils.embedder.embed_error(str(self), description=self.description)
 		)
