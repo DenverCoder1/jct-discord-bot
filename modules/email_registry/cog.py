@@ -253,11 +253,11 @@ class EmailRegistryCog(commands.Cog):
 		ctx: SlashContext,
 		name_or_email: str,
 		channel_mentions: str,
-		func: Callable[[SlashContext, Person, Iterable[str]], Person],
+		func: Callable[[SlashContext, int, Iterable[str]], Person],
 	):
 		await ctx.defer()
 		person = self.finder.search_one(ctx, name=name_or_email, email=name_or_email)
-		person = func(ctx, person, extract_channel_mentions(channel_mentions))
+		person = func(ctx, person.id, extract_channel_mentions(channel_mentions))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 
