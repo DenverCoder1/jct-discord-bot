@@ -1,4 +1,4 @@
-from modules.calendar import html_parser
+from . import html_parser
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
