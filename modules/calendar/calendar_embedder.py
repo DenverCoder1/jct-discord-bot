@@ -1,5 +1,4 @@
 from modules.calendar import html_parser
-import re
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
@@ -7,7 +6,6 @@ from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 from .event import Event
 from typing import Iterable, Dict, Optional, Sequence
-from functools import reduce
 import discord
 
 
@@ -30,18 +28,6 @@ class CalendarEmbedder:
 			"8️⃣",
 			"9️⃣",
 		)
-		# symbols that can't be inside URL
-		URL_INVALID = r"\s()\[\],!<>|\"{}"
-		# regex for parsing url
-		self.URL_REGEX = re.compile(
-			fr"https?://(?:www\.)?([^/{URL_INVALID}]*/?[^{URL_INVALID}]{{1,3}})([^{URL_INVALID}]*)"
-		)
-		# regex to match URL and URL title attribute inside parentheses
-		self.FULL_URLS_REGEX = re.compile(
-			fr'\(({self.URL_REGEX.pattern} "{self.URL_REGEX.pattern}")\)'
-		)
-		# regex to match HTML opening and closing tags
-		self.HTML_TAG_REGEX = re.compile(r"</?.*?>")
 
 	async def embed_event_pages(
 		self,
