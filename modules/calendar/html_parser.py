@@ -21,7 +21,8 @@ def md_links_to_html(text: str) -> str:
 def html_links_to_md(text: str) -> str:
 	def repl(match):
 		"""parses link regex as a shortened markdown link with full link as title attribute"""
-		partial_link = match.group(3) or match.group(4) or match.group(6)
+		partial_link = match.group(3) or match.group(6)
+		label = match.group(4)
 		full_link = match.group(2) or match.group(5)
 		trimmed = partial_link in full_link and not full_link.endswith(partial_link)
 		return f'[{partial_link}{"..." if trimmed else ""}]({full_link} "{full_link}")'
