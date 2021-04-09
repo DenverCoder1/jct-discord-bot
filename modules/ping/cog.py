@@ -3,6 +3,8 @@ from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 import config
 import random
+import getpass
+import socket
 
 
 class PingCog(commands.Cog):
@@ -21,7 +23,10 @@ class PingCog(commands.Cog):
 	async def ping(self, ctx: SlashContext):
 		# log in console that a ping was received
 		print("Received ping")
-		await ctx.send(random.choice(self.lines))
+		await ctx.send(
+			f"**{getpass.getuser()} @ {socket.gethostname()} $**"
+			f" {random.choice(self.lines)}"
+		)
 
 
 # This function will be called when this extension is loaded. It is necessary to add these functions to the bot.
