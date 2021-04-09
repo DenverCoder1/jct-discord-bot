@@ -88,21 +88,13 @@ class CalendarService:
 		and optionally, the end time, location and description."""
 		all_day = False
 		# parse start date
-		start_date = parse_date(
-			start, from_tz=self.timezone, to_tz=self.timezone, future=True
-		)
+		start_date = parse_date(start, future=True)
 		# check start date
 		if start_date is None:
 			raise ValueError(f'Start date "{start}" could not be parsed.')
 		# parse end date
 		if end is not None:
-			end_date = parse_date(
-				end,
-				from_tz=self.timezone,
-				to_tz=self.timezone,
-				future=True,
-				base=start_date,
-			)
+			end_date = parse_date(end, future=True, base=start_date)
 		else:
 			# if no end date was specified, use the start time
 			end_date = start_date
@@ -172,24 +164,15 @@ class CalendarService:
 	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new start date if provided
-		new_start_date = (
-			parse_date(
-				new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start,
-			)
-			or event.start
-		)
+		new_start_date = parse_date(new_start, base=event.start) or event.start
+		# if the start time is changed, the end time will move with it if it's not specified
+		start_offset = new_start_date - event.start
 		# parse new end date if provided
-		new_end_date = (
-			parse_date(
-				new_end,
-				from_tz=self.timezone,
-				to_tz=self.timezone,
-				base=(new_start_date if new_start_date else event.end),
-			)
-			or event.end
-		)
+		new_end_date = parse_date(
+			new_end, base=(new_start_date if new_start_date else event.end)
+		) or (event.end + start_offset)
 		# check that new time range is valid
-		if new_end_date.replace(tzinfo=None) < new_start_date.replace(tzinfo=None):
+		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# create request body
 		event_details = {
@@ -252,7 +235,6 @@ class CalendarService:
 			description=html_parser.html_links_to_md(desc) if desc else None,
 			start=self.__get_endpoint_datetime(details, "start"),
 			end=self.__get_endpoint_datetime(details, "end"),
-			timezone=details["start"]["timeZone"],
 		)
 
 	def __get_endpoint_datetime(
@@ -262,7 +244,7 @@ class CalendarService:
 		dt = parse_date(
 			details[endpoint].get("dateTime") or details[endpoint]["date"],
 			from_tz=details[endpoint]["timeZone"],
-			to_tz=details[endpoint]["timeZone"],
+			to_tz=self.timezone,
 		)
 		assert dt is not None
 		return dt

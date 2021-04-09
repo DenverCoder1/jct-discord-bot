@@ -33,7 +33,7 @@ class Calendar:
 		cls,
 		ctx: SlashContext,
 		groups: Optional[Iterable[Group]] = None,
-		group_id: int = None,
+		group_id: Optional[int] = None,
 	) -> "Calendar":
 		"""Returns Calendar given a Discord member or a specified group id"""
 		groups = groups or Group.get_groups()

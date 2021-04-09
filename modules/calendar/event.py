@@ -16,7 +16,6 @@ class Event:
 		all_day: bool,
 		start: datetime,
 		end: datetime,
-		timezone: str,
 	):
 		self.__id = event_id
 		self.__link = link
@@ -24,9 +23,8 @@ class Event:
 		self.__location = location
 		self.__description = description
 		self.__all_day = all_day
-		self.__start = start
-		self.__end = end
-		self.__timezone = timezone
+		self.__start = start.replace(tzinfo=None)
+		self.__end = end.replace(tzinfo=None)
 
 	@property
 	def id(self) -> str:
@@ -67,11 +65,6 @@ class Event:
 	def end(self) -> datetime:
 		"""Returns the end date as a datetime object"""
 		return self.__end
-
-	@property
-	def timezone(self) -> str:
-		"""Returns the timezone passed to the constructor or the calendar's timezone if not specified."""
-		return self.__timezone
 
 	@property
 	def __one_day(self) -> bool:
