@@ -4,9 +4,9 @@ from typing import Generator
 __MD_LINK_REGEX = re.compile(
 	# Group 1: The label
 	# Group 2: The full URL
-	# Group 3: The title text
-	r"\[(.*?[^\\])\]\((https?:\/\/\S*?)(?: \"(.*?)\")?\)"
+	r"\[(.*?[^\\])\]\((https?:\/\/\S*?) \".*?\"\)"
 )
+
 __HTML_LINK_REGEX = re.compile(
 	# Group 2|5: The full URL
 	# Group 3|6: A truncated URL, if the label was the same as the URL

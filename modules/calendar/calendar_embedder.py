@@ -174,12 +174,15 @@ class CalendarEmbedder:
 		embed.set_footer(text=self.__footer_text())
 		return embed
 
-	def __format_paragraph(self, text: str, limit: int = 200) -> str:
-		"""Trims a string of text to approximately `limit` characters,
+	def __format_paragraph(self, text: str, limit: int = 100) -> str:
+		"""Trims a string of text to approximately `limit` displayed characters,
 		but preserves links using markdown if they get cut off"""
 		text = text.replace("<br>", "\n")
 		# if limit is in the middle of a link, let the whole link through (shortened reasonably)
 		for match in html_parser.match_md_links(text):
+			# increase limit by the number of hidden characters
+			limit += len(match.group(2)) * 2 + len('[]( "")')
+			# if match extends beyond the limit, move limit to the end of the match
 			if match.end() > limit:
 				limit = match.end() if match.start() < limit else limit
 				break
