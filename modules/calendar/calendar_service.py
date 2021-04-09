@@ -1,12 +1,14 @@
+from modules.calendar import html_parser
 from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
-from typing import Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
 import config
 from fuzzywuzzy import fuzz
+from utils.utils import parse_date
 
 
 class CalendarService:
@@ -63,13 +65,13 @@ class CalendarService:
 		events = events_result.get("items", [])
 		# filter by search term
 		clean_query = query.lower().replace(" ", "")
-		filtered = filter(
-			lambda item: clean_query in item["summary"].lower().replace(" ", "")
-			or fuzz.token_set_ratio(query, item["summary"]) > 75,
-			events,
-		)
 		# convert dicts to Event objects
-		converted_events = tuple(map(lambda item: Event.from_dict(item), filtered))
+		converted_events = tuple(
+			self.__dict_to_event(dict_)
+			for dict_ in events
+			if clean_query in dict_["summary"].lower().replace(" ", "")
+			or fuzz.token_set_ratio(query, dict_["summary"]) > 75
+		)
 		# return events and the next page's token
 		return converted_events
 
@@ -120,7 +122,7 @@ class CalendarService:
 		event_details = {
 			"summary": summary,
 			"location": location,
-			"description": description,
+			"description": html_parser.md_links_to_html(description),
 			"start": (
 				{
 					"dateTime": start_date.isoformat("T", "seconds"),
@@ -144,7 +146,7 @@ class CalendarService:
 			.insert(calendarId=calendar_id, body=event_details)
 			.execute()
 		)
-		return Event.from_dict(event)
+		return self.__dict_to_event(event)
 
 	def delete_event(self, calendar_id: str, event: Event) -> None:
 		"""Delete an event from a calendar given the calendar id and event object"""
@@ -195,7 +197,7 @@ class CalendarService:
 			"location": new_location
 			if new_location is not None
 			else event.location or "",
-			"description": new_description
+			"description": html_parser.md_links_to_html(new_description)
 			if new_description is not None
 			else event.description,
 			"start": {
@@ -213,7 +215,7 @@ class CalendarService:
 			.update(calendarId=calendar_id, eventId=event.id, body=event_details)
 			.execute()
 		)
-		return Event.from_dict(updated_event)
+		return self.__dict_to_event(updated_event)
 
 	def create_calendar(self, summary: str) -> Calendar:
 		"""Creates a new public calendar on the service account given the name
@@ -237,3 +239,30 @@ class CalendarService:
 		)
 		# returns True if the rule was applied successfully
 		return created_rule["id"] == f"user:{email}"
+
+	def __dict_to_event(self, details: Dict[str, Any]) -> Event:
+		"""Create an event from a JSON object as returned by the Calendar API"""
+		desc = details.get("description")
+		return Event(
+			event_id=details["id"],
+			link=details["htmlLink"],
+			title=details["summary"],
+			all_day=("date" in details["start"]),
+			location=details.get("location"),
+			description=html_parser.html_links_to_md(desc) if desc else None,
+			start=self.__get_endpoint_datetime(details, "start"),
+			end=self.__get_endpoint_datetime(details, "end"),
+			timezone=details["start"]["timeZone"],
+		)
+
+	def __get_endpoint_datetime(
+		self, details: Dict[str, Any], endpoint: str
+	) -> datetime:
+		"""Returns a datetime given 'start' or 'end' as the endpoint"""
+		dt = parse_date(
+			details[endpoint].get("dateTime") or details[endpoint]["date"],
+			from_tz=details[endpoint]["timeZone"],
+			to_tz=details[endpoint]["timeZone"],
+		)
+		assert dt is not None
+		return dt

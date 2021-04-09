@@ -1,3 +1,4 @@
+from modules.calendar import html_parser
 import re
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
@@ -187,45 +188,16 @@ class CalendarEmbedder:
 		embed.set_footer(text=self.__footer_text())
 		return embed
 
-	def __shorten_links(self, text: str) -> str:
-		"""remove the protocol and most of path from URLs in text"""
-		# Replace links with shortened forms in markdown linking to full url and including title attributes
-		return self.URL_REGEX.sub(
-			lambda m: f'[{m.group(1)}{"..." if m.group(2) else ""}]({m.group(0)} "{m.group(0)}")',
-			text,
-		)
-
-	def __remove_html_tags(self, text: str) -> str:
-		"""remove html tags from text"""
-		# replace <br> with newline
-		text = text.replace("<br>", "\n")
-		# remove html tags
-		return self.HTML_TAG_REGEX.sub("", text)
-
-	def __format_paragraph(self, text: str, max: int = 100) -> str:
-		"""Trims a string of text to a maximum number of characters,
+	def __format_paragraph(self, text: str, limit: int = 200) -> str:
+		"""Trims a string of text to approximately `limit` characters,
 		but preserves links using markdown if they get cut off"""
-		# check for server emoji tags and increase max by the sum of the characters in the emoji tags
-		emoji_list = re.findall(r"<:[\w-]+:\d+>", text[:max])
-		max += reduce(lambda acc, next: acc + len(next) - 1, emoji_list, 0)
-		# remove html tags
-		html_tags_removed = self.__remove_html_tags(text)
-		# replace links with shortened versions in markdown
-		shortened_links = self.__shorten_links(html_tags_removed)
-		# replace full urls and titles with placeholders to not include them when trimming
-		trimmed = self.FULL_URLS_REGEX.sub("({})", shortened_links)
-		# shift 'max' to the index of the next word in the text or the end of the text if none
-		match = re.search(r"(\b\s|$)", trimmed[max:])
-		assert match is not None
-		max += match.start()
-		# trim the text normally
-		trimmed = trimmed[:max].strip() + "..." if len(trimmed) > max else trimmed
-		# get full urls to replace placeholders
-		full_urls = self.FULL_URLS_REGEX.findall(shortened_links)
-		# put the full urls back into the text
-		for full_url in full_urls:
-			trimmed = re.sub(r"\({}\)", f"({full_url[0]})", trimmed, count=1)
-		return trimmed
+		text = text.replace("<br>", "\n").strip()
+		# if limit is in the middle of a link, let the whole link through (shortened reasonably)
+		for match in html_parser.match_md_links(text):
+			if match.end() > limit:
+				limit = match.end() if match.start() < limit else limit
+				break
+		return text[:limit] + "..." if len(text) > limit else text
 
 	def __format_event(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
