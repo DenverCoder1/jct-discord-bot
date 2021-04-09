@@ -25,7 +25,8 @@ def html_links_to_md(text: str) -> str:
 		label = match.group(4)
 		full_link = match.group(2) or match.group(5)
 		trimmed = partial_link in full_link and not full_link.endswith(partial_link)
-		return f'[{partial_link}{"..." if trimmed else ""}]({full_link} "{full_link}")'
+		label = label or (partial_link + ("..." if trimmed else ""))
+		return f'[{label}]({full_link} "{full_link}")'
 
 	return __HTML_LINK_REGEX.sub(repl, text)
 
