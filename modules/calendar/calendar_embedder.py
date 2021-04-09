@@ -181,7 +181,7 @@ class CalendarEmbedder:
 		# if limit is in the middle of a link, let the whole link through (shortened reasonably)
 		for match in html_parser.match_md_links(text):
 			# increase limit by the number of hidden characters
-			limit += len(match.group(2)) * 2 + len('[]( "")')
+			limit += len(f"[]({match.group(2)})")
 			# if match extends beyond the limit, move limit to the end of the match
 			if match.end() > limit:
 				limit = match.end() if match.start() < limit else limit

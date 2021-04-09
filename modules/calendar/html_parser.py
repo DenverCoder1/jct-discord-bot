@@ -3,8 +3,8 @@ from typing import Generator
 
 __MD_LINK_REGEX = re.compile(
 	# Group 1: The label
-	# Group 2: The full URL
-	r"\[(.*?[^\\])\]\((https?:\/\/\S*?) \".*?\"\)"
+	# Group 2: The full URL (optionally title text as well)
+	r"\[(.*?[^\\])\]\((https?:\/\/.*?)\)"
 )
 
 __HTML_LINK_REGEX = re.compile(
