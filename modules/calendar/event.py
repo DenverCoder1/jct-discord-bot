@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
-from utils.utils import format_date, parse_date
+from typing import Optional
+from utils.utils import format_date
 
 
 class Event:
@@ -92,30 +92,3 @@ class Event:
 		if self.all_day and not self.__one_day:
 			end_date -= timedelta(days=1)
 		return format_date(end_date, all_day=self.all_day, base=base)
-
-	@classmethod
-	def from_dict(cls, details: Dict[str, Any], target_timezone: str) -> "Event":
-		"""Create an event from a JSON object as returned by the Calendar API"""
-		return cls(
-			event_id=details["id"],
-			link=details["htmlLink"],
-			title=details["summary"],
-			all_day=("date" in details["start"]),
-			location=details.get("location"),
-			description=details.get("description"),
-			start=cls.get_endpoint_datetime(details, "start", target_timezone),
-			end=cls.get_endpoint_datetime(details, "end", target_timezone),
-		)
-
-	@staticmethod
-	def get_endpoint_datetime(
-		details: Dict[str, Any], endpoint: str, target_timezone: str
-	) -> datetime:
-		"""Returns a datetime given 'start' or 'end' as the endpoint"""
-		dt = parse_date(
-			details[endpoint].get("dateTime") or details[endpoint]["date"],
-			from_tz=details[endpoint]["timeZone"],
-			to_tz=target_timezone,
-		)
-		assert dt is not None
-		return dt
