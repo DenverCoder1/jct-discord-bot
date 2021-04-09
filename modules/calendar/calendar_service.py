@@ -1,4 +1,4 @@
-from modules.calendar import html_parser
+from . import html_parser
 from .calendar import Calendar
 from .event import Event
 from utils.utils import parse_date
