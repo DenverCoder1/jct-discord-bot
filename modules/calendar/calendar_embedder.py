@@ -177,13 +177,13 @@ class CalendarEmbedder:
 	def __format_paragraph(self, text: str, limit: int = 200) -> str:
 		"""Trims a string of text to approximately `limit` characters,
 		but preserves links using markdown if they get cut off"""
-		text = text.replace("<br>", "\n").strip()
+		text = text.replace("<br>", "\n")
 		# if limit is in the middle of a link, let the whole link through (shortened reasonably)
 		for match in html_parser.match_md_links(text):
 			if match.end() > limit:
 				limit = match.end() if match.start() < limit else limit
 				break
-		return text[:limit] + "..." if len(text) > limit else text
+		return text[:limit].strip() + "..." if len(text) > limit else text.strip()
 
 	def __format_event(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
