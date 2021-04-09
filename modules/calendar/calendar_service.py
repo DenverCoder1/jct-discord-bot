@@ -69,7 +69,9 @@ class CalendarService:
 			events,
 		)
 		# convert dicts to Event objects
-		converted_events = tuple(map(lambda item: Event.from_dict(item), filtered))
+		converted_events = tuple(
+			map(lambda item: Event.from_dict(item, self.timezone), filtered)
+		)
 		# return events and the next page's token
 		return converted_events
 
@@ -86,21 +88,13 @@ class CalendarService:
 		and optionally, the end time, location and description."""
 		all_day = False
 		# parse start date
-		start_date = parse_date(
-			start, from_tz=self.timezone, to_tz=self.timezone, future=True
-		)
+		start_date = parse_date(start, future=True)
 		# check start date
 		if start_date is None:
 			raise ValueError(f'Start date "{start}" could not be parsed.')
 		# parse end date
 		if end is not None:
-			end_date = parse_date(
-				end,
-				from_tz=self.timezone,
-				to_tz=self.timezone,
-				future=True,
-				base=start_date,
-			)
+			end_date = parse_date(end, future=True, base=start_date)
 		else:
 			# if no end date was specified, use the start time
 			end_date = start_date
@@ -144,7 +138,7 @@ class CalendarService:
 			.insert(calendarId=calendar_id, body=event_details)
 			.execute()
 		)
-		return Event.from_dict(event)
+		return Event.from_dict(event, self.timezone)
 
 	def delete_event(self, calendar_id: str, event: Event) -> None:
 		"""Delete an event from a calendar given the calendar id and event object"""
@@ -170,24 +164,13 @@ class CalendarService:
 	) -> Event:
 		"""Update an event from a calendar given the calendar id, event object, and parameters to update"""
 		# parse new start date if provided
-		new_start_date = (
-			parse_date(
-				new_start, from_tz=self.timezone, to_tz=self.timezone, base=event.start,
-			)
-			or event.start
-		).replace(tzinfo=None)
+		new_start_date = parse_date(new_start, base=event.start) or event.start
 		# if the start time is changed, the end time will move with it if it's not specified
 		start_offset = new_start_date - event.start
 		# parse new end date if provided
-		new_end_date = (
-			parse_date(
-				new_end,
-				from_tz=self.timezone,
-				to_tz=self.timezone,
-				base=(new_start_date if new_start_date else event.end),
-			)
-			or (event.end + start_offset)
-		).replace(tzinfo=None)
+		new_end_date = parse_date(
+			new_end, base=(new_start_date if new_start_date else event.end)
+		) or (event.end + start_offset)
 		# check that new time range is valid
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
@@ -215,7 +198,7 @@ class CalendarService:
 			.update(calendarId=calendar_id, eventId=event.id, body=event_details)
 			.execute()
 		)
-		return Event.from_dict(updated_event)
+		return Event.from_dict(updated_event, self.timezone)
 
 	def create_calendar(self, summary: str) -> Calendar:
 		"""Creates a new public calendar on the service account given the name
