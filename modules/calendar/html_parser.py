@@ -4,7 +4,8 @@ from typing import Generator
 __MD_LINK_REGEX = re.compile(
 	# Group 1: The label
 	# Group 2: The full URL
-	r"\[(.*?[^\\])\]\((https?:\/\/.*?)\)"
+	# Group 3: The title text
+	r"\[(.*?[^\\])\]\((https?:\/\/\S*?)(?: \"(.*?)\")?\)"
 )
 __HTML_LINK_REGEX = re.compile(
 	# Group 2|5: The full URL
@@ -19,7 +20,7 @@ def md_links_to_html(text: str) -> str:
 
 
 def html_links_to_md(text: str) -> str:
-	def repl(match):
+	def link_repl(match):
 		"""parses link regex as a shortened markdown link with full link as title attribute"""
 		# inner text of the link or None if the text is the link
 		inner_text = match.group(4)
@@ -34,7 +35,7 @@ def html_links_to_md(text: str) -> str:
 		# return markdown link
 		return f'[{label}]({full_link} "{full_link}")'
 
-	return __HTML_LINK_REGEX.sub(repl, text)
+	return __HTML_LINK_REGEX.sub(link_repl, text)
 
 
 def match_md_links(text: str) -> Generator[re.Match, None, None]:
