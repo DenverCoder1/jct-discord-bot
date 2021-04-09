@@ -3,8 +3,9 @@ from typing import Generator
 
 __MD_LINK_REGEX = re.compile(
 	# Group 1: The label
-	# Group 2: The full URL (optionally title text as well)
-	r"\[(.*?[^\\])\]\((https?:\/\/.*?)\)"
+	# Group 2: The full URL including any title text
+	# Group 3: The full URL without the title text
+	r"\[(.*?[^\\])\]\(((https?:\/\/\S+).*?)\)"
 )
 
 __HTML_LINK_REGEX = re.compile(
@@ -16,7 +17,7 @@ __HTML_LINK_REGEX = re.compile(
 
 
 def md_links_to_html(text: str) -> str:
-	return __MD_LINK_REGEX.sub(r"<a href='\2'>\1</a>", text)
+	return __MD_LINK_REGEX.sub(r"<a href='\3'>\1</a>", text)
 
 
 def html_links_to_md(text: str) -> str:

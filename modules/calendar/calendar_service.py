@@ -243,7 +243,7 @@ class CalendarService:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
 		dt = parse_date(
 			details[endpoint].get("dateTime") or details[endpoint]["date"],
-			from_tz=details[endpoint]["timeZone"],
+			from_tz=details[endpoint].get("timeZone") or self.timezone,
 			to_tz=self.timezone,
 		)
 		assert dt is not None
