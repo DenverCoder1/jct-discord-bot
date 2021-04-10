@@ -213,7 +213,10 @@ class CalendarCog(commands.Cog):
 			),
 			create_option(
 				name="title",
-				description='New title of the event (eg. "HW 1 #statistics"). ${title} refers to old title.',
+				description=(
+					'New title of the event (eg. "HW 1 #statistics"). ${title} refers'
+					" to old title."
+				),
 				option_type=SlashCommandOptionType.STRING,
 				required=False,
 			),
@@ -234,15 +237,18 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="description",
 				description=(
-					'New description of the event (eg. "Submission box:'
-					' https://moodle.jct.ac.il/123. ${description} refers to old description.")'
+					'eg. "[Submission](https://...)". ${description}'
+					' refers to old  description. Use \\n for newlines.")'
 				),
 				option_type=SlashCommandOptionType.STRING,
 				required=False,
 			),
 			create_option(
 				name="location",
-				description='The location of the event (eg. "Brause 305"). ${location} refers to old location.',
+				description=(
+					'The location of the event (eg. "Brause 305"). ${location} refers'
+					" to old location."
+				),
 				option_type=SlashCommandOptionType.STRING,
 				required=False,
 			),
@@ -282,13 +288,21 @@ class CalendarCog(commands.Cog):
 		event_to_update = await self.embedder.get_event_choice(
 			ctx, events, query, "update"
 		)
-		# replace channel mentions
+		# replace channel mentions and variables
 		if title is not None:
-			title = course_mentions.replace_channel_mentions(title).replace("${title}", event_to_update.title)
+			title = course_mentions.replace_channel_mentions(title).replace(
+				"${title}", event_to_update.title
+			)
 		if description is not None:
-			description = course_mentions.replace_channel_mentions(description).replace("${description}", event_to_update.description)
+			description = (
+				course_mentions.replace_channel_mentions(description)
+				.replace("${description}", event_to_update.description or "")
+				.replace("\\n", "\n")
+			)
 		if location is not None:
-			location = course_mentions.replace_channel_mentions(location).replace("${location}", event_to_update.location)
+			location = course_mentions.replace_channel_mentions(location).replace(
+				"${location}", event_to_update.location or ""
+			)
 		try:
 			event = self.service.update_event(
 				calendar.id, event_to_update, title, start, end, description, location,
