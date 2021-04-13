@@ -99,7 +99,7 @@ class CalendarEmbedder:
 		if len(events) == 1:
 			return one(events)
 		# multiple events found
-		embed, _ = self.embed_event_list(
+		embed, generator = self.embed_event_list(
 			title=f"⚠ Multiple events were found.",
 			events=(event for event in events),
 			calendar=calendar,
@@ -111,11 +111,14 @@ class CalendarEmbedder:
 			enumeration=self.number_emoji,
 		)
 		await ctx.send(embed=embed)
+		# get the number of events that were displayed
+		next_event = next(generator, None)
+		num_events = events.index(next_event) if next_event else len(events)
 		# ask user to pick an event with emojis
 		selection_index = await wait_for_reaction(
 			bot=self.bot,
 			message=ctx.message,
-			emoji_list=self.number_emoji[: len(events)],
+			emoji_list=self.number_emoji[:num_events],
 			allowed_users=[ctx.author],
 		)
 		# get the event selected by the user
