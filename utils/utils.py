@@ -70,7 +70,7 @@ def parse_date(
 	if date_str is None:
 		return None
 	# set dateparser settings
-	settings = {
+	settings: Dict[str, Any] = {
 		"RELATIVE_BASE": base.replace(tzinfo=None),
 		**({"TIMEZONE": from_tz} if from_tz else {}),
 		**({"TO_TIMEZONE": to_tz} if to_tz else {}),
