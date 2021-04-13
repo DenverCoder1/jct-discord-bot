@@ -78,8 +78,14 @@ def parse_date(
 	}
 	# parse the date with dateparser
 	date = dateparser.parse(date_str, settings=settings)
-	# make times PM if time is early in the day, base is PM, and "AM" is not specified
-	if date and date.hour < 8 and base.hour >= 12 and not "am" in date_str.lower():
+	# make times PM if time is early in the day, base is PM, and no indication that AM was specified
+	if (
+		date
+		and date.hour < 8
+		and base.hour >= 12
+		and not "am" in date_str.lower()
+		and not "T" in date_str
+	):
 		date += timedelta(hours=12)
 	# return the datetime object
 	return date
