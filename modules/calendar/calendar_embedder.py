@@ -79,7 +79,7 @@ class CalendarEmbedder:
 		self,
 		ctx: SlashContext,
 		events: Sequence[Event],
-		calendar,
+		calendar: Calendar,
 		query: str,
 		action: str,
 	) -> Event:
