@@ -23,6 +23,28 @@ class Calendar:
 		"""The name of the calendar"""
 		return self.__name
 
+	def add_url(self) -> str:
+		"""The url to add the calendar to Google Calendar"""
+		return (
+			"https://calendar.google.com/calendar/render"
+			f"?cid=https://www.google.com/calendar/feeds/{self.__id}"
+			"/public/basic"
+		)
+
+	def view_url(self, timezone: str) -> str:
+		"""The url to view the calendar"""
+		return (
+			"https://calendar.google.com/calendar/u/0/embed"
+			f"?src={self.__id}&ctz={timezone}"
+		)
+
+	def ical_url(self) -> str:
+		"""The iCal url for the calendar"""
+		return (
+			"https://calendar.google.com/calendar/ical"
+			f"/{self.__id.replace('@','%40')}/public/basic.ics"
+		)
+
 	@classmethod
 	def from_dict(cls, details: Dict[str, str]) -> "Calendar":
 		"""Create a calendar from a JSON object as returned by the Calendar API"""
