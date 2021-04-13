@@ -8,7 +8,6 @@ from google.oauth2 import service_account
 from datetime import datetime
 import config
 from fuzzywuzzy import fuzz
-from utils.utils import parse_date
 
 
 class CalendarService:
@@ -23,19 +22,9 @@ class CalendarService:
 	def get_links(self, calendar: Calendar) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
 		return {
-			"Add to Google Calendar": (
-				"https://calendar.google.com/calendar/render"
-				f"?cid=https://www.google.com/calendar/feeds/{calendar.id}"
-				"/public/basic"
-			),
-			"View the Events": (
-				"https://calendar.google.com/calendar/u/0/embed"
-				f"?src={calendar.id}&ctz={self.timezone}"
-			),
-			"iCal Format": (
-				"https://calendar.google.com/calendar/ical"
-				f"/{calendar.id.replace('@','%40')}/public/basic.ics"
-			),
+			"Add to Google Calendar": calendar.add_url(),
+			"View the Events": calendar.view_url(self.timezone),
+			"iCal Format": calendar.ical_url(),
 		}
 
 	def fetch_upcoming(
@@ -166,23 +155,24 @@ class CalendarService:
 		# parse new start date if provided
 		new_start_date = parse_date(new_start, base=event.start) or event.start
 		# if the start time is changed, the end time will move with it if it's not specified
-		start_offset = new_start_date - event.start
+		start_delta = new_start_date - event.start
 		# parse new end date if provided
 		new_end_date = parse_date(
-			new_end, base=(new_start_date if new_start_date else event.end)
-		) or (event.end + start_offset)
+			new_end,
+			base=(new_start_date if new_start_date != event.start else event.end),
+		) or (event.end + start_delta)
 		# check that new time range is valid
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
 		# create request body
 		event_details = {
-			"summary": new_summary if new_summary is not None else event.title,
-			"location": new_location
-			if new_location is not None
-			else event.location or "",
-			"description": html_parser.md_links_to_html(new_description)
-			if new_description is not None
-			else event.description,
+			"summary": new_summary or event.title,
+			"location": new_location or event.location or "",
+			"description": (
+				html_parser.md_links_to_html(new_description)
+				if new_description is not None
+				else event.description or ""
+			),
 			"start": {
 				"timeZone": self.timezone,
 				"dateTime": new_start_date.isoformat("T", "seconds"),

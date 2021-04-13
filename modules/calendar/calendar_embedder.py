@@ -48,6 +48,7 @@ class CalendarEmbedder:
 				embed = self.embed_event_list(
 					title=f"📅 Upcoming Events for {calendar.name}",
 					events=events[start : start + results_per_page],
+					calendar=calendar,
 					description=f'Showing results for "{query}"' if query else "",
 					page_num=page_num,
 				)
@@ -75,7 +76,12 @@ class CalendarEmbedder:
 				break
 
 	async def get_event_choice(
-		self, ctx: SlashContext, events: Sequence[Event], query: str, action: str,
+		self,
+		ctx: SlashContext,
+		events: Sequence[Event],
+		calendar: Calendar,
+		query: str,
+		action: str,
 	) -> Event:
 		"""
 		If there are no events, throws an error.
@@ -92,6 +98,7 @@ class CalendarEmbedder:
 		embed = self.embed_event_list(
 			title=f"⚠ Multiple events were found.",
 			events=events,
+			calendar=calendar,
 			description=(
 				f"Please specify which event you would like to {action}."
 				f'\n\nShowing results for "{query}"'
@@ -114,6 +121,7 @@ class CalendarEmbedder:
 		self,
 		title: str,
 		events: Iterable[Event],
+		calendar: Calendar,
 		description: str = "",
 		colour: discord.Colour = discord.Colour.blue(),
 		enumeration: Sequence[str] = (),
@@ -132,6 +140,8 @@ class CalendarEmbedder:
 		embed = discord.Embed(title=title, colour=colour)
 		# set initial description if available
 		embed.description = "" if description == "" else f"{description}\n"
+		# get calendar links
+		links = self.__calendar_links(calendar)
 		if not events:
 			embed.description += "No events found"
 		else:
@@ -144,10 +154,13 @@ class CalendarEmbedder:
 				# add the event details
 				event_description += self.__format_event(event)
 				# make sure embed doesn't exceed max size
-				if len(embed.description + event_description) > self.max_length:
+				if len(embed.description + event_description + links) > self.max_length:
 					break
 				# add event to embed
 				embed.description += event_description
+		# add links for viewing and editing on Google Calendar
+		embed.description += links
+		# add page number and timezone info
 		embed.set_footer(text=self.__footer_text(page_num=page_num))
 		return embed
 
@@ -165,12 +178,19 @@ class CalendarEmbedder:
 		return embed
 
 	def embed_event(
-		self, title: str, event: Event, colour: discord.Colour = discord.Colour.green(),
+		self,
+		title: str,
+		event: Event,
+		calendar: Calendar,
+		colour: discord.Colour = discord.Colour.green(),
 	) -> discord.Embed:
 		"""Embed an event with the summary, link, and dates"""
 		embed = discord.Embed(title=title, colour=colour)
 		# add overview of event to the embed
 		embed.description = self.__format_event(event)
+		# add links for viewing and editing on Google Calendar
+		embed.description += self.__calendar_links(calendar)
+		# add timezone info
 		embed.set_footer(text=self.__footer_text())
 		return embed
 
@@ -197,6 +217,13 @@ class CalendarEmbedder:
 		if event.location:
 			info += f":round_pushpin: {self.__format_paragraph(event.location)}\n"
 		return info
+
+	def __calendar_links(self, calendar: Calendar) -> str:
+		"""Return text with links to view or edit the Google Calendar"""
+		return (
+			f"\n[👀 View events]({calendar.view_url(self.timezone)}) | [✏️ Edit"
+			f" with Google]({calendar.add_url()}) (use `/calendar grant` for access)"
+		)
 
 	def __footer_text(self, page_num: Optional[int] = None) -> str:
 		"""Return text about timezone to display at end of embeds with dates"""

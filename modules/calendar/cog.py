@@ -193,7 +193,7 @@ class CalendarCog(commands.Cog):
 		except ValueError as error:
 			raise FriendlyError(str(error), ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
-			":white_check_mark: Event created successfully", event
+			":white_check_mark: Event created successfully", event, calendar
 		)
 		await ctx.send(embed=embed)
 
@@ -286,7 +286,7 @@ class CalendarCog(commands.Cog):
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
 		event_to_update = await self.embedder.get_event_choice(
-			ctx, events, query, "update"
+			ctx, events, calendar, query, "update"
 		)
 		# replace channel mentions and variables
 		if title is not None:
@@ -310,7 +310,7 @@ class CalendarCog(commands.Cog):
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
-			":white_check_mark: Event updated successfully", event
+			":white_check_mark: Event updated successfully", event, calendar
 		)
 		# edit message if sent already, otherwise send
 		sender = ctx.send if ctx.message is None else ctx.message.edit
@@ -356,7 +356,7 @@ class CalendarCog(commands.Cog):
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
 		event_to_delete = await self.embedder.get_event_choice(
-			ctx, events, query, "delete"
+			ctx, events, calendar, query, "delete"
 		)
 		# delete event
 		try:
@@ -364,7 +364,7 @@ class CalendarCog(commands.Cog):
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
-			"🗑 Event deleted successfully", event_to_delete
+			"🗑 Event deleted successfully", event_to_delete, calendar
 		)
 		# edit message if sent already, otherwise send
 		sender = ctx.send if ctx.message is None else ctx.message.edit
