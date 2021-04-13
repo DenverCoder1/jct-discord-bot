@@ -5,7 +5,8 @@ import dateparser
 import asyncio
 import discord
 from datetime import datetime, timedelta
-from typing import Any, Collection, Dict, Iterable, Optional, Sequence
+from typing import Any, Collection, Dict, Generator, Iterable, Optional, Sequence, Tuple
+from discord.errors import NotFound
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
 
@@ -160,8 +161,12 @@ async def wait_for_reaction(
 			"reaction_add", check=validate_reaction, timeout=timeout
 		)
 	except asyncio.TimeoutError as error:
-		# clear reactions
-		await message.clear_reactions()
+		try:
+			# clear reactions
+			await message.clear_reactions()
+		except NotFound:
+			# do nothing if message was deleted
+			pass
 		# raise timeout error as friendly error
 		raise FriendlyError(
 			f"You did not react within {timeout} seconds",
@@ -179,3 +184,26 @@ async def wait_for_reaction(
 def one(iterable: Iterable):
 	"""Returns a single element from an iterable or raises StopIteration if it was empty."""
 	return next(iter(iterable))
+
+
+def peek(generator: Generator, default: Any = None) -> Tuple[Any, Generator]:
+	"""Returns the next item and a generator which matches the one passed"""
+
+	def new_generator(first: Any) -> Generator[Any, None, None]:
+		"""yield the item removed and then the rest of the items"""
+		yield first
+		yield from generator
+
+	try:
+		next_item = next(generator)
+		# return the extracted item and the original generator
+		return next_item, new_generator(next_item)
+	except StopIteration:
+		# return default and empty generator if generator was empty
+		return default, (_ for _ in [])
+
+
+def is_empty(generator: Generator) -> Tuple[Any, Generator]:
+	"""Returns True if generator is empty and a generator that matches the one passed"""
+	next_item, generator = peek(generator)
+	return next_item is None, generator
