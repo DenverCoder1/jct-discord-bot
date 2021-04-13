@@ -4,7 +4,7 @@ import csv
 import dateparser
 import asyncio
 import discord
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Collection, Dict, Iterable, Optional, Sequence
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
@@ -57,28 +57,32 @@ def parse_date(
 	from_tz: Optional[str] = None,
 	to_tz: Optional[str] = None,
 	future: Optional[bool] = None,
-	base: Optional[datetime] = None,
-	settings: Dict[str, Any] = {},
+	base: datetime = datetime.now(),
 ) -> Optional[datetime]:
 	"""Returns datetime object for given date string
 	Arguments:
-	<date_str>: date string to parse
-	[from_tz]: string representing the timezone to interpret the date as (eg. "Asia/Jerusalem")
-	[to_tz]: string representing the timezone to return the date in (eg. "Asia/Jerusalem")
-	[future]: set to true to prefer dates from the future when parsing
-	[base]: datetime representing where dates should be parsed relative to
-	[settings]: dict of additional settings for dateparser.parse()
+	:param date_str: :class:`Optional[str]` date string to parse
+	:param from_tz: :class:`Optional[str]` string representing the timezone to interpret the date as (eg. "Asia/Jerusalem")
+	:param to_tz: :class:`Optional[str]` string representing the timezone to return the date in (eg. "Asia/Jerusalem")
+	:param future: :class:`Optional[bool]` set to true to prefer dates from the future when parsing
+	:param base: :class:`datetime` datetime representing where dates should be parsed relative to
 	"""
 	if date_str is None:
 		return None
+	# set dateparser settings
 	settings = {
-		**settings,
+		"RELATIVE_BASE": base.replace(tzinfo=None),
 		**({"TIMEZONE": from_tz} if from_tz else {}),
 		**({"TO_TIMEZONE": to_tz} if to_tz else {}),
 		**({"PREFER_DATES_FROM": "future"} if future else {}),
-		**({"RELATIVE_BASE": base.replace(tzinfo=None)} if base else {}),
 	}
-	return dateparser.parse(date_str, settings=settings)
+	# parse the date with dateparser
+	date = dateparser.parse(date_str, settings=settings)
+	# make times PM if time is early in the day, base is PM, and "AM" is not specified
+	if date and date.hour < 8 and base.hour >= 12 and not "am" in date_str.lower():
+		date += timedelta(hours=12)
+	# return the datetime object
+	return date
 
 
 def format_date(
