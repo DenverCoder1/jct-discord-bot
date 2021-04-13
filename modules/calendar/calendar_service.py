@@ -168,10 +168,8 @@ class CalendarService:
 		event_details = {
 			"summary": new_summary or event.title,
 			"location": new_location or event.location or "",
-			"description": (
-				html_parser.md_links_to_html(new_description)
-				if new_description is not None
-				else event.description or ""
+			"description": html_parser.md_links_to_html(
+				new_description or event.description or ""
 			),
 			"start": {
 				"timeZone": self.timezone,
