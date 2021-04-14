@@ -167,7 +167,7 @@ class CalendarService:
 		# check if event is all day
 		all_day = (
 			new_start_date.time() == datetime.min.time()
-			and new_end_date.time() == new_end_date.min.time()
+			and new_end_date.time() == datetime.min.time()
 			and new_start_date != new_end_date
 		)
 		# create request body
