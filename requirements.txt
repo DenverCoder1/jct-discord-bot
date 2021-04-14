@@ -11,3 +11,4 @@ dateparser==1.0.0
 pyluach==1.2.1
 fuzzywuzzy==0.18.0
 python-Levenshtein==0.12.2
+more-itertools==8.7.0

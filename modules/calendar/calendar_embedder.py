@@ -1,11 +1,13 @@
+from __future__ import annotations
+from typing import Dict, Optional, Sequence
 from . import html_parser
 from discord.ext import commands
-from utils.utils import one, peek, is_empty, wait_for_reaction
+from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 from .event import Event
-from typing import Generator, Dict, Optional, Sequence, Tuple
+from more_itertools import peekable
 import discord
 
 
@@ -38,14 +40,14 @@ class CalendarEmbedder:
 		calendar: Calendar,
 	):
 		"""Embed page of events and wait for reactions to continue to new pages"""
-		# generator for events
-		events = (event for event in events_list)
+		# peekable generator for events
+		events = peekable(events_list)
 		# set start index
 		page_num = 1 if len(events_list) > results_per_page else None
 		while True:
 			try:
 				# create embed
-				embed, events = self.embed_event_list(
+				embed = self.embed_event_list(
 					title=f"📅 Upcoming Events for {calendar.name}",
 					events=events,
 					calendar=calendar,
@@ -59,15 +61,14 @@ class CalendarEmbedder:
 				if not page_num:
 					break
 				# set emoji and page based on whether there are more events
-				empty, events = is_empty(events)
-				if not empty:
+				if events:
 					next_emoji = "⏬"
 					page_num += 1
 				else:
 					next_emoji = "⤴️"
 					page_num = 1
-					# reset the generator
-					events = (event for event in events_list)
+					# reset the peekable generator
+					events = peekable(events_list)
 				# wait for author to respond to go to next page
 				await wait_for_reaction(
 					bot=self.bot,
@@ -82,7 +83,7 @@ class CalendarEmbedder:
 	async def get_event_choice(
 		self,
 		ctx: SlashContext,
-		events: Sequence[Event],
+		events_list: Sequence[Event],
 		calendar: Calendar,
 		query: str,
 		action: str,
@@ -93,15 +94,17 @@ class CalendarEmbedder:
 		If there is one event, return it.
 		"""
 		# no events found
-		if not events:
+		if not events_list:
 			raise FriendlyError(f'No events were found for "{query}".', ctx, ctx.author)
 		# if only 1 event found, get the event at index 0
-		if len(events) == 1:
-			return one(events)
+		if len(events_list) == 1:
+			return one(events_list)
+		# create a peekable iterable of events
+		events = peekable(events_list)
 		# multiple events found
-		embed, generator = self.embed_event_list(
+		embed = self.embed_event_list(
 			title=f"⚠ Multiple events were found.",
-			events=(event for event in events),
+			events=events,
 			calendar=calendar,
 			description=(
 				f"Please specify which event you would like to {action}."
@@ -112,8 +115,8 @@ class CalendarEmbedder:
 		)
 		await ctx.send(embed=embed)
 		# get the number of events that were displayed
-		next_event = next(generator, None)
-		num_events = events.index(next_event) if next_event else len(events)
+		next_event = events.peek(None)
+		num_events = events_list.index(next_event) if next_event else len(events_list)
 		# ask user to pick an event with emojis
 		selection_index = await wait_for_reaction(
 			bot=self.bot,
@@ -122,65 +125,59 @@ class CalendarEmbedder:
 			allowed_users=[ctx.author],
 		)
 		# get the event selected by the user
-		return events[selection_index]
+		return events_list[selection_index]
 
 	def embed_event_list(
 		self,
 		title: str,
-		events: Generator[Event, None, None],
+		events: peekable[Event],
 		calendar: Calendar,
 		description: str = "",
 		colour: discord.Colour = discord.Colour.blue(),
 		enumeration: Sequence[str] = (),
 		page_num: Optional[int] = None,
 		max_results: int = 10,
-	) -> Tuple[discord.Embed, Generator[Event, None, None]]:
+	) -> discord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
 		Arguments:
 
 		:param title: :class:`str` the title to display at the top
-		:param events: :class:`Generator[Event, None, None]` the events to display
+		:param events: :class:`peekable[Event]` the events to display
 		:param calendar: :class:`Calendar` the calendar the events are from
 		:param description: :class:`Optional[str]` the description to embed below the title
 		:param colour: :class:`Optional[discord.Colour]` the embed colour
 		:param enumeration: :class:`Optional[Iterable[str]]` list of emojis to display alongside events (for reaction choices)
 		"""
 		embed = discord.Embed(title=title, colour=colour)
-		# set initial description if available
-		embed.description = "" if description == "" else f"{description}\n"
 		# get calendar links
 		links = self.__calendar_links(calendar)
-		# check if generator is empty
-		empty, events = is_empty(events)
-		if empty:
-			embed.description += "No events found.\n"
-		else:
-			# add events to embed
-			for i in range(max_results):
-				event, events = peek(events)
-				# if event is None, no more events
-				if not event:
-					break
-				# build event description
-				event_description = "\n"
-				# add enumeration emoji if available
-				if i < len(enumeration):
-					event_description += f"{enumeration[i]} "
-				# add the event details
-				event_description += self.__format_event(event)
-				# make sure embed doesn't exceed max size
-				if len(embed.description + event_description + links) > self.max_length:
-					break
-				# add event to embed
-				embed.description += event_description
-				# consume event
-				next(events)
+		# set initial description if available
+		embed.description = f"{description}\n" if description else ""
+		# check if events peekable is empty
+		embed.description += "No events found.\n" if not events else ""
+		# add events to embed
+		for i in range(max_results):
+			next_event = events.peek(None)
+			# if event is None, no more events
+			if not next_event:
+				break
+			# add enumeration emoji if available
+			event_details = f"\n{enumeration[i]} " if i < len(enumeration) else "\n"
+			# add the event details
+			event_details += self.__format_event(next_event)
+			# make sure embed doesn't exceed max length
+			if len(embed.description + event_details + links) > self.max_length:
+				break
+			# add event to embed
+			embed.description += event_details
+			# consume event
+			next(events)
 		# add links for viewing and editing on Google Calendar
 		embed.description += links
 		# add page number and timezone info
 		embed.set_footer(text=self.__footer_text(page_num=page_num))
-		return embed, events
+		return embed
 
 	def embed_links(
 		self,
