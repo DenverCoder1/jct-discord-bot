@@ -148,24 +148,28 @@ class CalendarEmbedder:
 		:param description: :class:`Optional[str]` the description to embed below the title
 		:param colour: :class:`Optional[discord.Colour]` the embed colour
 		:param enumeration: :class:`Optional[Iterable[str]]` list of emojis to display alongside events (for reaction choices)
+		:param page_num: :class:`Optional[int]` page number to display in the footer
+		:param max_results: :class:`int` maximum results to display in the list
 		"""
 		embed = discord.Embed(title=title, colour=colour)
 		# get calendar links
 		links = self.__calendar_links(calendar)
+		# limit max results to the number of emojis in the enumeration
+		max_results = min(max_results, len(enumeration)) if enumeration else max_results
 		# set initial description if available
 		embed.description = f"{description}\n" if description else ""
 		# check if events peekable is empty
 		embed.description += "No events found.\n" if not events else ""
+		# create iterator for enumeration
+		enumerator = iter(enumeration)
 		# add events to embed
-		for i in range(max_results):
-			next_event = events.peek(None)
+		for _ in range(max_results):
+			event = events.peek(None)
 			# if event is None, no more events
-			if not next_event:
+			if not event:
 				break
-			# add enumeration emoji if available
-			event_details = f"\n{enumeration[i]} " if i < len(enumeration) else "\n"
-			# add the event details
-			event_details += self.__format_event(next_event)
+			# get event details and add enumeration emoji if available
+			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
 			# make sure embed doesn't exceed max length
 			if len(embed.description + event_details + links) > self.max_length:
 				break

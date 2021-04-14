@@ -273,8 +273,8 @@ class CalendarCog(commands.Cog):
 		title: Optional[str] = None,
 		start: Optional[str] = None,
 		end: Optional[str] = None,
-		description=None,
-		location=None,
+		description: Optional[str] = None,
+		location: Optional[str] = None,
 		class_name: Optional[int] = None,
 	):
 		await ctx.defer()
@@ -289,17 +289,17 @@ class CalendarCog(commands.Cog):
 			ctx, events, calendar, query, "update"
 		)
 		# replace channel mentions and variables
-		if title is not None:
+		if title:
 			title = course_mentions.replace_channel_mentions(title).replace(
 				"${title}", event_to_update.title
 			)
-		if description is not None:
+		if description:
 			description = (
 				course_mentions.replace_channel_mentions(description)
 				.replace("${description}", event_to_update.description or "")
 				.replace("\\n", "\n")
 			)
-		if location is not None:
+		if location:
 			location = course_mentions.replace_channel_mentions(location).replace(
 				"${location}", event_to_update.location or ""
 			)
