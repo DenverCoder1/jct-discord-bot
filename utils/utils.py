@@ -82,10 +82,10 @@ def parse_date(
 	# make times PM if time is early in the day, base is PM, and no indication that AM was specified
 	if (
 		date
-		and date.hour < 8
-		and base.hour >= 12
-		and not "am" in date_str.lower()
-		and not "T" in date_str
+		and date.hour < 8  # hour is before 8:00
+		and base.hour >= 12  # relative base is PM
+		and not "am" in date_str.lower()  # am is not specified
+		and not re.match(r"^2\d{3}-[01]\d-[0-3]\d\S*$", date_str)  # not in iso format
 	):
 		date += timedelta(hours=12)
 	# return the datetime object
