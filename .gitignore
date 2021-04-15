@@ -135,3 +135,6 @@ mypy.ini
 
 # Google OAUTH
 jct-compsci-esp-*.json
+
+# SQL stuff
+*.session.sql
