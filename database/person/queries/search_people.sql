@@ -6,7 +6,7 @@ FROM (
 			string_agg(categories.name, ', ') AS categories,
 			GREATEST(
 				similarity(people.name, %(name)s),
-				similarity(people.name, %(name)s)
+				similarity(people.surname, %(name)s)
 			) AS similarity
 		FROM people
 			LEFT JOIN person_category ON people.id = person_category.person
