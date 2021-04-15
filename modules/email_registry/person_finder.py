@@ -1,12 +1,10 @@
 import discord
-import config
 from utils.utils import one
 from discord_slash.context import SlashContext
-from typing import Any, Iterable, Optional, Set
+from typing import Optional, Set
 from .weighted_set import WeightedSet
 from database.person import Person
 from ..error.friendly_error import FriendlyError
-from database import sql_fetcher
 
 
 __search_weights = {
@@ -26,18 +24,18 @@ def search(
 
 	# add the people belonging to the category of the given channel (if any)
 	if channel:
-		for person in __search_people("search_channel.sql", channel.id):
+		for person in Person.search_by_channel(channel.id):
 			weights[person] += __search_weights["channel"]
 
 	# search their name
 	if name:
 		for word in name.split():
-			for person in __search_people("search_by_name.sql", word):
-				weights[person] += __search_weights["word"]
+			for person, similarity in Person.search_by_name(word):
+				weights[person] += __search_weights["word"] * similarity
 
 	# add the people who have the email mentioned
 	if email:
-		for person in __search_people("search_email.sql", email):
+		for person in Person.search_by_email(email):
 			weights[person] += __search_weights["email"]
 
 	return weights.heaviest_items()
@@ -77,18 +75,3 @@ def search_one(
 			sender,
 		)
 	return one(people)
-
-
-def __search_people(sql_file: str, param: Any) -> Iterable[Person]:
-	"""
-	Searches the database using a given SQL file and returns a list of people found.
-
-	:param sql_file: The SQL file name to use for the search. Must contain a only `%(param)s`.
-	:param param: The parameter to replace %s with in the sql file
-	"""
-	query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
-	with config.conn as conn:
-		with conn.cursor() as cursor:
-			cursor.execute(query, {"param": param})
-			ids = {row[0] for row in cursor.fetchall()}
-	return {Person.get_person(person_id) for person_id in ids}
