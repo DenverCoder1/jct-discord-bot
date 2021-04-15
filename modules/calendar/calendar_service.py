@@ -164,23 +164,35 @@ class CalendarService:
 		# check that new time range is valid
 		if new_end_date < new_start_date:
 			raise ValueError("The start time must come before the end time.")
+		# check if event is all day
+		all_day = (
+			new_start_date.time() == datetime.min.time()
+			and new_end_date.time() == datetime.min.time()
+			and new_start_date != new_end_date
+		)
 		# create request body
 		event_details = {
 			"summary": new_summary or event.title,
 			"location": new_location or event.location or "",
-			"description": (
-				html_parser.md_links_to_html(new_description)
-				if new_description is not None
-				else event.description or ""
+			"description": html_parser.md_links_to_html(
+				new_description or event.description or ""
 			),
-			"start": {
-				"timeZone": self.timezone,
-				"dateTime": new_start_date.isoformat("T", "seconds"),
-			},
-			"end": {
-				"timeZone": self.timezone,
-				"dateTime": new_end_date.isoformat("T", "seconds"),
-			},
+			"start": (
+				{
+					"dateTime": new_start_date.isoformat("T", "seconds"),
+					"timeZone": self.timezone,
+				}
+				if not all_day
+				else {"date": new_start_date.date().isoformat()}
+			),
+			"end": (
+				{
+					"dateTime": new_end_date.isoformat("T", "seconds"),
+					"timeZone": self.timezone,
+				}
+				if not all_day
+				else {"date": new_end_date.date().isoformat()}
+			),
 		}
 		# update the event
 		updated_event = (
