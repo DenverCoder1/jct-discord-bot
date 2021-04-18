@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import Dict, Optional, Sequence
-from . import html_parser
+import re
+from typing import Dict, Generator, Optional, Sequence
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
@@ -218,7 +218,7 @@ class CalendarEmbedder:
 		but preserves links using markdown if they get cut off"""
 		text = text.replace("<br>", "\n")
 		# if limit is in the middle of a link, let the whole link through (shortened reasonably)
-		for match in html_parser.match_md_links(text):
+		for match in self.__match_md_links(text):
 			# increase limit by the number of hidden characters
 			limit += len(f"[]({match.group(2)})")
 			# if match extends beyond the limit, move limit to the end of the match
@@ -249,3 +249,19 @@ class CalendarEmbedder:
 		page_num_text = f"Page {page_num} | " if page_num is not None else ""
 		timezone_text = f"Times are shown for {self.timezone}"
 		return page_num_text + timezone_text
+
+	__MD_LINK_REGEX = re.compile(
+		# Group 1: The label
+		# Group 2: The full URL including any title text
+		# Group 3: The full URL without the title text
+		r"\[(.*?[^\\])\]\(((https?:\/\/\S+).*?)\)"
+	)
+
+	@classmethod
+	def __match_md_links(cls, text: str) -> Generator[re.Match, None, None]:
+		start = 0
+		match = cls.__MD_LINK_REGEX.search(text)
+		while match:
+			yield match
+			start = match.end()
+			match = cls.__MD_LINK_REGEX.search(text, pos=start)
