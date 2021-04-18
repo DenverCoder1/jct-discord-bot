@@ -6,7 +6,7 @@ beautifulsoup4==4.9.1
 psycopg2-binary==2.8.6
 google-api-python-client==2.2.0
 google-auth-httplib2==0.0.4
-google-auth-oauthlib==0.4.2
+google-auth-oauthlib==0.4.4
 dateparser==1.0.0
 pyluach==1.2.1
 fuzzywuzzy==0.18.0
