@@ -1,12 +1,12 @@
 discord.py==1.7.1
 discord-py-slash-command==1.1.2
-python-dotenv==0.15.0
+python-dotenv==0.17.0
 googlesearch-python==2020.0.2
 beautifulsoup4==4.9.1
 psycopg2-binary==2.8.6
 google-api-python-client==2.2.0
 google-auth-httplib2==0.0.4
-google-auth-oauthlib==0.4.2
+google-auth-oauthlib==0.4.4
 dateparser==1.0.0
 pyluach==1.2.1
 fuzzywuzzy==0.18.0
