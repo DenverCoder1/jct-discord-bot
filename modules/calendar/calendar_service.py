@@ -7,6 +7,7 @@ from google.oauth2 import service_account
 from datetime import datetime
 from fuzzywuzzy import fuzz
 from markdown import Markdown
+from .default_title import DefaultTitle
 from markdownify import markdownify as html_to_md
 import config
 
@@ -19,7 +20,7 @@ class CalendarService:
 		)
 		self.service = build("calendar", "v3", credentials=self.creds)
 		self.timezone = timezone
-		self.md = Markdown()
+		self.md = Markdown(extensions=[DefaultTitle()])
 
 	def get_links(self, calendar: Calendar) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
