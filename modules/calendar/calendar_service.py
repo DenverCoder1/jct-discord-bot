@@ -1,14 +1,12 @@
 from .calendar import Calendar
 from .event import Event
+from .md_html_converter import md_to_html, html_to_md
 from utils.utils import parse_date
 from typing import Any, Dict, Optional, Sequence
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
 from fuzzywuzzy import fuzz
-from markdown import Markdown
-from .default_title import DefaultTitle
-from markdownify import markdownify as html_to_md
 import config
 
 
@@ -20,7 +18,6 @@ class CalendarService:
 		)
 		self.service = build("calendar", "v3", credentials=self.creds)
 		self.timezone = timezone
-		self.md = Markdown(extensions=[DefaultTitle()])
 
 	def get_links(self, calendar: Calendar) -> Dict[str, str]:
 		"""Get a dict of links for adding and viewing a given Google Calendar"""
@@ -106,7 +103,7 @@ class CalendarService:
 		event_details = {
 			"summary": summary,
 			"location": location,
-			"description": self.md.convert(description),
+			"description": md_to_html(description),
 			"start": (
 				{
 					"dateTime": start_date.isoformat("T", "seconds"),
@@ -177,7 +174,7 @@ class CalendarService:
 		event_details = {
 			"summary": new_summary or event.title,
 			"location": new_location or event.location or "",
-			"description": self.md.convert(new_description or event.description or ""),
+			"description": md_to_html(new_description or event.description or ""),
 			"start": (
 				{
 					"dateTime": new_start_date.isoformat("T", "seconds"),
