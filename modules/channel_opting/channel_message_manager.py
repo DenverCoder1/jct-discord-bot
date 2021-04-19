@@ -1,5 +1,5 @@
 from typing import List, Optional
-from utils.embedder import embed_success
+from utils.embedder import build_embed
 from utils.utils import one
 from database.channel_message import ChannelMessage
 import discord
@@ -69,7 +69,7 @@ class ChannelMessageManager:
 	async def __send_channel_message(
 		self, channel: discord.TextChannel
 	) -> discord.Message:
-		embed = embed_success(
+		embed = build_embed(
 			title=channel.name.replace("-", " ").title(),
 			description=channel.mention,
 			colour=discord.Colour.dark_purple(),

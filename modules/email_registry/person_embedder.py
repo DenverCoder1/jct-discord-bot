@@ -1,11 +1,11 @@
 from typing import Iterable
-from utils.embedder import embed_success
+from utils.embedder import build_embed
 from database.person import Person
 import discord
 
 
 def gen_embed(person: Person):
-	return embed_success(
+	return build_embed(
 		title=person.name,
 		description=(
 			f"{person.linked_emails}\n{person.categories}".strip()

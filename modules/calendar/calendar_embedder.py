@@ -2,7 +2,7 @@ from __future__ import annotations
 import re
 from typing import Dict, Generator, Optional, Sequence
 from utils import utils
-from utils.embedder import embed_success
+from utils.embedder import build_embed
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
@@ -182,7 +182,7 @@ class CalendarEmbedder:
 		description += links
 		# add page number and timezone info
 		footer = self.__footer_text(page_num=page_num)
-		return embed_success(
+		return build_embed(
 			title=title,
 			description=description,
 			footer=footer,
@@ -198,7 +198,7 @@ class CalendarEmbedder:
 		"""Embed a list of links given a mapping of link text to urls"""
 		# add links to embed
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
-		return embed_success(
+		return build_embed(
 			title=title, description="\n".join(description), colour=colour
 		)
 
@@ -216,7 +216,7 @@ class CalendarEmbedder:
 		description += self.__calendar_links(calendar)
 		# add timezone info
 		footer = self.__footer_text()
-		return embed_success(
+		return build_embed(
 			title=title,
 			description=description,
 			footer=footer,

@@ -9,10 +9,9 @@ def embed_success(
 	description: Optional[str] = None,
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
-	colour: discord.Colour = discord.Colour.green(),
 ) -> discord.Embed:
 	"""Embed a success message and an optional description, footer, and url"""
-	return __embed(title, description, footer, url, colour)
+	return build_embed(title, description, footer, url, discord.Colour.green())
 
 
 def embed_warning(
@@ -20,10 +19,9 @@ def embed_warning(
 	description: Optional[str] = None,
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
-	colour: discord.Colour = discord.Colour.gold(),
 ) -> discord.Embed:
 	"""Embed a warning message and an optional description, footer, and url"""
-	return __embed(title, description, footer, url, colour)
+	return build_embed(title, description, footer, url, discord.Colour.gold())
 
 
 def embed_error(
@@ -31,18 +29,17 @@ def embed_error(
 	description: Optional[str] = None,
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
-	colour: discord.Colour = discord.Colour.red(),
 ) -> discord.Embed:
 	"""Embed an error message and an optional description, footer, and url"""
-	return __embed(title, description, footer, url, colour)
+	return build_embed(title, description, footer, url, discord.Colour.red())
 
 
-def __embed(
+def build_embed(
 	title: str,
-	description: Optional[str],
-	footer: Optional[str],
-	url: Union[str, _EmptyEmbed],
-	colour: discord.Colour
+	description: Optional[str] = None,
+	footer: Optional[str] = None,
+	url: Union[str, _EmptyEmbed] = EmptyEmbed,
+	colour: discord.Colour = discord.Colour.blurple(),
 ) -> discord.Embed:
 	"""Embed a message and an optional description, footer, and url"""
 	# create the embed
