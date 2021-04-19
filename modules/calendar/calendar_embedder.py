@@ -171,7 +171,7 @@ class CalendarEmbedder:
 				break
 			# get event details and add enumeration emoji if available
 			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
-			# make sure embed doesn't exceed max length
+			# make sure embed doesn't exceed max length (unless it won't fit on its own page)
 			if len(description + event_details + links) > self.max_length and i > 0:
 				break
 			# add event to embed
