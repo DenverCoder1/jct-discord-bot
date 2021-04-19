@@ -1,6 +1,8 @@
 from __future__ import annotations
 import re
 from typing import Dict, Generator, Optional, Sequence
+from utils import utils
+from utils.embedder import embed_success
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
@@ -151,19 +153,18 @@ class CalendarEmbedder:
 		:param page_num: :class:`Optional[int]` page number to display in the footer
 		:param max_results: :class:`int` maximum results to display in the list
 		"""
-		embed = discord.Embed(title=title, colour=colour)
 		# get calendar links
 		links = self.__calendar_links(calendar)
 		# limit max results to the number of emojis in the enumeration
 		max_results = min(max_results, len(enumeration)) if enumeration else max_results
 		# set initial description if available
-		embed.description = f"{description}\n" if description else ""
+		description = f"{description}\n" if description else ""
 		# check if events peekable is empty
-		embed.description += "No events found.\n" if not events else ""
+		description += "No events found.\n" if not events else ""
 		# create iterator for enumeration
 		enumerator = iter(enumeration)
 		# add events to embed
-		for _ in range(max_results):
+		for i in range(max_results):
 			event = events.peek(None)
 			# if event is None, no more events
 			if not event:
@@ -171,17 +172,22 @@ class CalendarEmbedder:
 			# get event details and add enumeration emoji if available
 			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
 			# make sure embed doesn't exceed max length
-			if len(embed.description + event_details + links) > self.max_length:
+			if len(description + event_details + links) > self.max_length and i > 0:
 				break
 			# add event to embed
-			embed.description += event_details
+			description += event_details
 			# consume event
 			next(events)
 		# add links for viewing and editing on Google Calendar
-		embed.description += links
+		description += links
 		# add page number and timezone info
-		embed.set_footer(text=self.__footer_text(page_num=page_num))
-		return embed
+		footer = self.__footer_text(page_num=page_num)
+		return embed_success(
+			title=title,
+			description=description,
+			footer=footer,
+			colour=colour
+		)
 
 	def embed_links(
 		self,
@@ -190,11 +196,11 @@ class CalendarEmbedder:
 		colour: discord.Colour = discord.Colour.dark_blue(),
 	) -> discord.Embed:
 		"""Embed a list of links given a mapping of link text to urls"""
-		embed = discord.Embed(title=title, colour=colour)
 		# add links to embed
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
-		embed.description = "\n".join(description)
-		return embed
+		return embed_success(
+			title=title, description="\n".join(description), colour=colour
+		)
 
 	def embed_event(
 		self,
@@ -204,14 +210,18 @@ class CalendarEmbedder:
 		colour: discord.Colour = discord.Colour.green(),
 	) -> discord.Embed:
 		"""Embed an event with the summary, link, and dates"""
-		embed = discord.Embed(title=title, colour=colour)
 		# add overview of event to the embed
-		embed.description = self.__format_event(event)
+		description = self.__format_event(event)
 		# add links for viewing and editing on Google Calendar
-		embed.description += self.__calendar_links(calendar)
+		description += self.__calendar_links(calendar)
 		# add timezone info
-		embed.set_footer(text=self.__footer_text())
-		return embed
+		footer = self.__footer_text()
+		return embed_success(
+			title=title,
+			description=description,
+			footer=footer,
+			colour=colour
+		)
 
 	def __format_paragraph(self, text: str, limit: int = 100) -> str:
 		"""Trims a string of text to approximately `limit` displayed characters,
@@ -225,7 +235,7 @@ class CalendarEmbedder:
 			if match.end() > limit:
 				limit = match.end() if match.start() < limit else limit
 				break
-		return text[:limit].strip() + "..." if len(text) > limit else text.strip()
+		return utils.trim(text, limit)
 
 	def __format_event(self, event: Event) -> str:
 		"""Format event as a markdown linked summary and the dates below"""
