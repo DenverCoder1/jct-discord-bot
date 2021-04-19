@@ -1,13 +1,13 @@
-from . import html_parser
 from .calendar import Calendar
 from .event import Event
+from .md_html_converter import md_to_html, html_to_md
 from utils.utils import parse_date
 from typing import Any, Dict, Optional, Sequence
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from datetime import datetime
-import config
 from fuzzywuzzy import fuzz
+import config
 
 
 class CalendarService:
@@ -103,7 +103,7 @@ class CalendarService:
 		event_details = {
 			"summary": summary,
 			"location": location,
-			"description": html_parser.md_links_to_html(description),
+			"description": md_to_html(description),
 			"start": (
 				{
 					"dateTime": start_date.isoformat("T", "seconds"),
@@ -174,9 +174,7 @@ class CalendarService:
 		event_details = {
 			"summary": new_summary or event.title,
 			"location": new_location or event.location or "",
-			"description": html_parser.md_links_to_html(
-				new_description or event.description or ""
-			),
+			"description": md_to_html(new_description or event.description or ""),
 			"start": (
 				{
 					"dateTime": new_start_date.isoformat("T", "seconds"),
@@ -234,7 +232,7 @@ class CalendarService:
 			title=details["summary"],
 			all_day=("date" in details["start"]),
 			location=details.get("location"),
-			description=html_parser.html_links_to_md(desc) if desc else None,
+			description=html_to_md(desc) if desc else None,
 			start=self.__get_endpoint_datetime(details, "start"),
 			end=self.__get_endpoint_datetime(details, "end"),
 		)
