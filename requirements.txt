@@ -14,3 +14,4 @@ python-Levenshtein==0.12.2
 more-itertools==8.7.0
 markdown==3.3.4
 markdownify==0.6.5
+lxml==4.6.3
