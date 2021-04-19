@@ -185,5 +185,5 @@ def one(iterable: Iterable):
 	"""Returns a single element from an iterable or raises StopIteration if it was empty."""
 	return next(iter(iterable))
 
-def trim(text: str, limit: int):
+def trim(text: str, limit: int) -> str:
 	return text[:limit - 3].strip() + "..." if len(text) > limit else text
