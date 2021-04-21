@@ -8,8 +8,37 @@ class PollCog(commands.Cog):
 		self.bot = bot
 		self.polls = {}
 
-	@commands.command(name="poll")
-	async def poll(self, ctx, *args):
+	@cog_ext.cog_subcommand(
+		base="poll",
+		name="create",
+		description="Create a poll.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="title",
+				description=(
+					"Title of the poll that you would like to create"					
+				),
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="option_1",
+				description="First poll option.",
+				option_type=SlashCommandOptionType.STRING,
+				required=True,
+			),
+			create_option(
+				name="option_2",
+				description=(
+					"Second poll option."					
+				),
+				option_type=SlashCommandOptionType.STRING,
+				required=True				
+			),
+		],
+	)
+	async def create(self, ctx, *args):
 		""" A command to create new user polls """
 
 		# Create the Poll object
@@ -28,14 +57,14 @@ class PollCog(commands.Cog):
 
 	# TODO: This will have to be changed to on_raw_reaction_add because on_reaction_add only triggers for messages in the bot's cache
 	@commands.Cog.listener()
-	async def on_reaction_add(self, reaction: discord.Reaction, member: discord.Member):
+	async def on_raw_reaction_add(self, reaction: discord.Reaction, member: discord.Member):
 		if reaction.message in self.polls and not member.bot:
 			# print(member.display_name + "added reaction")
 			await self.polls[reaction.message].vote(reaction, member)
 
 	# TODO: change to on_raw_reaction_remove, same reason as above
 	@commands.Cog.listener()
-	async def on_reaction_remove(
+	async def on_raw_reaction_remove(
 		self, reaction: discord.Reaction, member: discord.Member
 	):
 		if reaction.message in self.polls and not member.bot:
