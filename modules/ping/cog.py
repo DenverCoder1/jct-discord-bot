@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
+import os
 import config
 import random
 import getpass
@@ -12,7 +13,7 @@ class PingCog(commands.Cog):
 
 	def __init__(self, bot: commands.Bot):
 		self.bot = bot
-		with open("modules/ping/responses.txt") as responses:
+		with open(os.path.join("modules", "ping", "responses.txt")) as responses:
 			self.lines = responses.readlines()
 
 	@cog_ext.cog_slash(
