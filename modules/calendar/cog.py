@@ -39,7 +39,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to show links for (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -158,7 +158,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to add event to (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -255,7 +255,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to update event in (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -333,7 +333,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to delete event from (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -385,7 +385,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to get access to (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
