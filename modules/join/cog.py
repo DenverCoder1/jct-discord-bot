@@ -60,16 +60,17 @@ class JoinCog(commands.Cog):
 		],
 	)
 	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
-	async def _join(
+	async def join(
 		self,
 		ctx: SlashContext,
 		first_name: str,
 		last_name: str,
-		campus_id: int,
+		campus: int,
 		year: int,
 	):
+		await ctx.defer()
 		await assigner.assign(
-			ctx.author, f"{first_name.title()} {last_name.title()}", campus_id, year
+			ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
 		)
 		await ctx.send(
 			embeds=[
