@@ -33,9 +33,9 @@ class ChannelMessageManager:
 					allowed = None
 				if not member or member.bot:
 					return
-				await channel_message.referenced_channel.set_permissions(
-					member, view_channel=allowed
-				)
+				channel = channel_message.referenced_channel
+				assert channel is not None
+				await channel.set_permissions(member, view_channel=allowed)
 			except StopIteration:
 				pass
 
@@ -58,9 +58,9 @@ class ChannelMessageManager:
 			return
 		try:
 			channel_message = one(
-				cm for cm in channel_messages if cm.referenced_channel == channel
+				cm for cm in channel_messages if cm.referenced_channel_id == channel.id
 			)
-			await channel_message.message.delete()
+			await (await channel_message.message).delete()
 			channel_message.delete_from_database()
 			channel_messages.remove(channel_message)
 		except StopIteration:

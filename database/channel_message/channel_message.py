@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Optional
 import discord
 import config
 from functools import cached_property, cache
@@ -26,18 +26,27 @@ class ChannelMessage:
 		return await self.__host_channel().fetch_message(self.__message_id)
 
 	@cached_property
-	def referenced_channel(self) -> discord.TextChannel:
-		"""The channel that this message controls."""
+	def referenced_channel_id(self) -> int:
+		"""The ID of the channel that this message controls."""
+		return self.__referenced_channel_id
+
+	@cached_property
+	def referenced_channel(self) -> Optional[discord.TextChannel]:
+		"""The channel that this message controls, or None if the channel has been deleted."""
 		return self.__get_channel(self.__referenced_channel_id)
 
 	@cache
 	def __host_channel(self) -> discord.TextChannel:
-		return self.__get_channel(self.__host_channel_id)
+		channel = self.__get_channel(self.__host_channel_id)
+		assert channel is not None
+		return channel
 
 	@staticmethod
-	def __get_channel(channel_id: int) -> discord.TextChannel:
+	def __get_channel(channel_id: int) -> Optional[discord.TextChannel]:
+		"""
+		Returns a channel with the given ID, or None if it doesn't exist or is deleted.
+		"""
 		channel = discord.utils.get(config.guild().text_channels, id=channel_id)
-		assert channel is not None
 		return channel
 
 	@classmethod
@@ -75,4 +84,4 @@ class ChannelMessage:
 		)
 		with config.conn as conn:
 			with conn.cursor() as cursor:
-				cursor.execute(query, {"message_id", self.message_id})
+				cursor.execute(query, {"message_id": self.message_id})
