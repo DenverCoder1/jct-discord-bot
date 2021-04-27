@@ -48,7 +48,7 @@ class Greeter:
 
 	async def private_greet(self, member: discord.Member):
 		"""privately messages the user who joined"""
-		await (member.dm_channel or member.create_dm()).send(
+		await (member.dm_channel or await member.create_dm()).send(
 			utils.remove_tabs(
 				f"""
 				Welcome to the JCT CompSci ESP server, {member.mention}!
