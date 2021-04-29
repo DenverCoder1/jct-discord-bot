@@ -2,7 +2,7 @@ discord.py==1.7.1
 discord-py-slash-command==1.1.2
 python-dotenv==0.17.0
 googlesearch-python==2020.0.2
-beautifulsoup4==4.9.1
+beautifulsoup4==4.9.3
 psycopg2-binary==2.8.6
 google-api-python-client==2.3.0
 google-auth-httplib2==0.1.0
