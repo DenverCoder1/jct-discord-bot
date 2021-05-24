@@ -13,5 +13,5 @@ fuzzywuzzy==0.18.0
 python-Levenshtein==0.12.2
 more-itertools==8.7.0
 markdown==3.3.4
-markdownify==0.7.4
+markdownify==0.8.0
 lxml==4.6.3
