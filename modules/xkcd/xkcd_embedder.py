@@ -7,8 +7,8 @@ class XKCDEmbedder:
 	def gen_embed(self, comic: Comic) -> discord.Embed:
 		embed = build_embed(
 			title=f"{comic.num}: {comic.title}",
-			url=f"https://xkcd.com/{comic.num}"
+			footer=comic.alt,
+			url=f"https://xkcd.com/{comic.num}",
+			image=comic.img,
 		)
-		embed.set_image(url=comic.img)
-		embed.set_footer(text=comic.alt)
 		return embed

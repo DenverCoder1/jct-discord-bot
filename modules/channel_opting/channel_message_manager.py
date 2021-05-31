@@ -71,10 +71,10 @@ class ChannelMessageManager:
 	) -> discord.Message:
 		embed = build_embed(
 			title=channel.name.replace("-", " ").title(),
+			footer=f"Click {self.__emoji} to opt out of this channel.",
 			description=channel.mention,
 			colour=discord.Colour.dark_purple(),
 		)
-		embed.set_footer(text=f"Click {self.__emoji} to opt out of this channel.")
 		message = await self.__host_channel.send(embed=embed)
 		await message.add_reaction(self.__emoji)
 		return message
