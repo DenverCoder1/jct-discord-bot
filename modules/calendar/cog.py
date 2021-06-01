@@ -305,7 +305,13 @@ class CalendarCog(commands.Cog):
 			)
 		try:
 			event = self.service.update_event(
-				calendar.id, event_to_update, title, start, end, description, location,
+				calendar.id,
+				event_to_update,
+				title,
+				start,
+				end,
+				description,
+				location,
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -345,7 +351,10 @@ class CalendarCog(commands.Cog):
 		],
 	)
 	async def event_delete(
-		self, ctx: SlashContext, query: str, class_name: Optional[int] = None,
+		self,
+		ctx: SlashContext,
+		query: str,
+		class_name: Optional[int] = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
@@ -397,23 +406,26 @@ class CalendarCog(commands.Cog):
 		],
 	)
 	async def calendar_grant(
-		self, ctx: SlashContext, email: str, class_name: Optional[int] = None,
+		self,
+		ctx: SlashContext,
+		email: str,
+		class_name: Optional[int] = None,
 	):
-		await ctx.defer()
+		await ctx.defer(hidden=True)
 		# get calendar from selected class_role or author
 		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
 		# validate email address
 		if not is_email(email):
-			raise FriendlyError("Invalid email address", ctx, ctx.author)
+			raise FriendlyError("Invalid email address", ctx, ctx.author, hidden=True)
 		# add manager to calendar
 		if self.service.add_manager(calendar.id, email):
 			embed = embed_success(
 				f":office_worker: Successfully added manager to {calendar.name}."
 			)
-			await ctx.send(embed=embed)
+			await ctx.send(embed=embed, hidden=True)
 			return
 		raise FriendlyError(
-			"An error occurred while applying changes.", ctx, ctx.author
+			"An error occurred while applying changes.", ctx, ctx.author, hidden=True
 		)
 
 	@Scheduler.schedule(1)

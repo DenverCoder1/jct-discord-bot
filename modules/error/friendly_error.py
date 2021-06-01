@@ -23,6 +23,8 @@ class FriendlyError(Exception):
 			Description for the FriendlyError embed.
 	image: Optional[:class:`str`]
 			Image for the FriendlyError embed.
+	hidden: :class:`bool`
+			Whether the message is hidden, which means message content will only be seen to the author.
 	"""
 
 	def __init__(
@@ -33,12 +35,14 @@ class FriendlyError(Exception):
 		inner: Optional[BaseException] = None,
 		description: Optional[str] = None,
 		image: Optional[str] = None,
+		hidden: bool = False,
 	):
 		self.sender = sender
 		self.member = member
 		self.inner = inner
 		self.description = description
 		self.image = image
+		self.hidden = hidden
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
@@ -52,5 +56,6 @@ class FriendlyError(Exception):
 		await sender.send(
 			embed=utils.embedder.embed_error(
 				str(self), description=self.description, image=self.image
-			)
+			),
+			hidden=self.hidden,
 		)
