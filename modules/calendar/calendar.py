@@ -70,7 +70,10 @@ class Calendar:
 			# no group roles found
 			if not member_groups:
 				raise FriendlyError(
-					"Could not find your class role.", ctx, ctx.author,
+					"Could not find your class role.",
+					ctx,
+					ctx.author,
+					hidden=ctx._deferred_hidden,
 				)
 			# multiple group roles found
 			if len(member_groups) > 1:
@@ -79,6 +82,7 @@ class Calendar:
 					" roles.",
 					ctx,
 					ctx.author,
+					hidden=ctx._deferred_hidden,
 				)
 			# only one group found
 			group = one(member_groups)
