@@ -1,4 +1,4 @@
-discord.py==1.7.2
+discord.py==1.7.3
 discord-py-slash-command==1.2.2
 python-dotenv==0.17.1
 googlesearch-python==1.0.1
