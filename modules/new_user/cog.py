@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import config
 
+
 class NewUserCog(commands.Cog):
 	"""Ask members who join to use the join command"""
 
