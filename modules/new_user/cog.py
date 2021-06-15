@@ -1,6 +1,7 @@
 from .greeter import Greeter
 import discord
 from discord.ext import commands
+import config
 
 
 class NewUserCog(commands.Cog):
@@ -13,6 +14,11 @@ class NewUserCog(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_join(self, member: discord.Member):
 		"""Ask members who join to use the join command."""
+
+		# if joined a different guild, skip welcoming
+		if member.guild != config.guild():
+			return
+
 		print(f"{member.name} joined the server.")
 
 		await self.greeter.give_initial_role(member)
