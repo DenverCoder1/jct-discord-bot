@@ -161,7 +161,7 @@ class EmailRegistryCog(commands.Cog):
 	)
 	@commands.has_guild_permissions(manage_roles=True)
 	async def add_person(
-		self, ctx: SlashContext, first_name: str, last_name: str, channels: str
+		self, ctx: SlashContext, first_name: str, last_name: str, channels: str = ""
 	):
 		await ctx.defer()
 		person = person_adder.add_person(
