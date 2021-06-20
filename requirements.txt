@@ -3,7 +3,7 @@ discord-py-slash-command==1.2.2
 python-dotenv==0.17.1
 googlesearch-python==1.0.1
 beautifulsoup4==4.9.3
-psycopg2-binary==2.8.6
+psycopg2-binary==2.9.1
 google-api-python-client==2.9.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.4.4
