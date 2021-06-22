@@ -47,7 +47,7 @@ class JoinCog(commands.Cog):
 			),
 			create_option(
 				name="year",
-				description="Your year (an integer 1 to 4 inclusive)",
+				description="Your year",
 				option_type=SlashCommandOptionType.INTEGER,
 				required=True,
 				choices=[
