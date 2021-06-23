@@ -1,5 +1,5 @@
 discord.py==1.7.3
-discord-py-slash-command==2.0.0
+discord-py-slash-command==2.0.1
 python-dotenv==0.18.0
 googlesearch-python==1.0.1
 beautifulsoup4==4.9.3
