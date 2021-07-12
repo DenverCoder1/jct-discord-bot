@@ -3,6 +3,10 @@ from typing import Optional, Union
 from discord.embeds import EmptyEmbed, _EmptyEmbed
 from utils import utils
 
+MAX_EMBED_DESCRIPTION_LENGTH = 4096
+MAX_EMBED_FIELD_TITLE_LENGTH = 256
+MAX_EMBED_FIELD_FOOTER_LENGTH = 2048
+
 
 def embed_success(
 	title: str,
@@ -47,11 +51,11 @@ def build_embed(
 ) -> discord.Embed:
 	"""Embed a message and an optional description, footer, and url"""
 	# create the embed
-	embed = discord.Embed(title=utils.trim(title, 256), url=url, colour=colour)
+	embed = discord.Embed(title=utils.trim(title, MAX_EMBED_FIELD_TITLE_LENGTH), url=url, colour=colour)
 	if description:
-		embed.description = utils.trim(description, 2048)
+		embed.description = utils.trim(description, MAX_EMBED_DESCRIPTION_LENGTH)
 	if footer:
-		embed.set_footer(text=utils.trim(footer, 2048))
+		embed.set_footer(text=utils.trim(footer, MAX_EMBED_FIELD_FOOTER_LENGTH))
 	if image:
 		embed.set_image(url=image)
 	return embed
