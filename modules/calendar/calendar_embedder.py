@@ -59,7 +59,11 @@ class CalendarEmbedder:
 				await sender(embed=embed)
 				# if only one page, break out of loop
 				if not page_num:
-					break
+					# if no more events found, break out of loop
+					if not events.peek(None):
+						break
+					# if there are more events, this was just the first page
+					page_num = 1
 				# set emoji and page based on whether there are more events
 				if events:
 					next_emoji = "⏬"
