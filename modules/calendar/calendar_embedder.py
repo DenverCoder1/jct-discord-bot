@@ -2,7 +2,7 @@ from __future__ import annotations
 import re
 from typing import Dict, Generator, Optional, Sequence
 from utils import utils
-from utils.embedder import build_embed
+from utils.embedder import build_embed, MAX_EMBED_DESCRIPTION_LENGTH
 from discord.ext import commands
 from utils.utils import one, wait_for_reaction
 from discord_slash.context import SlashContext
@@ -17,8 +17,6 @@ class CalendarEmbedder:
 	def __init__(self, bot: commands.Bot, timezone: str):
 		self.bot = bot
 		self.timezone = timezone
-		# maximum length of embed description
-		self.max_length = 2048
 		# emoji list for enumerating events
 		self.number_emoji = (
 			"0️⃣",
@@ -172,7 +170,7 @@ class CalendarEmbedder:
 			# get event details and add enumeration emoji if available
 			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
 			# make sure embed doesn't exceed max length (unless it won't fit on its own page)
-			if len(description + event_details + links) > self.max_length and i > 0:
+			if len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH and i > 0:
 				break
 			# add event to embed
 			description += event_details
