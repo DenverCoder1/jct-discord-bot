@@ -43,7 +43,7 @@ class CalendarEmbedder:
 		# peekable generator for events
 		events = peekable(events_list)
 		# set start index
-		page_num = 1 if len(events_list) > results_per_page else None
+		page_num = 1
 		while True:
 			try:
 				# create embed
@@ -57,18 +57,15 @@ class CalendarEmbedder:
 				)
 				sender = ctx.send if ctx.message is None else ctx.message.edit
 				await sender(embed=embed)
-				# if only one page, break out of loop
-				if not page_num:
-					# if no more events found, break out of loop
-					if not events.peek(None):
-						break
-					# if there are more events, this was just the first page
-					page_num = 1
 				# set emoji and page based on whether there are more events
 				if events:
 					next_emoji = "⏬"
 					page_num += 1
 				else:
+					# if only 1 page, exit the loop
+					if page_num == 1:
+						break
+					# add reaction for starting over from page 1
 					next_emoji = "⤴️"
 					page_num = 1
 					# reset the peekable generator
@@ -182,6 +179,9 @@ class CalendarEmbedder:
 			next(events)
 		# add links for viewing and editing on Google Calendar
 		description += links
+		# hide page number if page one and no more results
+		if page_num == 1 and not events:
+			page_num = None
 		# add page number and timezone info
 		footer = self.__footer_text(page_num=page_num)
 		return build_embed(
