@@ -1,3 +1,6 @@
+from utils.embedder import embed_success
+from modules.email_registry import person_remover
+from discord.channel import TextChannel
 import config
 import discord
 from database.person import Person
@@ -62,7 +65,8 @@ class EmailRegistryCog(commands.Cog):
 					ctx,
 				)
 			raise FriendlyError(
-				"Please specify the professor's name or channel of the email you are looking for.",
+				"Please specify the professor's name or channel of the email you are"
+				" looking for.",
 				ctx,
 				image="https://media.discordapp.net/attachments/798518399842910228/849023621460131872/EmailSlashCommand.gif",
 			)
@@ -168,6 +172,47 @@ class EmailRegistryCog(commands.Cog):
 			first_name, last_name, extract_channel_mentions(channels), ctx
 		)
 		await ctx.send(embed=person_embedder.gen_embed(person))
+
+	@cog_ext.cog_subcommand(
+		base="email",
+		subcommand_group="person",
+		name="remove",
+		description="Remove a faculty member from the email registry.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="name",
+				description="The name of the person you want to remove.",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+			create_option(
+				name="channel",
+				description="A channel this person is associated with.",
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=False,
+			),
+			create_option(
+				name="email",
+				description="The email address of the person you want to remove.",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+		],
+	)
+	@commands.has_guild_permissions(manage_roles=True)
+	async def remove_person(
+		self,
+		ctx: SlashContext,
+		name: Optional[str] = None,
+		channel: Optional[TextChannel] = None,
+		email: Optional[str] = None,
+	):
+		await ctx.defer()
+		person = person_remover.remove_person(ctx, name, channel, email)
+		await ctx.send(
+			embed=embed_success(f"Successfully removed {person.name} from the system.")
+		)
 
 	@cog_ext.cog_subcommand(
 		base="email",
