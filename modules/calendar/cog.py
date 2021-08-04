@@ -39,7 +39,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to show links for (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -49,10 +49,11 @@ class CalendarCog(commands.Cog):
 				],
 			),
 		],
+		connector={"class_name": "group_id"},
 	)
-	async def calendar_links(self, ctx: SlashContext, class_name: Optional[int] = None):
+	async def calendar_links(self, ctx: SlashContext, group_id: Optional[int] = None):
 		# get calendar from selected class_role or author
-		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, group_id)
 		# fetch links for calendar
 		links = self.service.get_links(calendar)
 		embed = self.embedder.embed_links(
@@ -94,17 +95,18 @@ class CalendarCog(commands.Cog):
 				],
 			),
 		],
+		connector={"class_name": "group_id"},
 	)
 	async def events(
 		self,
 		ctx: SlashContext,
 		query: str = "",
 		results_per_page: int = 5,
-		class_name: Optional[int] = None,
+		group_id: Optional[int] = None,
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, group_id)
 		# convert channel mentions to full names
 		full_query = course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
@@ -158,7 +160,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to add event to (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -168,6 +170,7 @@ class CalendarCog(commands.Cog):
 				],
 			),
 		],
+		connector={"class_name": "group_id"},
 	)
 	async def event_add(
 		self,
@@ -177,7 +180,7 @@ class CalendarCog(commands.Cog):
 		end: Optional[str] = None,
 		description: str = "",
 		location: str = "",
-		class_name: Optional[int] = None,
+		group_id: Optional[int] = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
@@ -185,7 +188,7 @@ class CalendarCog(commands.Cog):
 		description = course_mentions.replace_channel_mentions(description)
 		location = course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
-		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, group_id)
 		try:
 			event = self.service.add_event(
 				calendar.id, title, start, end, description, location
@@ -255,7 +258,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to update event in (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -265,6 +268,7 @@ class CalendarCog(commands.Cog):
 				],
 			),
 		],
+		connector={"class_name": "group_id"},
 	)
 	async def event_update(
 		self,
@@ -275,13 +279,13 @@ class CalendarCog(commands.Cog):
 		end: Optional[str] = None,
 		description: Optional[str] = None,
 		location: Optional[str] = None,
-		class_name: Optional[int] = None,
+		group_id: Optional[int] = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
 		query = course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, group_id)
 		# get a list of upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
@@ -305,7 +309,13 @@ class CalendarCog(commands.Cog):
 			)
 		try:
 			event = self.service.update_event(
-				calendar.id, event_to_update, title, start, end, description, location,
+				calendar.id,
+				event_to_update,
+				title,
+				start,
+				end,
+				description,
+				location,
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -333,7 +343,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to delete event from (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -343,15 +353,19 @@ class CalendarCog(commands.Cog):
 				],
 			),
 		],
+		connector={"class_name": "group_id"},
 	)
 	async def event_delete(
-		self, ctx: SlashContext, query: str, class_name: Optional[int] = None,
+		self,
+		ctx: SlashContext,
+		query: str,
+		group_id: Optional[int] = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
 		query = course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, group_id)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
@@ -385,7 +399,7 @@ class CalendarCog(commands.Cog):
 			create_option(
 				name="class_name",
 				description=(
-					"Calendar to show events for (eg. Lev 2023). Leave blank if you"
+					"Calendar to get access to (eg. Lev 2023). Leave blank if you"
 					" have only one class role."
 				),
 				option_type=SlashCommandOptionType.INTEGER,
@@ -395,25 +409,29 @@ class CalendarCog(commands.Cog):
 				],
 			),
 		],
+		connector={"class_name": "group_id"},
 	)
 	async def calendar_grant(
-		self, ctx: SlashContext, email: str, class_name: Optional[int] = None,
+		self,
+		ctx: SlashContext,
+		email: str,
+		group_id: Optional[int] = None,
 	):
-		await ctx.defer()
+		await ctx.defer(hidden=True)
 		# get calendar from selected class_role or author
-		calendar = Calendar.get_calendar(ctx, self.groups, class_name)
+		calendar = Calendar.get_calendar(ctx, self.groups, group_id)
 		# validate email address
 		if not is_email(email):
-			raise FriendlyError("Invalid email address", ctx, ctx.author)
+			raise FriendlyError("Invalid email address", ctx, ctx.author, hidden=True)
 		# add manager to calendar
 		if self.service.add_manager(calendar.id, email):
 			embed = embed_success(
 				f":office_worker: Successfully added manager to {calendar.name}."
 			)
-			await ctx.send(embed=embed)
+			await ctx.send(embed=embed, hidden=True)
 			return
 		raise FriendlyError(
-			"An error occurred while applying changes.", ctx, ctx.author
+			"An error occurred while applying changes.", ctx, ctx.author, hidden=True
 		)
 
 	@Scheduler.schedule(1)

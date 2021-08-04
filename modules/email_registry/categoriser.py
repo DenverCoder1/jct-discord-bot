@@ -42,4 +42,4 @@ def __add_remove_categories(
 				cursor.execute(
 					query, {"person_id": person_id, "channel_id": channel_id}
 				)
-			return Person.get_person(person_id)
+	return Person.get_person(person_id)

@@ -5,7 +5,7 @@ import dateparser
 import asyncio
 import discord
 from datetime import datetime, timedelta
-from typing import Any, Collection, Dict, Iterable, Optional, Sequence
+from typing import Any, Collection, Dict, Iterable, Optional, Sequence, TypeVar
 from discord.errors import NotFound
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
@@ -181,6 +181,13 @@ async def wait_for_reaction(
 		return emoji_list.index(str(reaction.emoji))
 
 
-def one(iterable: Iterable):
+T = TypeVar("T")
+
+
+def one(iterable: Iterable[T]) -> T:
 	"""Returns a single element from an iterable or raises StopIteration if it was empty."""
 	return next(iter(iterable))
+
+
+def trim(text: str, limit: int) -> str:
+	return text[: limit - 3].strip() + "..." if len(text) > limit else text

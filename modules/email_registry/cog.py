@@ -55,14 +55,19 @@ class EmailRegistryCog(commands.Cog):
 		)
 		people = {person for person in people if person.emails}
 		if not people:
+			if name or channel:
+				raise FriendlyError(
+					"The email you are looking for aught to be here... But it isn't."
+					" Perhaps the archives are incomplete.",
+					ctx,
+				)
 			raise FriendlyError(
-				"The email you are looking for aught to be here... But it isn't."
-				" Perhaps the archives are incomplete.",
+				"Please specify the professor's name or channel of the email you are looking for.",
 				ctx,
+				image="https://media.discordapp.net/attachments/798518399842910228/849023621460131872/EmailSlashCommand.gif",
 			)
-		else:
-			embeds = person_embedder.gen_embeds(people)
-			await ctx.send(embeds=embeds)
+		embeds = person_embedder.gen_embeds(people)
+		await ctx.send(embeds=embeds)
 
 	@cog_ext.cog_subcommand(
 		base="email",
@@ -156,7 +161,7 @@ class EmailRegistryCog(commands.Cog):
 	)
 	@commands.has_guild_permissions(manage_roles=True)
 	async def add_person(
-		self, ctx: SlashContext, first_name: str, last_name: str, channels: str
+		self, ctx: SlashContext, first_name: str, last_name: str, channels: str = ""
 	):
 		await ctx.defer()
 		person = person_adder.add_person(

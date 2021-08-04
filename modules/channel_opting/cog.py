@@ -30,10 +30,14 @@ class ChannelOptingCog(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
+		if channel.guild != config.guild():
+			return
 		await self.__manager.create_channel_message(self.__channel_messages, channel)
 
 	@commands.Cog.listener()
 	async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+		if channel.guild != config.guild():
+			return
 		await self.__manager.delete_channel_message(self.__channel_messages, channel)
 
 

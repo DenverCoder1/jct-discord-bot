@@ -1,4 +1,5 @@
 from typing import List, Optional
+from utils.embedder import build_embed
 from utils.utils import one
 from database.channel_message import ChannelMessage
 import discord
@@ -32,9 +33,9 @@ class ChannelMessageManager:
 					allowed = None
 				if not member or member.bot:
 					return
-				await channel_message.referenced_channel.set_permissions(
-					member, view_channel=allowed
-				)
+				channel = channel_message.referenced_channel
+				assert channel is not None
+				await channel.set_permissions(member, view_channel=allowed)
 			except StopIteration:
 				pass
 
@@ -57,9 +58,9 @@ class ChannelMessageManager:
 			return
 		try:
 			channel_message = one(
-				cm for cm in channel_messages if cm.referenced_channel == channel
+				cm for cm in channel_messages if cm.referenced_channel_id == channel.id
 			)
-			await channel_message.message.delete()
+			await (await channel_message.message).delete()
 			channel_message.delete_from_database()
 			channel_messages.remove(channel_message)
 		except StopIteration:
@@ -68,12 +69,12 @@ class ChannelMessageManager:
 	async def __send_channel_message(
 		self, channel: discord.TextChannel
 	) -> discord.Message:
-		embed = discord.Embed(
+		embed = build_embed(
 			title=channel.name.replace("-", " ").title(),
+			footer=f"Click {self.__emoji} to opt out of this channel.",
 			description=channel.mention,
 			colour=discord.Colour.dark_purple(),
 		)
-		embed.set_footer(text=f"Click {self.__emoji} to opt out of this channel.")
 		message = await self.__host_channel.send(embed=embed)
 		await message.add_reaction(self.__emoji)
 		return message
