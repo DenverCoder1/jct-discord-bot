@@ -17,6 +17,7 @@ def remove_email(person: Person, email: str, ctx: SlashContext) -> Person:
 def __add_remove_email(
 	sql_file: str, person: Person, email: str, ctx: SlashContext
 ) -> Person:
+	email = email.strip()
 	query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 	with config.conn as conn:
 		with conn.cursor() as cursor:
