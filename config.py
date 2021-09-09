@@ -11,7 +11,7 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN", "")
 
 guild_id = int(os.getenv("DISCORD_GUILD", ""))
-_guild: Optional[discord.Guild]  # To be loaded on ready
+_guild: Optional[discord.Guild] = None # To be loaded on ready
 
 
 def guild() -> discord.Guild:

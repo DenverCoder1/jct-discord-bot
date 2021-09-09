@@ -12,8 +12,11 @@ def main():
 	intents.guilds = True
 	intents.members = True
 
+	activity = discord.Game("with students' patience")
+
 	# empty space effectively disables prefix since discord strips trailing spaces
-	bot = commands.Bot(" ", intents=intents)
+	bot = commands.Bot(" ", intents=intents, activity=activity)
+
 	setattr(bot, "slash", SlashCommand(bot, override_type=True, sync_commands=True))
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
@@ -24,9 +27,11 @@ def main():
 	@bot.event
 	async def on_ready():
 		"""When discord is connected"""
+		# skip if this function has already run
+		if config._guild is not None:
+			return
 		print(f"{bot.user.name} has connected to Discord!")
 		config._guild = bot.get_guild(config.guild_id)
-		await bot.change_presence(activity=discord.Game("with students' patience"))
 		# Start Scheduler
 		Scheduler(bot)
 
