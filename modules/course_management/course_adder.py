@@ -4,7 +4,7 @@ import discord.utils
 import config
 from discord_slash.context import SlashContext
 from psycopg2 import errors
-from modules.course_management.util import sort_courses
+from modules.course_management.util import sort_single_course
 from ..email_registry import categoriser
 from ..email_registry import person_finder
 from ..error.friendly_error import FriendlyError
@@ -36,7 +36,7 @@ async def __create_channel(ctx: SlashContext, channel_name: str) -> discord.Text
 		)
 
 	new_channel = await category.create_text_channel(channel_name)
-	await sort_courses(category)
+	await sort_single_course(new_channel)
 	return new_channel
 
 

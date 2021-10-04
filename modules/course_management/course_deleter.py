@@ -8,13 +8,12 @@ from utils.utils import get_discord_obj, get_id
 from database import sql_fetcher
 
 
-async def delete_course(ctx: SlashContext, channel_id: int):
-	await __delete_channel(ctx, channel_id)
-	__delete_from_database(channel_id)
+async def delete_course(ctx: SlashContext, channel: discord.TextChannel):
+	await __delete_channel(ctx, channel)
+	__delete_from_database(channel.id)
 
 
-async def __delete_channel(ctx: SlashContext, channel_id: int):
-	channel = discord.utils.get(config.guild().text_channels, id=channel_id)
+async def __delete_channel(ctx: SlashContext, channel: discord.TextChannel):
 	if is_course(channel):
 		await channel.delete()
 	else:

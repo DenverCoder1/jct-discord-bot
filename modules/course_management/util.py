@@ -4,22 +4,7 @@ import config
 from utils.utils import get_id
 
 
-@overload
-def is_course(channel_id: int, /) -> bool:
-	...
-
-
-@overload
-def is_course(channel: discord.TextChannel, /) -> bool:
-	...
-
-
-def is_course(arg1: Union[int, discord.TextChannel]) -> bool:
-	channel = (
-		discord.utils.get(config.guild().text_channels, id=arg1)
-		if isinstance(arg1, int)
-		else arg1
-	)
+def is_course(channel: discord.TextChannel) -> bool:
 	return channel is not None and channel.category_id in {
 		get_id("ACTIVE_COURSES_CATEGORY"),
 		get_id("INACTIVE_COURSES_CATEGORY"),
@@ -32,4 +17,20 @@ async def sort_courses(category: discord.CategoryChannel) -> None:
 	Args:
 		category (CategoryChannel): The category to sort (should be either the active or inactive courses category).
 	"""
-	pass  # TODO: Implement this
+	if not category.text_channels:
+		return
+	start_position = category.text_channels[0].position
+	for i, channel in enumerate(sorted(category.text_channels, key=lambda c: c.name)):
+		await channel.edit(position=start_position + i)
+
+
+async def sort_single_course(channel: discord.TextChannel) -> None:
+	"""Reposition a single course within its category. This function assumes that the rest of the categories are in sorted order; if thry aren't, use the alternative function `sort_courses`
+
+	Args:
+		channel (discord.TextChannel): The channel to sort within its category.
+	"""
+	for other_channel in channel.category.text_channels:
+		if other_channel != channel and other_channel.name > channel.name:
+			await channel.edit(position=other_channel.position)
+			break
