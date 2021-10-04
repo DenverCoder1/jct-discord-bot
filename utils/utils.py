@@ -78,7 +78,7 @@ def parse_date(
 		**({"PREFER_DATES_FROM": "future"} if future else {}),
 	}
 	# parse the date with dateparser
-	date = dateparser.parse(date_str, settings=settings)
+	date = dateparser.parse(date_str, settings=settings)  # type: ignore
 	# make times PM if time is early in the day, base is PM, and no indication that AM was specified
 	if (
 		date

@@ -9,6 +9,7 @@ from discord.ext.commands import has_permissions
 from discord.ext import commands
 from . import course_adder
 from . import course_deleter
+from . import course_activator
 import config
 
 
@@ -77,12 +78,15 @@ class CourseManagerCog(commands.Cog):
 		guild_ids=[config.guild_id],
 		options=[
 			create_option(
-				name="channel",
-				description="Mention a course the professor teaches. (eg. #automata)",
+				name="course",
+				description=(
+					"The channel corresponding to the course you want to delete."
+				),
 				option_type=SlashCommandOptionType.CHANNEL,
 				required=True,
 			),
 		],
+		connector={"course": "channel"},
 	)
 	@has_permissions(manage_channels=True)
 	async def delete_course(self, ctx: SlashContext, channel: discord.TextChannel):
@@ -93,6 +97,26 @@ class CourseManagerCog(commands.Cog):
 				" face of the earth. Hope you're proud of yourself."
 			)
 		)
+
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="activate",
+		description="Move an inactive course channel to the active courses list.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="course",
+				description=(
+					"The channel corresponding to the course you want to activate."
+				),
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=True,
+			)
+		],
+	)
+	async def activate_course(self, ctx: SlashContext, course: discord.TextChannel):
+		await course_activator.activate_course(ctx, course.id)
+		await ctx.send(embed=embed_success(f"Successfully activated {course.name}."))
 
 
 def setup(bot):
