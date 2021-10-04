@@ -155,7 +155,6 @@ class CourseManagerCog(commands.Cog):
 		name="deactivate-all",
 		description="Move all active course channels to the inactive courses list.",
 		guild_ids=[config.guild_id],
-		options=[],
 	)
 	@has_permissions(manage_channels=True)
 	async def deactivate_all_courses(self, ctx: SlashContext):
