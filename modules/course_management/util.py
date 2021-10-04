@@ -1,7 +1,7 @@
 from typing import Union, overload
 import discord
 import config
-from utils.utils import get_id
+from utils.utils import get_discord_obj, get_id
 
 
 def is_course(channel: discord.TextChannel) -> bool:
@@ -11,17 +11,21 @@ def is_course(channel: discord.TextChannel) -> bool:
 	}
 
 
-async def sort_courses(category: discord.CategoryChannel) -> None:
+async def sort_courses() -> None:
 	"""Sort the courses in the given category alphabetically.
 
 	Args:
 		category (CategoryChannel): The category to sort (should be either the active or inactive courses category).
 	"""
-	if not category.text_channels:
-		return
-	start_position = category.text_channels[0].position
-	for i, channel in enumerate(sorted(category.text_channels, key=lambda c: c.name)):
-		await channel.edit(position=start_position + i)
+	for label in {"ACTIVE_COURSES_CATEGORY", "INACTIVE_COURSES_CATEGORY"}:
+		category = get_discord_obj(config.guild().categories, label)
+		if not category.text_channels:
+			return
+		start_position = category.text_channels[0].position
+		for i, channel in enumerate(
+			sorted(category.text_channels, key=lambda c: c.name)
+		):
+			await channel.edit(position=start_position + i)
 
 
 async def sort_single_course(channel: discord.TextChannel) -> None:

@@ -13,8 +13,17 @@ async def activate_course(ctx: SlashContext, channel: discord.TextChannel):
 
 
 async def deactivate_course(ctx: SlashContext, channel: discord.TextChannel):
-	"""Move a course from the active categories category to the inactive one."""
+	"""Move a course from the active courses category to the inactive one."""
 	await __move_course(ctx, channel, "deactivate")
+
+
+async def deactivate_all_courses(ctx: SlashContext):
+	"""Move all active courses from the active courses to the inactive one."""
+	category: discord.CategoryChannel = get_discord_obj(
+		config.guild().categories, "ACTIVE_COURSES_CATEGORY"
+	)
+	for channel in category.text_channels:
+		await deactivate_course(ctx, channel)
 
 
 async def __move_course(

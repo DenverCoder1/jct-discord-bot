@@ -4,11 +4,11 @@ from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
+from modules.course_management import util
 from modules.course_management.util import sort_courses
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
-
 from utils.utils import get_discord_obj
 from . import course_adder
 from . import course_deleter
@@ -18,6 +18,10 @@ from discord.ext import tasks
 
 
 class CourseManagerCog(commands.Cog):
+	@commands.Cog.listener()
+	async def on_ready(self):
+		self.sort_courses_categories.start()
+
 	@cog_ext.cog_subcommand(
 		base="course",
 		name="add",
@@ -140,16 +144,39 @@ class CourseManagerCog(commands.Cog):
 			)
 		],
 	)
+	@has_permissions(manage_channels=True)
 	async def deactivate_course(self, ctx: SlashContext, course: discord.TextChannel):
 		await ctx.defer()
 		await course_activator.deactivate_course(ctx, course)
 		await ctx.send(embed=embed_success(f"Successfully deactivated #{course.name}."))
 
-	@tasks.loop(hours=23)
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="deactivate-all",
+		description="Move all active course channels to the inactive courses list.",
+		guild_ids=[config.guild_id],
+		options=[],
+	)
+	@has_permissions(manage_channels=True)
+	async def deactivate_all_courses(self, ctx: SlashContext):
+		await ctx.defer()
+		await course_activator.deactivate_all_courses(ctx)
+		await ctx.send(embed=embed_success(f"Successfully deactivated all courses."))
+
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="sort",
+		description="Sort all course channels alphabetically.",
+		guild_ids=[config.guild_id],
+	)
+	@has_permissions(manage_channels=True)
+	async def sort_courses(self, ctx: SlashContext):
+		ctx.defer()
+		await util.sort_courses()
+
+	@tasks.loop(hours=24)
 	async def sort_courses_categories(self):
-		print("sorting courses task")
-		for label in {"ACTIVE_COURSES_CATEGORY", "INACTIVE_COURSES_CATEGORY"}:
-			await sort_courses(get_discord_obj(config.guild().categories, label))
+		await util.sort_courses()
 
 
 def setup(bot):
