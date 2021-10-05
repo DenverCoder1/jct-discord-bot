@@ -1,10 +1,8 @@
 import discord
 import config
 from discord_slash.context import SlashContext
-
 from modules.course_management.util import is_course
 from ..error.friendly_error import FriendlyError
-from utils.utils import get_discord_obj, get_id
 from database import sql_fetcher
 
 
