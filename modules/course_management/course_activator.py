@@ -1,13 +1,13 @@
 import discord
 from discord_slash.context import SlashContext
 import config
-from modules.course_management.util import sort_single_course
+from modules.course_management.util import (
+	sort_single_course,
+	ACTIVE_COURSES_CATEGORY,
+	INACTIVE_COURSES_CATEGORY,
+)
 from modules.error.friendly_error import FriendlyError
 from utils.utils import get_discord_obj, get_id
-
-
-ACTIVE_COURSES_CATEGORY = "ACTIVE_COURSES_CATEGORY"
-INACTIVE_COURSES_CATEGORY = "INACTIVE_COURSES_CATEGORY"
 
 
 async def activate_course(ctx: SlashContext, channel: discord.TextChannel):
@@ -35,7 +35,7 @@ async def __move_course(ctx: SlashContext, channel: discord.TextChannel, active:
 	if not channel.category_id == get_id(source_label):
 		raise FriendlyError(
 			f"You can only {'activate' if active else 'deactivate'} a course which is"
-			f" in the {'active' if active else 'inactive'} courses category",
+			f" in the {'inactive' if active else 'active'} courses category",
 			ctx,
 			ctx.author,
 		)

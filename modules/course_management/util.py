@@ -4,10 +4,14 @@ import config
 from utils.utils import get_discord_obj, get_id
 
 
+ACTIVE_COURSES_CATEGORY = "ACTIVE_COURSES_CATEGORY"
+INACTIVE_COURSES_CATEGORY = "INACTIVE_COURSES_CATEGORY"
+
+
 def is_course(channel: discord.TextChannel) -> bool:
 	return channel is not None and channel.category_id in {
-		get_id("ACTIVE_COURSES_CATEGORY"),
-		get_id("INACTIVE_COURSES_CATEGORY"),
+		get_id(ACTIVE_COURSES_CATEGORY),
+		get_id(INACTIVE_COURSES_CATEGORY),
 	}
 
 
@@ -17,7 +21,7 @@ async def sort_courses() -> None:
 	Args:
 		category (CategoryChannel): The category to sort (should be either the active or inactive courses category).
 	"""
-	for label in {"ACTIVE_COURSES_CATEGORY", "INACTIVE_COURSES_CATEGORY"}:
+	for label in {ACTIVE_COURSES_CATEGORY, INACTIVE_COURSES_CATEGORY}:
 		category = get_discord_obj(config.guild().categories, label)
 		if not category.text_channels:
 			return

@@ -1,10 +1,9 @@
-import psycopg2.extensions as sql
 import discord
 import discord.utils
 import config
 from discord_slash.context import SlashContext
 from psycopg2 import errors
-from modules.course_management.util import sort_single_course
+from modules.course_management.util import ACTIVE_COURSES_CATEGORY, sort_single_course
 from ..email_registry import categoriser
 from ..email_registry import person_finder
 from ..error.friendly_error import FriendlyError
@@ -27,7 +26,7 @@ async def add_course(
 
 async def __create_channel(ctx: SlashContext, channel_name: str) -> discord.TextChannel:
 	# find courses category
-	category = get_discord_obj(config.guild().categories, "ACTIVE_COURSES_CATEGORY")
+	category = get_discord_obj(config.guild().categories, ACTIVE_COURSES_CATEGORY)
 
 	# make sure the channel doesn't already exist
 	if discord.utils.get(category.text_channels, name=channel_name) is not None:
