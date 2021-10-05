@@ -38,23 +38,23 @@ class JoinCog(commands.Cog):
 			create_option(
 				name="campus",
 				description="Your campus (Lev or Tal)",
-				option_type=SlashCommandOptionType.INTEGER,
+				option_type=SlashCommandOptionType.STRING,
 				required=True,
 				choices=[
-					create_choice(name=campus.name, value=campus.id)
+					create_choice(name=campus.name, value=str(campus.id))
 					for campus in Campus.get_campuses()
 				],
 			),
 			create_option(
 				name="year",
 				description="Your year",
-				option_type=SlashCommandOptionType.INTEGER,
+				option_type=SlashCommandOptionType.STRING,
 				required=True,
 				choices=[
-					create_choice(name="Year 1", value=1),
-					create_choice(name="Year 2", value=2),
-					create_choice(name="Year 3", value=3),
-					create_choice(name="Year 4", value=4),
+					create_choice(name="Year 1", value="1"),
+					create_choice(name="Year 2", value="2"),
+					create_choice(name="Year 3", value="3"),
+					create_choice(name="Year 4", value="4"),
 				],
 			),
 		],
@@ -65,12 +65,13 @@ class JoinCog(commands.Cog):
 		ctx: SlashContext,
 		first_name: str,
 		last_name: str,
-		campus: int,
-		year: int,
+		campus: str,
+		year: str,
 	):
+		# TODO: campus and year should really take integer options, but mobile has a bug
 		await ctx.defer()
 		await assigner.assign(
-			ctx.author, f"{first_name.title()} {last_name.title()}", campus, year
+			ctx.author, f"{first_name.title()} {last_name.title()}", int(campus), int(year)
 		)
 		await ctx.send(
 			embeds=[
