@@ -1,4 +1,3 @@
-from typing import Literal, Union
 import discord
 from discord_slash.context import SlashContext
 import config
@@ -7,38 +6,36 @@ from modules.error.friendly_error import FriendlyError
 from utils.utils import get_discord_obj, get_id
 
 
+ACTIVE_COURSES_CATEGORY = "ACTIVE_COURSES_CATEGORY"
+INACTIVE_COURSES_CATEGORY = "INACTIVE_COURSES_CATEGORY"
+
+
 async def activate_course(ctx: SlashContext, channel: discord.TextChannel):
 	"""Move a course from the inactive courses category to the active one."""
-	await __move_course(ctx, channel, "activate")
+	await __move_course(ctx, channel, active=True)
 
 
 async def deactivate_course(ctx: SlashContext, channel: discord.TextChannel):
 	"""Move a course from the active courses category to the inactive one."""
-	await __move_course(ctx, channel, "deactivate")
+	await __move_course(ctx, channel, active=False)
 
 
 async def deactivate_all_courses(ctx: SlashContext):
 	"""Move all active courses from the active courses to the inactive one."""
 	category: discord.CategoryChannel = get_discord_obj(
-		config.guild().categories, "ACTIVE_COURSES_CATEGORY"
+		config.guild().categories, ACTIVE_COURSES_CATEGORY
 	)
 	for channel in category.text_channels:
 		await deactivate_course(ctx, channel)
 
 
-async def __move_course(
-	ctx: SlashContext,
-	channel: discord.TextChannel,
-	action: Union[Literal["activate"], Literal["deactivate"]],
-):
-	source_label, target_label = map(
-		lambda prefix: prefix + "ACTIVE_COURSES_CATEGORY",
-		("IN", "") if action == "activate" else ("", "IN"),
-	)
+async def __move_course(ctx: SlashContext, channel: discord.TextChannel, active: bool):
+	source_label = INACTIVE_COURSES_CATEGORY if active else ACTIVE_COURSES_CATEGORY
+	target_label = ACTIVE_COURSES_CATEGORY if active else INACTIVE_COURSES_CATEGORY
 	if not channel.category_id == get_id(source_label):
 		raise FriendlyError(
-			f"You can only {action} a course which is in the"
-			f" {source_label.lower().replace('_', ' ')}",
+			f"You can only {'activate' if active else 'deactivate'} a course which is"
+			f" in the {'active' if active else 'inactive'} courses category",
 			ctx,
 			ctx.author,
 		)

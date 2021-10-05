@@ -5,11 +5,9 @@ from discord_slash.context import SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
 from modules.course_management import util
-from modules.course_management.util import sort_courses
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
-from utils.utils import get_discord_obj
 from . import course_adder
 from . import course_deleter
 from . import course_activator
@@ -18,8 +16,7 @@ from discord.ext import tasks
 
 
 class CourseManagerCog(commands.Cog):
-	@commands.Cog.listener()
-	async def on_ready(self):
+	def __init__(self):
 		self.sort_courses_categories.start()
 
 	@cog_ext.cog_subcommand(
@@ -160,7 +157,7 @@ class CourseManagerCog(commands.Cog):
 	async def deactivate_all_courses(self, ctx: SlashContext):
 		await ctx.defer()
 		await course_activator.deactivate_all_courses(ctx)
-		await ctx.send(embed=embed_success(f"Successfully deactivated all courses."))
+		await ctx.send(embed=embed_success("Successfully deactivated all courses."))
 
 	@cog_ext.cog_subcommand(
 		base="course",
@@ -172,10 +169,20 @@ class CourseManagerCog(commands.Cog):
 	async def sort_courses(self, ctx: SlashContext):
 		ctx.defer()
 		await util.sort_courses()
+		ctx.send(
+			embed=embed_success(
+				"I'm pretty bad at sorting asynchronously, but I think I did it"
+				" right..."
+			)
+		)
 
 	@tasks.loop(hours=24)
 	async def sort_courses_categories(self):
 		await util.sort_courses()
+
+	@sort_courses_categories.before_loop
+	async def before_sort(self):
+		await self.bot.wait_until_ready()
 
 
 def setup(bot):
