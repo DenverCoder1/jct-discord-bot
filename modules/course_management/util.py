@@ -1,4 +1,3 @@
-from typing import Union, overload
 import discord
 import config
 from utils.utils import get_discord_obj, get_id
