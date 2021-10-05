@@ -167,9 +167,9 @@ class CourseManagerCog(commands.Cog):
 	)
 	@has_permissions(manage_channels=True)
 	async def sort_courses(self, ctx: SlashContext):
-		ctx.defer()
+		await ctx.defer()
 		await util.sort_courses()
-		ctx.send(
+		await ctx.send(
 			embed=embed_success(
 				"I'm pretty bad at sorting asynchronously, but I think I did it"
 				" right..."
