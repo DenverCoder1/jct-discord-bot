@@ -1,9 +1,9 @@
-import psycopg2.extensions as sql
 import discord
 import discord.utils
 import config
 from discord_slash.context import SlashContext
-from psycopg2.errors import UniqueViolation
+from psycopg2 import errors
+from modules.course_management.util import ACTIVE_COURSES_CATEGORY, sort_single_course
 from ..email_registry import categoriser
 from ..email_registry import person_finder
 from ..error.friendly_error import FriendlyError
@@ -11,6 +11,8 @@ from typing import Iterable
 from utils import embedder
 from database import sql_fetcher
 from utils.utils import get_discord_obj
+
+UniqueViolation = errors.lookup("23505")
 
 
 async def add_course(
@@ -24,7 +26,7 @@ async def add_course(
 
 async def __create_channel(ctx: SlashContext, channel_name: str) -> discord.TextChannel:
 	# find courses category
-	category = get_discord_obj(config.guild().categories, "COURSES_CATEGORY")
+	category = get_discord_obj(config.guild().categories, ACTIVE_COURSES_CATEGORY)
 
 	# make sure the channel doesn't already exist
 	if discord.utils.get(category.text_channels, name=channel_name) is not None:
@@ -32,17 +34,8 @@ async def __create_channel(ctx: SlashContext, channel_name: str) -> discord.Text
 			"this channel already exists. Please try again.", ctx, ctx.author,
 		)
 
-	# create the new course channel at the bottom of the category
 	new_channel = await category.create_text_channel(channel_name)
-
-	# find position to insert the new course channel
-	for channel in category.text_channels:
-		if channel.name > new_channel.name:
-			# reposition course channel to be in alphabetic order
-			# must be done post-creation because channel name may be changed by discord on creation
-			await new_channel.edit(position=channel.position)
-			break
-
+	await sort_single_course(new_channel)
 	return new_channel
 
 
