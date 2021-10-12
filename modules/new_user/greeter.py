@@ -9,18 +9,6 @@ class Greeter:
 
 	def __init__(self, bot: commands.Bot) -> None:
 		self.bot = bot
-		self.command_desc = utils.remove_tabs(
-			f"""
-			```/join first_name, last_name, campus, year```
-
-			Where:
-			> **first_name** is your first name,
-			> **last_name** is your last name,
-			> **campus** is *Lev* or *Tal*,
-			> **year** is one of Year 1, Year 2, Year 3, or Year 4
-
-			"""
-		)
 
 	def __intro_channel(self):
 		return config.guild().get_channel(utils.get_id("INTRO_CHANNEL"))
@@ -33,31 +21,26 @@ class Greeter:
 		print(f"Gave {role.name} to {member.name}")
 
 	async def server_greet(self, member: discord.Member):
-		await self.__intro_channel().send(
-			utils.remove_tabs(
-				f"""Welcome to the JCT CompSci ESP server, {member.mention}!
-
-				Please type the following command so we know who you are:
-
-				{self.command_desc}
-
-				If you have any trouble feel free to contact an admin using @Admin.
-				"""
-			)
+		channel = self.__intro_channel()
+		await utils.delayed_send(channel, 2, f"Hey {member.mention}!")
+		await utils.delayed_send(channel, 4, "Welcome to the server!")
+		await utils.delayed_send(
+			channel, 4, "Please type `/join` and enter the details it asks you for"
 		)
+		await utils.delayed_send(
+			channel, 3, "If you have any trouble tag @Admin can help you"
+		)
+		await utils.delayed_send(channel, 2, "But just so you dont, here's a GIF")
+		channel.send("https://i.imgur.com/5So77B6.gif")
 
 	async def private_greet(self, member: discord.Member):
 		"""privately messages the user who joined"""
 		await (member.dm_channel or await member.create_dm()).send(
 			utils.remove_tabs(
 				f"""
-				Welcome to the JCT CompSci ESP server, {member.mention}!
+				Hey, {member.mention}! Welcome!
 
-				If you haven't already done so, please type head over to the {self.__intro_channel().mention} channel in the JCT CompSci ESP server and type the following command so we know who you are:
-
-				{self.command_desc}
-
-				If you have any trouble feel free to contact an admin using @Admin in the {self.__intro_channel().mention} channel.
+				Please type head over to the {self.__intro_channel().mention} channel and follow instructions there.
 				"""
 			)
 		)
