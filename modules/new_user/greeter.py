@@ -31,7 +31,7 @@ class Greeter:
 			channel, 3, "If you have any trouble tag @Admin can help you"
 		)
 		await utils.delayed_send(channel, 2, "But just so you dont, here's a GIF")
-		channel.send("https://i.imgur.com/5So77B6.gif")
+		await channel.send("https://i.imgur.com/5So77B6.gif")
 
 	async def private_greet(self, member: discord.Member):
 		"""privately messages the user who joined"""
