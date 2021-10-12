@@ -1,7 +1,7 @@
 import os
 import re
 import csv
-from time import sleep
+from asyncio import sleep
 import dateparser
 import asyncio
 import discord
@@ -211,7 +211,7 @@ async def delayed_send(
 	mention_author=None,
 ):
 	async with messageable.typing():
-		sleep(seconds)
+		await sleep(seconds)
 		await messageable.send(
 			content,
 			tts=tts,
