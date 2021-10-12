@@ -18,7 +18,6 @@ class Greeter:
 		role = member.guild.get_role(utils.get_id(label))
 		assert role is not None
 		await member.add_roles(role)
-		print(f"Gave {role.name} to {member.name}")
 
 	async def server_greet(self, member: discord.Member):
 		channel = self.__intro_channel()

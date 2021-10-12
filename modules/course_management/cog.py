@@ -16,8 +16,9 @@ from discord.ext import tasks
 
 
 class CourseManagerCog(commands.Cog):
-	def __init__(self):
+	def __init__(self, bot: commands.Bot):
 		self.sort_courses_categories.start()
+		self.bot = bot
 
 	@cog_ext.cog_subcommand(
 		base="course",
@@ -186,4 +187,4 @@ class CourseManagerCog(commands.Cog):
 
 
 def setup(bot):
-	bot.add_cog(CourseManagerCog())
+	bot.add_cog(CourseManagerCog(bot))
