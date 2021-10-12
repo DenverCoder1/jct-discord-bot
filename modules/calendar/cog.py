@@ -196,7 +196,9 @@ class CalendarCog(commands.Cog):
 		except ValueError as error:
 			raise FriendlyError(str(error), ctx, ctx.author, error)
 		embed = self.embedder.embed_event(
-			":white_check_mark: Event created successfully", event, calendar
+			f":white_check_mark: Event added to {calendar.name} calendar successfully",
+			event,
+			calendar,
 		)
 		await ctx.send(embed=embed)
 
@@ -309,13 +311,7 @@ class CalendarCog(commands.Cog):
 			)
 		try:
 			event = self.service.update_event(
-				calendar.id,
-				event_to_update,
-				title,
-				start,
-				end,
-				description,
-				location,
+				calendar.id, event_to_update, title, start, end, description, location,
 			)
 		except ValueError as error:
 			raise FriendlyError(error.args[0], ctx, ctx.author, error)
@@ -356,10 +352,7 @@ class CalendarCog(commands.Cog):
 		connector={"class_name": "group_id"},
 	)
 	async def event_delete(
-		self,
-		ctx: SlashContext,
-		query: str,
-		group_id: Optional[int] = None,
+		self, ctx: SlashContext, query: str, group_id: Optional[int] = None,
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
@@ -412,10 +405,7 @@ class CalendarCog(commands.Cog):
 		connector={"class_name": "group_id"},
 	)
 	async def calendar_grant(
-		self,
-		ctx: SlashContext,
-		email: str,
-		group_id: Optional[int] = None,
+		self, ctx: SlashContext, email: str, group_id: Optional[int] = None,
 	):
 		await ctx.defer(hidden=True)
 		# get calendar from selected class_role or author
