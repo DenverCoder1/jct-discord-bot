@@ -1,11 +1,13 @@
 import os
 import re
 import csv
+from asyncio import sleep
 import dateparser
 import asyncio
 import discord
 from datetime import datetime, timedelta
 from typing import Any, Collection, Dict, Iterable, Optional, Sequence, TypeVar
+from discord.abc import Messageable
 from discord.errors import NotFound
 from discord.ext import commands
 from modules.error.friendly_error import FriendlyError
@@ -191,3 +193,34 @@ def one(iterable: Iterable[T]) -> T:
 
 def trim(text: str, limit: int) -> str:
 	return text[: limit - 3].strip() + "..." if len(text) > limit else text
+
+
+async def delayed_send(
+	messageable: Messageable,
+	seconds: float,
+	content=None,
+	*,
+	tts=False,
+	embed=None,
+	file=None,
+	files=None,
+	delete_after=None,
+	nonce=None,
+	allowed_mentions=None,
+	reference=None,
+	mention_author=None,
+):
+	async with messageable.typing():
+		await sleep(seconds)
+		await messageable.send(
+			content,
+			tts=tts,
+			embed=embed,
+			file=file,
+			files=files,
+			delete_after=delete_after,
+			nonce=nonce,
+			allowed_mentions=allowed_mentions,
+			reference=reference,
+			mention_author=mention_author,
+		)

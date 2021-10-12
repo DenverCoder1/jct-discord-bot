@@ -34,7 +34,6 @@ async def assign(member: discord.Member, name: str, campus_id: int, year: int):
 		await __add_role(member, campus_id, year)
 		await member.add_roles(__student_role())
 		await member.remove_roles(__unassigned_role())
-		print(f"Removed Unassigned from {member} and added Student")
 		await server_welcome(member)
 
 
@@ -55,7 +54,6 @@ async def __add_role(member: discord.Member, campus_id: int, year: int):
 	class_role = config.guild().get_role(role_id)
 	assert class_role is not None
 	await member.add_roles(class_role)
-	print(f"Gave {class_role.name} to {member.display_name}")
 
 
 async def server_welcome(member: discord.Member):
