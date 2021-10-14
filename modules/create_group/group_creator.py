@@ -4,7 +4,7 @@ from .new_group import NewGroup
 import psycopg2.extensions as sql
 
 
-class groups_creator:
+class GroupsCreator:
 	def __init__(self, conn: sql.connection):
 		self.conn = conn
 
