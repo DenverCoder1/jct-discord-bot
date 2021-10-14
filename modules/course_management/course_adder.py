@@ -18,13 +18,15 @@ UniqueViolation = errors.lookup("23505")
 async def add_course(
 	ctx: SlashContext, course_name: str, professors: Iterable[str], channel_name: str,
 ):
-	channel = await __create_channel(ctx, channel_name)
+	channel = await __create_channel(ctx, channel_name, course_name)
 	await __add_to_database(ctx, channel, course_name)
 	await __link_professors(ctx, channel, professors)
 	return channel
 
 
-async def __create_channel(ctx: SlashContext, channel_name: str) -> discord.TextChannel:
+async def __create_channel(
+	ctx: SlashContext, channel_name: str, description: str = ""
+) -> discord.TextChannel:
 	# find courses category
 	category = get_discord_obj(config.guild().categories, ACTIVE_COURSES_CATEGORY)
 
@@ -34,7 +36,7 @@ async def __create_channel(ctx: SlashContext, channel_name: str) -> discord.Text
 			"this channel already exists. Please try again.", ctx, ctx.author,
 		)
 
-	new_channel = await category.create_text_channel(channel_name)
+	new_channel = await category.create_text_channel(channel_name, topic=description)
 	await sort_single_course(new_channel)
 	return new_channel
 
@@ -76,7 +78,6 @@ async def __link_professors(
 	ctx: SlashContext, channel: discord.TextChannel, professors: Iterable[str],
 ):
 	for professor_name in professors:
-		professor_name = professor_name.strip()
 		try:
 			professor = person_finder.search_one(ctx, professor_name)
 			categoriser.categorise_person(ctx, professor.id, (channel.mention,))
