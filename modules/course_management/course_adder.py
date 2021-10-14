@@ -25,7 +25,7 @@ async def add_course(
 
 
 async def __create_channel(
-	ctx: SlashContext, channel_name: str, description: str = ""
+	ctx: SlashContext, channel_name: str, course_name: str = ""
 ) -> discord.TextChannel:
 	# find courses category
 	category = get_discord_obj(config.guild().categories, ACTIVE_COURSES_CATEGORY)
@@ -36,7 +36,10 @@ async def __create_channel(
 			"this channel already exists. Please try again.", ctx, ctx.author,
 		)
 
-	new_channel = await category.create_text_channel(channel_name, topic=description)
+	new_channel = await category.create_text_channel(
+		channel_name,
+		topic=f"Here you can discuss anything related to the course {course_name}.",
+	)
 	await sort_single_course(new_channel)
 	return new_channel
 
