@@ -3,7 +3,7 @@ import discord
 import psycopg2.extensions as sql
 from database import sql_fetcher
 from database.campus import Campus
-from .group_channel_creator import GroupChannelCreator
+from . import group_channel_creator
 import config
 
 
@@ -72,8 +72,10 @@ class NewGroup:
 		await config.guild().edit_role_positions(position_dict)
 
 	async def __create_group_channel(self):
-		self.__channel = await GroupChannelCreator.create_group_channel(
-			f"📚{self.__year}-{self.__campus.name.lower()}", [self.__role]
+		self.__channel = await group_channel_creator.create_group_channel(
+			f"📚︱{self.__year}-{self.__campus.name.lower()}",
+			[self.__role],
+			"Here you can discuss schedules, links, and courses your class is taking.",
 		)
 
 	async def __add_to_campus_channel(self):
