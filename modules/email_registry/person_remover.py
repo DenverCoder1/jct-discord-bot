@@ -1,5 +1,6 @@
 from discord.channel import TextChannel
 from modules.email_registry.person_finder import search_one
+from modules.email_registry.email_adder import remove_email
 from discord_slash.context import SlashContext
 from database.person import Person
 import config
@@ -14,6 +15,8 @@ def remove_person(
 	email: Optional[str] = None,
 ) -> Person:
 	person = search_one(ctx, name, channel, email)
+	for email in person.emails:
+		remove_email(person, email, ctx)
 	query = sql_fetcher.fetch(
 		"modules", "email_registry", "queries", "remove_person.sql"
 	)

@@ -15,11 +15,7 @@ def is_course(channel: discord.TextChannel) -> bool:
 
 
 async def sort_courses() -> None:
-	"""Sort the courses in the given category alphabetically.
-
-	Args:
-		category (CategoryChannel): The category to sort (should be either the active or inactive courses category).
-	"""
+	"""Sort the courses in the given category alphabetically."""
 	for label in {ACTIVE_COURSES_CATEGORY, INACTIVE_COURSES_CATEGORY}:
 		category = get_discord_obj(config.guild().categories, label)
 		if not category.text_channels:
@@ -37,6 +33,7 @@ async def sort_single_course(channel: discord.TextChannel) -> None:
 	Args:
 		channel (discord.TextChannel): The channel to sort within its category.
 	"""
+	assert channel.category is not None
 	for other_channel in channel.category.text_channels:
 		if other_channel != channel and other_channel.name > channel.name:
 			await channel.edit(position=other_channel.position)

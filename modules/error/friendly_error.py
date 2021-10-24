@@ -30,14 +30,14 @@ class FriendlyError(Exception):
 	def __init__(
 		self,
 		msg: str,
-		sender: Union[discord.abc.Messageable, SlashContext],
+		messageable: discord.abc.Messageable,
 		member: Union[discord.Member, discord.User, None] = None,
 		inner: Optional[BaseException] = None,
 		description: Optional[str] = None,
 		image: Optional[str] = None,
 		hidden: bool = False,
 	):
-		self.sender = sender
+		self.sender = messageable
 		self.member = member
 		self.inner = inner
 		self.description = description
