@@ -1,6 +1,5 @@
 from discord.channel import TextChannel
 from modules.email_registry.person_finder import search_one
-from modules.email_registry.email_adder import remove_email
 from discord_slash.context import SlashContext
 from database.person import Person
 import config
