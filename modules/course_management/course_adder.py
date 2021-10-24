@@ -1,4 +1,5 @@
 import discord
+from discord.abc import Messageable
 import discord.utils
 import config
 from discord_slash.context import SlashContext
@@ -45,7 +46,7 @@ async def __create_channel(
 
 
 async def __add_to_database(
-	ctx: SlashContext, channel: discord.TextChannel, course_name: str
+	messageable: Messageable, channel: discord.TextChannel, course_name: str
 ):
 	course_query = sql_fetcher.fetch(
 		"modules", "course_management", "queries", "add_course.sql"
@@ -72,7 +73,7 @@ async def __add_to_database(
 						" will have to be deleted from the database manually. Ask a"
 						" bot dev to do this."
 					),
-					sender=ctx,
+					messageable=messageable,
 					inner=e,
 				)
 

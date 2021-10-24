@@ -21,9 +21,9 @@ class Person:
 		return self.__name
 
 	@property
-	def emails(self) -> str:
-		"""A comma separated string of email addresses of this person."""
-		return self.__emails
+	def emails(self) -> Iterable[str]:
+		"""An iterable containing the email addresses registered to this person."""
+		return self.__emails.split(", ")
 
 	@property
 	def categories(self) -> str:
