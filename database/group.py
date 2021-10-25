@@ -9,11 +9,11 @@ from async_lru import alru_cache as async_cache
 
 class Group:
 	def __init__(
-		self, id: int, grad_year: int, campus_id: int, role_id: int, calendar: str
+		self, id: int, grad_year: int, campus: Campus, role_id: int, calendar: str
 	):
 		self.__id = id
 		self.__grad_year = grad_year
-		self.__campus_id = campus_id
+		self.__campus = campus
 		self.__role_id = role_id
 		self.__calendar = calendar
 
@@ -27,10 +27,10 @@ class Group:
 		"""The year in which this group is to graduate."""
 		return self.__grad_year
 
-	@async_cache
-	async def campus(self) -> Campus:
+	@property
+	def campus(self) -> Campus:
 		"""The campus this Group belongs to"""
-		return await Campus.get_campus(self.__campus_id)
+		return self.__campus
 
 	@cached_property
 	def role(self) -> discord.Role:
@@ -44,10 +44,10 @@ class Group:
 		"""The calendar id associated with this Group. (Looks like an email address)"""
 		return self.__calendar
 
-	@async_cache
-	async def name(self) -> str:
+	@property
+	def name(self) -> str:
 		"""The name of this Group. (eg Lev 2021)"""
-		return f"{(await self.campus()).name} {self.__grad_year}"
+		return f"{self.campus.name} {self.__grad_year}"
 
 	@classmethod
 	async def get_group(cls, group_id: int) -> "Group":
@@ -62,9 +62,18 @@ class Group:
 	async def get_groups(cls) -> Collection["Group"]:
 		"""Fetch a list of groups from the database"""
 		records = await sql.select.many(
-			"groups", ("id", "grad_year", "campus", "role", "calendar")
+			"groups_campuses_view", ("id", "grad_year", "campus", "role", "calendar")
 		)
-		return [cls(*record) for record in records]
+		return [
+			cls(
+				r["group_id"],
+				r["grad_year"],
+				Campus(r["campus_id"], r["campus_name"], r["campus_channel"]),
+				r["role"],
+				r["calendar"],
+			)
+			for r in records
+		]
 
 	def __eq__(self, other):
 		"""Compares them by ID"""

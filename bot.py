@@ -2,6 +2,7 @@ import asyncio
 import os
 import asyncpg
 import discord
+import database.preloaded
 from discord_slash import SlashCommand
 import config
 from discord.ext import commands
@@ -11,6 +12,9 @@ from utils.scheduler import Scheduler
 async def main():
 	# Connect to the database
 	config.conn = await asyncpg.connect(os.getenv("DATABASE_URL", ""), ssl="require")
+	# Preload necessary data from the database
+	database.preloaded.load()
+
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
 	intents = discord.Intents.default()
 	intents.guilds = True

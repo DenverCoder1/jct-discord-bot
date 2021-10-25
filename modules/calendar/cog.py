@@ -1,4 +1,3 @@
-import asyncio
 import config
 from datetime import datetime
 from typing import Optional
@@ -13,11 +12,10 @@ from utils.embedder import embed_success
 from utils.utils import is_email
 from utils.scheduler import Scheduler
 from database.group import Group
+from database import preloaded
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option, create_choice
-
-groups = asyncio.get_event_loop().soon(Group.get_groups())
 
 
 class CalendarCog(commands.Cog):
@@ -45,8 +43,8 @@ class CalendarCog(commands.Cog):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=asyncio.run(group.name()), value=group.id)
-					for group in groups
+					create_choice(name=group.name, value=group.id)
+					for group in preloaded.groups
 				],
 			),
 		],
@@ -54,7 +52,7 @@ class CalendarCog(commands.Cog):
 	)
 	async def calendar_links(self, ctx: SlashContext, group_id: Optional[int] = None):
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(ctx, groups, group_id)
+		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# fetch links for calendar
 		links = self.service.get_links(calendar)
 		embed = self.embedder.embed_links(
@@ -92,8 +90,8 @@ class CalendarCog(commands.Cog):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=asyncio.run(group.name()), value=group.id)
-					for group in groups
+					create_choice(name=group.name, value=group.id)
+					for group in preloaded.groups
 				],
 			),
 		],
@@ -108,7 +106,7 @@ class CalendarCog(commands.Cog):
 	):
 		await ctx.defer()
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(ctx, groups, group_id)
+		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# convert channel mentions to full names
 		full_query = course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
@@ -168,8 +166,8 @@ class CalendarCog(commands.Cog):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=asyncio.run(group.name()), value=group.id)
-					for group in groups
+					create_choice(name=group.name, value=group.id)
+					for group in preloaded.groups
 				],
 			),
 		],
@@ -191,7 +189,7 @@ class CalendarCog(commands.Cog):
 		description = course_mentions.replace_channel_mentions(description)
 		location = course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(ctx, groups, group_id)
+		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		try:
 			event = self.service.add_event(
 				calendar.id, title, start, end, description, location
@@ -269,8 +267,8 @@ class CalendarCog(commands.Cog):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=asyncio.run(group.name()), value=group.id)
-					for group in groups
+					create_choice(name=group.name, value=group.id)
+					for group in preloaded.groups
 				],
 			),
 		],
@@ -291,7 +289,7 @@ class CalendarCog(commands.Cog):
 		# replace channel mentions with course names
 		query = course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(ctx, groups, group_id)
+		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# get a list of upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
@@ -349,8 +347,8 @@ class CalendarCog(commands.Cog):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=asyncio.run(group.name()), value=group.id)
-					for group in groups
+					create_choice(name=group.name, value=group.id)
+					for group in preloaded.groups
 				],
 			),
 		],
@@ -363,7 +361,7 @@ class CalendarCog(commands.Cog):
 		# replace channel mentions with course names
 		query = course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(ctx, groups, group_id)
+		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
@@ -403,8 +401,8 @@ class CalendarCog(commands.Cog):
 				option_type=SlashCommandOptionType.INTEGER,
 				required=False,
 				choices=[
-					create_choice(name=asyncio.run(group.name()), value=group.id)
-					for group in groups
+					create_choice(name=group.name, value=group.id)
+					for group in preloaded.groups
 				],
 			),
 		],
@@ -415,7 +413,7 @@ class CalendarCog(commands.Cog):
 	):
 		await ctx.defer(hidden=True)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(ctx, groups, group_id)
+		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# validate email address
 		if not is_email(email):
 			raise FriendlyError("Invalid email address", ctx, ctx.author, hidden=True)

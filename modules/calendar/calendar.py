@@ -87,4 +87,4 @@ class Calendar:
 			# only one group found
 			group = one(member_groups)
 		# return calendar for the group
-		return cls(id=group.calendar, name=await group.name())
+		return cls(id=group.calendar, name=group.name)
