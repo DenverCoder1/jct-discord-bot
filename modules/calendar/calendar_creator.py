@@ -9,9 +9,9 @@ class CalendarCreator:
 		self.__conn = conn
 		self.__service = service
 
-	def create_group_calendars(self, year: int):
+	async def create_group_calendars(self, year: int):
 		"""Create a calendar for each campus and add it to the database"""
-		for campus in Campus.get_campuses():
+		for campus in await Campus.get_campuses():
 			# create calendar
 			calendar = self.__service.create_calendar(
 				f"JCT CompSci {campus.name} {year}"

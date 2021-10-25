@@ -46,7 +46,7 @@ class ChannelMessageManager:
 			return
 		message = await self.__send_channel_message(channel)
 		channel_messages.append(
-			ChannelMessage.add_to_database(
+			await ChannelMessage.add_to_database(
 				message.id, channel.id, self.__host_channel.id
 			)
 		)
@@ -61,7 +61,7 @@ class ChannelMessageManager:
 				cm for cm in channel_messages if cm.referenced_channel_id == channel.id
 			)
 			await (await channel_message.message).delete()
-			channel_message.delete_from_database()
+			await channel_message.delete_from_database()
 			channel_messages.remove(channel_message)
 		except StopIteration:
 			pass

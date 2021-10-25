@@ -51,14 +51,14 @@ class Calendar:
 		return cls(id=details["id"], name=details["summary"])
 
 	@classmethod
-	def get_calendar(
+	async def get_calendar(
 		cls,
 		ctx: SlashContext,
 		groups: Optional[Iterable[Group]] = None,
 		group_id: Optional[int] = None,
 	) -> "Calendar":
 		"""Returns Calendar given a Discord member or a specified group id"""
-		groups = groups or Group.get_groups()
+		groups = groups or await Group.get_groups()
 		if group_id:
 			# get the group specified by the user given the group id
 			group = one(group for group in groups if group.id == group_id)
@@ -87,4 +87,4 @@ class Calendar:
 			# only one group found
 			group = one(member_groups)
 		# return calendar for the group
-		return cls(id=group.calendar, name=group.name)
+		return cls(id=group.calendar, name=await group.name())

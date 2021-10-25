@@ -1,2 +1,0 @@
-select message, referenced_channel, host_channel
-from channel_messages

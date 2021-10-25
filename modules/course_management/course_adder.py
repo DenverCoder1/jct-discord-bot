@@ -83,8 +83,8 @@ async def __link_professors(
 ):
 	for professor_name in professors:
 		try:
-			professor = person_finder.search_one(ctx, professor_name)
-			categoriser.categorise_person(ctx, professor.id, (channel.mention,))
+			professor = await person_finder.search_one(ctx, professor_name)
+			await categoriser.categorise_person(ctx, professor.id, (channel.mention,))
 		except FriendlyError:
 			await ctx.send(
 				embed=embedder.embed_warning(

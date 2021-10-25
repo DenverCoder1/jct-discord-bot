@@ -4,20 +4,15 @@ from discord_slash.context import SlashContext
 from database.person import Person
 import config
 from typing import Optional
-from database import sql_fetcher
+from database import sql
 
 
-def remove_person(
+async def remove_person(
 	ctx: SlashContext,
 	name: Optional[str] = None,
 	channel: Optional[TextChannel] = None,
 	email: Optional[str] = None,
 ) -> Person:
-	person = search_one(ctx, name, channel, email)
-	query = sql_fetcher.fetch(
-		"modules", "email_registry", "queries", "remove_person.sql"
-	)
-	with config.conn as conn:
-		with conn.cursor() as cursor:
-			cursor.execute(query, {"id": person.id})
+	person = await search_one(ctx, name, channel, email)
+	await sql.delete("people", id=person.id)
 	return person

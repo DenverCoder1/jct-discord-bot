@@ -9,7 +9,9 @@ class GroupsCreator:
 		self.conn = conn
 
 	async def create_groups(self, year: int) -> Iterable[NewGroup]:
-		groups = [NewGroup(campus, year, self.conn) for campus in Campus.get_campuses()]
+		groups = [
+			NewGroup(campus, year, self.conn) for campus in await Campus.get_campuses()
+		]
 		for new_group in groups:
 			await new_group.add_to_system()
 		return groups

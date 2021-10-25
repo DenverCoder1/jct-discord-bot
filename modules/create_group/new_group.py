@@ -65,7 +65,7 @@ class NewGroup:
 		)
 
 	async def __move_role(self):
-		roles = [group.role for group in Group.get_groups()]
+		roles = [group.role for group in await Group.get_groups()]
 		positions = [role.position for role in roles]
 		new_position = min(positions) - 1
 		position_dict = {self.role: new_position}

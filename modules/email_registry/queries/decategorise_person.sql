@@ -1,7 +1,7 @@
 DELETE FROM person_category
 WHERE
-	person = %(person_id)s
+	person = $1
 	AND
     category = (SELECT id
 	    FROM categories
-		WHERE channel = %(channel_id)s)
+		WHERE channel = $2)

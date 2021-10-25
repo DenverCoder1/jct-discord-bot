@@ -3,7 +3,8 @@ import discord
 import config
 from typing import Collection
 from functools import cached_property
-from database import sql_fetcher
+from database import sql
+from async_lru import alru_cache as async_cache
 
 
 class Group:
@@ -26,10 +27,10 @@ class Group:
 		"""The year in which this group is to graduate."""
 		return self.__grad_year
 
-	@cached_property
-	def campus(self) -> Campus:
+	@async_cache
+	async def campus(self) -> Campus:
 		"""The campus this Group belongs to"""
-		return Campus.get_campus(self.__campus_id)
+		return await Campus.get_campus(self.__campus_id)
 
 	@cached_property
 	def role(self) -> discord.Role:
@@ -43,28 +44,27 @@ class Group:
 		"""The calendar id associated with this Group. (Looks like an email address)"""
 		return self.__calendar
 
-	@property
-	def name(self) -> str:
+	@async_cache
+	async def name(self) -> str:
 		"""The name of this Group. (eg Lev 2021)"""
-		return f"{self.campus.name} {self.__grad_year}"
+		return f"{(await self.campus()).name} {self.__grad_year}"
 
 	@classmethod
-	def get_group(cls, group_id: int) -> "Group":
+	async def get_group(cls, group_id: int) -> "Group":
 		"""Fetch a group from the database given its ID."""
-		query = sql_fetcher.fetch("database", "group", "queries", "get_group.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"group_id": group_id})
-				return cls(*cursor.fetchone())
+		record = await sql.select.one(
+			"groups", ("id", "grad_year", "campus", "role", "calendar"), id=group_id
+		)
+		assert record is not None
+		return cls(*record)
 
 	@classmethod
-	def get_groups(cls) -> Collection["Group"]:
+	async def get_groups(cls) -> Collection["Group"]:
 		"""Fetch a list of groups from the database"""
-		query = sql_fetcher.fetch("database", "group", "queries", "get_groups.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query)
-				return [cls(*tup) for tup in cursor.fetchall()]
+		records = await sql.select.many(
+			"groups", ("id", "grad_year", "campus", "role", "calendar")
+		)
+		return [cls(*record) for record in records]
 
 	def __eq__(self, other):
 		"""Compares them by ID"""

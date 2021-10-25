@@ -4,7 +4,7 @@ from discord.channel import TextChannel
 import config
 import discord
 from database.person import Person
-from typing import Callable, Iterable, Optional
+from typing import Any, Callable, Coroutine, Iterable, Optional
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import SlashCommandOptionType
@@ -51,7 +51,7 @@ class EmailRegistryCog(commands.Cog):
 		channel: Optional[discord.TextChannel] = None,
 	):
 		await ctx.defer()  # let discord know the response may take more than 3 seconds
-		people = person_finder.search(
+		people = await person_finder.search(
 			name,
 			channel
 			or (ctx.channel if isinstance(ctx.channel, discord.TextChannel) else None),
@@ -108,9 +108,9 @@ class EmailRegistryCog(commands.Cog):
 	):
 		await ctx.defer()
 		# search for professor's details
-		person = person_finder.search_one(ctx, name, channel)
+		person = await person_finder.search_one(ctx, name, channel)
 		# add the emails to the database
-		person = email_adder.add_email(person, email, ctx)
+		person = await email_adder.add_email(person, email, ctx)
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	@cog_ext.cog_subcommand(
@@ -131,9 +131,9 @@ class EmailRegistryCog(commands.Cog):
 	async def remove_email(self, ctx: SlashContext, email: str):
 		await ctx.defer()
 		# search for professor's details
-		person = person_finder.search_one(ctx, email=email)
+		person = await person_finder.search_one(ctx, email=email)
 		# add/remove the emails to the database
-		person = email_adder.remove_email(person, email, ctx)
+		person = await email_adder.remove_email(person, email, ctx)
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	@cog_ext.cog_subcommand(
@@ -168,7 +168,7 @@ class EmailRegistryCog(commands.Cog):
 		self, ctx: SlashContext, first_name: str, last_name: str, channels: str = ""
 	):
 		await ctx.defer()
-		person = person_adder.add_person(
+		person = await person_adder.add_person(
 			first_name, last_name, extract_channel_mentions(channels), ctx
 		)
 		await ctx.send(embed=person_embedder.gen_embed(person))
@@ -209,7 +209,7 @@ class EmailRegistryCog(commands.Cog):
 		email: Optional[str] = None,
 	):
 		await ctx.defer()
-		person = person_remover.remove_person(ctx, name, channel, email)
+		person = await person_remover.remove_person(ctx, name, channel, email)
 		await ctx.send(
 			embed=embed_success(f"Successfully removed {person.name} from the system.")
 		)
@@ -295,11 +295,13 @@ class EmailRegistryCog(commands.Cog):
 		ctx: SlashContext,
 		name_or_email: str,
 		channel_mentions: str,
-		func: Callable[[SlashContext, int, Iterable[str]], Person],
+		func: Callable[[SlashContext, int, Iterable[str]], Coroutine[Any, Any, Person]],
 	):
 		await ctx.defer()
-		person = person_finder.search_one(ctx, name=name_or_email, email=name_or_email)
-		person = func(ctx, person.id, extract_channel_mentions(channel_mentions))
+		person = await person_finder.search_one(
+			ctx, name=name_or_email, email=name_or_email
+		)
+		person = await func(ctx, person.id, extract_channel_mentions(channel_mentions))
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 
