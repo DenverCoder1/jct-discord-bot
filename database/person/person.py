@@ -51,7 +51,7 @@ class Person:
 	async def get_person(cls, person_id: int) -> "Person":
 		"""Searches the database for a person with a given id and returns a Person object."""
 		record = await sql.select.one(
-			"people_view", ("name", "emails", "categories"), id=person_id
+			"people_view", ("id", "name", "emails", "categories"), id=person_id
 		)
 		assert record is not None
 		return cls(*record)

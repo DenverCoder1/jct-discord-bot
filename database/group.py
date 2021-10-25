@@ -62,7 +62,16 @@ class Group:
 	async def get_groups(cls) -> Collection["Group"]:
 		"""Fetch a list of groups from the database"""
 		records = await sql.select.many(
-			"groups_campuses_view", ("id", "grad_year", "campus", "role", "calendar")
+			"groups_campuses_view",
+			(
+				"group_id",
+				"grad_year",
+				"campus_id",
+				"campus_name",
+				"campus_channel",
+				"role",
+				"calendar",
+			),
 		)
 		return [
 			cls(

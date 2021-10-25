@@ -31,7 +31,9 @@ def prepare_kwargs(
 	Returns:
 		Tuple[Sequence[str], Sequence[Any], Sequence[str]]: A tuple containing a sequence of the keys from the kwargs in the first index, a sequence of the values from the kwargs in the second index, and a sequence of the placeholders for the SQL prepared statements in the third index.
 	"""
-	keys, values, placeholders = zip(
-		*[(key, kwargs[key], f"${index}") for index, key in enumerate(kwargs, 1)]
+	keys, values, placeholders = (
+		zip(*[(key, kwargs[key], f"${index}") for index, key in enumerate(kwargs, 1)])
+		if kwargs
+		else ((), (), ())
 	)
 	return keys, values, placeholders

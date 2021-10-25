@@ -1,7 +1,7 @@
 import discord
 import config
 from functools import cached_property
-from typing import Iterable
+from typing import Collection
 from database import sql
 
 
@@ -38,7 +38,7 @@ class Campus:
 		return cls(*record)
 
 	@classmethod
-	async def get_campuses(cls) -> Iterable["Campus"]:
+	async def get_campuses(cls) -> Collection["Campus"]:
 		"""Fetch a list of campuses from the database."""
 		records = await sql.select.many("campuses", ("id", "name", "channel"))
 		return [cls(*record) for record in records]
