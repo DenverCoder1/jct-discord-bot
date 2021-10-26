@@ -3,16 +3,17 @@ import discord
 import config
 from typing import Collection
 from functools import cached_property
-from database import sql_fetcher
+from database import sql
+from async_lru import alru_cache as async_cache
 
 
 class Group:
 	def __init__(
-		self, id: int, grad_year: int, campus_id: int, role_id: int, calendar: str
+		self, id: int, grad_year: int, campus: Campus, role_id: int, calendar: str
 	):
 		self.__id = id
 		self.__grad_year = grad_year
-		self.__campus_id = campus_id
+		self.__campus = campus
 		self.__role_id = role_id
 		self.__calendar = calendar
 
@@ -26,10 +27,10 @@ class Group:
 		"""The year in which this group is to graduate."""
 		return self.__grad_year
 
-	@cached_property
+	@property
 	def campus(self) -> Campus:
 		"""The campus this Group belongs to"""
-		return Campus.get_campus(self.__campus_id)
+		return self.__campus
 
 	@cached_property
 	def role(self) -> discord.Role:
@@ -49,22 +50,39 @@ class Group:
 		return f"{self.campus.name} {self.__grad_year}"
 
 	@classmethod
-	def get_group(cls, group_id: int) -> "Group":
+	async def get_group(cls, group_id: int) -> "Group":
 		"""Fetch a group from the database given its ID."""
-		query = sql_fetcher.fetch("database", "group", "queries", "get_group.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"group_id": group_id})
-				return cls(*cursor.fetchone())
+		record = await sql.select.one(
+			"groups", ("id", "grad_year", "campus", "role", "calendar"), id=group_id
+		)
+		assert record is not None
+		return cls(*record)
 
 	@classmethod
-	def get_groups(cls) -> Collection["Group"]:
+	async def get_groups(cls) -> Collection["Group"]:
 		"""Fetch a list of groups from the database"""
-		query = sql_fetcher.fetch("database", "group", "queries", "get_groups.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query)
-				return [cls(*tup) for tup in cursor.fetchall()]
+		records = await sql.select.many(
+			"groups_campuses_view",
+			(
+				"group_id",
+				"grad_year",
+				"campus_id",
+				"campus_name",
+				"campus_channel",
+				"role",
+				"calendar",
+			),
+		)
+		return [
+			cls(
+				r["group_id"],
+				r["grad_year"],
+				Campus(r["campus_id"], r["campus_name"], r["campus_channel"]),
+				r["role"],
+				r["calendar"],
+			)
+			for r in records
+		]
 
 	def __eq__(self, other):
 		"""Compares them by ID"""

@@ -1,3 +1,5 @@
+import asyncio
+from database import preloaded
 from database.campus import Campus
 from utils import embedder, utils
 from . import assigner
@@ -42,7 +44,7 @@ class JoinCog(commands.Cog):
 				required=True,
 				choices=[
 					create_choice(name=campus.name, value=str(campus.id))
-					for campus in Campus.get_campuses()
+					for campus in preloaded.campuses
 				],
 			),
 			create_option(
@@ -51,10 +53,7 @@ class JoinCog(commands.Cog):
 				option_type=SlashCommandOptionType.STRING,
 				required=True,
 				choices=[
-					create_choice(name="Year 1", value="1"),
-					create_choice(name="Year 2", value="2"),
-					create_choice(name="Year 3", value="3"),
-					create_choice(name="Year 4", value="4"),
+					create_choice(name=f"Year {i}", value=str(i)) for i in range(1, 5)
 				],
 			),
 		],
@@ -71,7 +70,10 @@ class JoinCog(commands.Cog):
 		# TODO: campus and year should really take integer options, but mobile has a bug
 		await ctx.defer()
 		await assigner.assign(
-			ctx.author, f"{first_name.title()} {last_name.title()}", int(campus), int(year)
+			ctx.author,
+			f"{first_name.title()} {last_name.title()}",
+			int(campus),
+			int(year),
 		)
 		await ctx.send(
 			embeds=[

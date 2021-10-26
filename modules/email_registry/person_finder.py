@@ -14,7 +14,7 @@ __search_weights = {
 }
 
 
-def search(
+async def search(
 	name: Optional[str] = None,
 	channel: Optional[discord.TextChannel] = None,
 	email: Optional[str] = None,
@@ -24,24 +24,24 @@ def search(
 
 	# add the people belonging to the category of the given channel (if any)
 	if channel:
-		for person in Person.search_by_channel(channel.id):
+		for person in await Person.search_by_channel(channel.id):
 			weights[person] += __search_weights["channel"]
 
 	# search their name
 	if name:
 		for word in name.split():
-			for person, similarity in Person.search_by_name(word):
+			for person, similarity in await Person.search_by_name(word):
 				weights[person] += __search_weights["word"] * similarity
 
 	# add the people who have the email mentioned
 	if email:
-		for person in Person.search_by_email(email):
+		for person in await Person.search_by_email(email):
 			weights[person] += __search_weights["email"]
 
 	return weights.heaviest_items()
 
 
-def search_one(
+async def search_one(
 	sender: SlashContext,
 	name: Optional[str] = None,
 	channel: Optional[discord.TextChannel] = None,
@@ -59,7 +59,7 @@ def search_one(
 	:param email: The email of the person you want to search for.
 	:type email: Optional[str]
 	"""
-	people = search(name, channel, email)
+	people = await search(name, channel, email)
 	if not people:
 		raise FriendlyError(
 			f"Unable to find someone who matches your query. Check your spelling or"

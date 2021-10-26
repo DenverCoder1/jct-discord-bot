@@ -1,6 +1,7 @@
-from typing import Any, Iterable, Sequence, Set, Tuple
+from typing import Iterable, Sequence, Set, Tuple
 import config
 from database import sql_fetcher
+from database import sql
 
 
 class Person:
@@ -47,49 +48,51 @@ class Person:
 		)
 
 	@classmethod
-	def get_person(cls, person_id: int) -> "Person":
+	async def get_person(cls, person_id: int) -> "Person":
 		"""Searches the database for a person with a given id and returns a Person object."""
-		query = sql_fetcher.fetch("database", "person", "queries", "get_person.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"person_id": person_id})
-				return cls(*cursor.fetchone())
+		record = await sql.select.one(
+			"people_view", ("id", "name", "emails", "categories"), id=person_id
+		)
+		assert record is not None
+		return cls(*record)
 
 	@classmethod
-	def get_people(cls) -> Set["Person"]:
+	async def get_people(cls) -> Set["Person"]:
 		"""Searches the database for all people and returns a set of Person objects."""
-		query = sql_fetcher.fetch("database", "person", "queries", "get_people.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query)
-				people = {cls(*row) for row in cursor.fetchall()}
-		return people
+		records = await sql.select.many("people_view", ("name", "emails", "categories"))
+		return {cls(*record) for record in records}
 
 	@classmethod
-	def search_by_name(cls, name: str) -> Sequence[Tuple["Person", float]]:
-		"""
-		Searches the database for all people whose name or surname reasonably match the input and returns a sequence of (person, similarity) pairs sorted by decreasing similarity.
+	async def search_by_name(cls, name: str) -> Sequence[Tuple["Person", float]]:
+		"""Searches the database for all people whose name or surname reasonably match the input and returns a sequence of (person, similarity) pairs sorted by decreasing similarity.
+
+		Args:
+			name (str): The name of the person to search for.
+
+		Returns:
+			Sequence[Tuple[Person, float]]: A sequence of results where each result is a tuple of the person that matched as well as a similarity score between 0 and 1.
 		"""
 		query = sql_fetcher.fetch("database", "person", "queries", "search_people.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"name": name})
-				people = [(cls(*row[:-1]), row[-1]) for row in cursor.fetchall()]
-		return people
+		return [
+			(cls(*record[:-1]), record[-1])
+			for record in await config.conn.fetch(query, name)
+		]
 
 	@classmethod
-	def search_by_channel(cls, channel_id: int) -> Iterable["Person"]:
+	async def search_by_channel(cls, channel_id: int) -> Iterable["Person"]:
 		"""
 		Searches the database for all people whose channel matches the input and returns an iterable of these.
 		"""
-		return cls.__search_people("search_channel.sql", channel_id)
+		return await cls.__search_people(
+			"person_category_categories_view", channel=channel_id
+		)
 
 	@classmethod
-	def search_by_email(cls, email: str) -> Iterable["Person"]:
+	async def search_by_email(cls, email: str) -> Iterable["Person"]:
 		"""
 		Searches the database for all people whose email matches the input and returns an iterable of these.
 		"""
-		return cls.__search_people("search_email.sql", email)
+		return await cls.__search_people("emails", email=email)
 
 	def __eq__(self, other):
 		"""Compares them by ID"""
@@ -101,16 +104,15 @@ class Person:
 		return hash(self.__id)
 
 	@classmethod
-	def __search_people(cls, sql_file: str, param: Any) -> Iterable["Person"]:
-		"""
-		Searches the database using a given SQL file and returns a list of people found.
+	async def __search_people(cls, table: str, **conditions) -> Iterable["Person"]:
+		"""Searches the database using a given a table and some kwarg conditions and returns a list of people found.
 
-		:param sql_file: The SQL file name to use for the search. Must contain a only `%(param)s`.
-		:param param: The parameter to replace %s with in the sql file
+		Args:
+			table (str): The name of the table to search in.
+			**conditions: The column names and values that the found records should have.
+
+		Returns:
+			Iterable[Person]: An iterable of the people found.
 		"""
-		query = sql_fetcher.fetch("database", "person", "queries", sql_file)
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"param": param})
-				ids = {row[0] for row in cursor.fetchall()}
-		return {Person.get_person(person_id) for person_id in ids}
+		records = await sql.select.many(table, ("person",), **conditions)
+		return {await Person.get_person(record["person"]) for record in records}
