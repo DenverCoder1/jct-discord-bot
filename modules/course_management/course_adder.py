@@ -4,7 +4,6 @@ from discord.abc import Messageable
 import discord.utils
 import config
 from discord_slash.context import SlashContext
-from psycopg2 import errors
 from modules.course_management.util import ACTIVE_COURSES_CATEGORY, sort_single_course
 from ..email_registry import categoriser
 from ..email_registry import person_finder
@@ -13,8 +12,6 @@ from typing import Iterable
 from utils import embedder
 from database import sql, sql_fetcher
 from utils.utils import get_discord_obj
-
-UniqueViolation = errors.lookup("23505")
 
 
 async def add_course(
