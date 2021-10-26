@@ -4,7 +4,6 @@ import config
 from typing import Collection
 from functools import cached_property
 from database import sql
-from async_lru import alru_cache as async_cache
 
 
 class Group:
