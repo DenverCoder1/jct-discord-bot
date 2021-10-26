@@ -48,6 +48,22 @@ async def one(
 	return await __select(table, columns, config.conn.fetchrow, **conditions)
 
 
+async def value(table: str, column: str = "*", **conditions) -> Any:
+	"""Select a single cell from a table where the column is the one specified and the row matches the kwargs `conditions`.
+
+	For security reasons it is important that the only user input passed into this function is via the values of `**conditions`.
+
+	Args:
+		table (str): The name of the table to select from.
+		column (str, optional): The names of the columns to select. Defaults to the first column.
+		**conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
+
+	Returns:
+		Optional[Any]: The value of the selected cell if one was found, or None otherwise.
+	"""
+	return await __select(table, (column,), config.conn.fetchval, **conditions)
+
+
 T = TypeVar("T", covariant=True)
 
 

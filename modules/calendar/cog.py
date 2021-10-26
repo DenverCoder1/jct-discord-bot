@@ -1,5 +1,4 @@
 import config
-from datetime import datetime
 from typing import Optional
 from discord.ext import commands
 from .calendar import Calendar
@@ -10,7 +9,6 @@ from . import course_mentions
 from ..error.friendly_error import FriendlyError
 from utils.embedder import embed_success
 from utils.utils import is_email
-from utils.scheduler import Scheduler
 from database.group import Group
 from database import preloaded
 from discord_slash import cog_ext, SlashContext
@@ -26,7 +24,7 @@ class CalendarCog(commands.Cog):
 		timezone = "Asia/Jerusalem"
 		self.embedder = CalendarEmbedder(bot, timezone)
 		self.service = CalendarService(timezone)
-		self.creator = CalendarCreator(self.service, config.conn)
+		self.creator = CalendarCreator(self.service)
 
 	@cog_ext.cog_subcommand(
 		base="calendar",
@@ -108,7 +106,7 @@ class CalendarCog(commands.Cog):
 		# get calendar from selected class_role or author
 		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# convert channel mentions to full names
-		full_query = course_mentions.replace_channel_mentions(query)
+		full_query = await course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, full_query)
 		# display events and allow showing more with reactions
@@ -185,9 +183,9 @@ class CalendarCog(commands.Cog):
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
-		title = course_mentions.replace_channel_mentions(title)
-		description = course_mentions.replace_channel_mentions(description)
-		location = course_mentions.replace_channel_mentions(location)
+		title = await course_mentions.replace_channel_mentions(title)
+		description = await course_mentions.replace_channel_mentions(description)
+		location = await course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
 		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		try:
@@ -287,7 +285,7 @@ class CalendarCog(commands.Cog):
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
-		query = course_mentions.replace_channel_mentions(query)
+		query = await course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
 		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# get a list of upcoming events
@@ -298,19 +296,19 @@ class CalendarCog(commands.Cog):
 		)
 		# replace channel mentions and variables
 		if title:
-			title = course_mentions.replace_channel_mentions(title).replace(
+			title = (await course_mentions.replace_channel_mentions(title)).replace(
 				"${title}", event_to_update.title
 			)
 		if description:
 			description = (
-				course_mentions.replace_channel_mentions(description)
+				(await course_mentions.replace_channel_mentions(description))
 				.replace("${description}", event_to_update.description or "")
 				.replace("\\n", "\n")
 			)
 		if location:
-			location = course_mentions.replace_channel_mentions(location).replace(
-				"${location}", event_to_update.location or ""
-			)
+			location = (
+				await course_mentions.replace_channel_mentions(location)
+			).replace("${location}", event_to_update.location or "")
 		try:
 			event = self.service.update_event(
 				calendar.id, event_to_update, title, start, end, description, location,
@@ -359,7 +357,7 @@ class CalendarCog(commands.Cog):
 	):
 		await ctx.defer()
 		# replace channel mentions with course names
-		query = course_mentions.replace_channel_mentions(query)
+		query = await course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
 		calendar = await Calendar.get_calendar(ctx, await Group.get_groups(), group_id)
 		# fetch upcoming events
@@ -427,12 +425,6 @@ class CalendarCog(commands.Cog):
 		raise FriendlyError(
 			"An error occurred while applying changes.", ctx, ctx.author, hidden=True
 		)
-
-	@Scheduler.schedule(1)
-	async def on_new_academic_year(self):
-		"""Create calendars for each campus and update the database"""
-		year = datetime.now().year + 3
-		await self.creator.create_group_calendars(year)
 
 
 # setup functions for bot

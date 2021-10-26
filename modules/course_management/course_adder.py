@@ -1,3 +1,4 @@
+from asyncpg.exceptions import UniqueViolationError
 import discord
 from discord.abc import Messageable
 import discord.utils
@@ -10,7 +11,7 @@ from ..email_registry import person_finder
 from ..error.friendly_error import FriendlyError
 from typing import Iterable
 from utils import embedder
-from database import sql_fetcher
+from database import sql, sql_fetcher
 from utils.utils import get_discord_obj
 
 UniqueViolation = errors.lookup("23505")
@@ -48,34 +49,27 @@ async def __create_channel(
 async def __add_to_database(
 	messageable: Messageable, channel: discord.TextChannel, course_name: str
 ):
-	course_query = sql_fetcher.fetch(
-		"modules", "course_management", "queries", "add_course.sql"
-	)
-	with config.conn as conn:
-		with conn.cursor() as cursor:
-			# add the course to the database
-			try:
-				cursor.execute(
-					course_query,
-					{"course_name": course_name, "channel_id": channel.id},
-				)
-			except UniqueViolation as e:
-				await channel.delete(
-					reason=(
-						"The command that created this channel ultimately failed,"
-						" so it was deleted."
-					)
-				)
-				raise FriendlyError(
-					"A course with this name already exists in the database.",
-					description=(
-						"If a channel for this is missing, then the existing course"
-						" will have to be deleted from the database manually. Ask a"
-						" bot dev to do this."
-					),
-					messageable=messageable,
-					inner=e,
-				)
+	try:
+		await sql.insert(
+			"categories", returning="id", name=course_name, channel=channel.id
+		)
+	except UniqueViolationError as e:
+		await channel.delete(
+			reason=(
+				"The command that created this channel ultimately failed,"
+				" so it was deleted."
+			)
+		)
+		raise FriendlyError(
+			"A course with this name already exists in the database.",
+			description=(
+				"If a channel for this is missing, then the existing course"
+				" will have to be deleted from the database manually. Ask a"
+				" bot dev to do this."
+			),
+			messageable=messageable,
+			inner=e,
+		)
 
 
 async def __link_professors(
