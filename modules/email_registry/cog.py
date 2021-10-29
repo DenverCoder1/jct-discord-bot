@@ -63,6 +63,7 @@ class EmailRegistryCog(commands.Cog):
 					"The email you are looking for aught to be here... But it isn't."
 					" Perhaps the archives are incomplete.",
 					ctx,
+					description="🥚 Can i offer you a nice egg in this trying time?",
 				)
 			raise FriendlyError(
 				"Please specify the professor's name or channel of the email you are"
