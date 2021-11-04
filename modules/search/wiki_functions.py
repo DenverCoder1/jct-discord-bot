@@ -1,9 +1,6 @@
-from typing import Optional
 from bs4.element import ResultSet
 import requests
 from bs4 import BeautifulSoup
-from utils.utils import remove_tabs
-
 
 def remove_citations(wiki_paragraph):
 	"""removes citations from a string from a wiki"""
@@ -41,17 +38,6 @@ def get_wiki_intro(wiki_link: str) -> str:
 		if len(paragraph) < 150:
 			continue
 
-		return (
-			f"\n> {remove_citations(paragraph).strip()}\n~ Wikipedia (<{wiki_link}>).\n"
-		)
+		return remove_citations(paragraph).strip()
 
 	return ""
-
-
-def format_message(query: str, url: str, wiki_string: Optional[str] = None) -> str:
-	"""formats the message"""
-	return remove_tabs(
-		f"Search results for: {query}"
-		+ (f"\n{wiki_string}" if wiki_string else "")
-		+ f"\n{url}"
-	)
