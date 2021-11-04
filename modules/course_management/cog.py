@@ -4,15 +4,22 @@ from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.model import SlashCommandOptionType
 from discord_slash.utils.manage_commands import create_option
+from modules.course_management import util
 from utils.embedder import embed_success
 from discord.ext.commands import has_permissions
 from discord.ext import commands
 from . import course_adder
 from . import course_deleter
+from . import course_activator
 import config
+from discord.ext import tasks
 
 
 class CourseManagerCog(commands.Cog):
+	def __init__(self, bot: commands.Bot):
+		self.sort_courses_categories.start()
+		self.bot = bot
+
 	@cog_ext.cog_subcommand(
 		base="course",
 		name="add",
@@ -77,16 +84,20 @@ class CourseManagerCog(commands.Cog):
 		guild_ids=[config.guild_id],
 		options=[
 			create_option(
-				name="channel",
-				description="Mention a course the professor teaches. (eg. #automata)",
+				name="course",
+				description=(
+					"The channel corresponding to the course you want to delete."
+				),
 				option_type=SlashCommandOptionType.CHANNEL,
 				required=True,
 			),
 		],
+		connector={"course": "channel"},
 	)
 	@has_permissions(manage_channels=True)
 	async def delete_course(self, ctx: SlashContext, channel: discord.TextChannel):
-		await course_deleter.delete_course(ctx, channel.id)
+		await ctx.defer()
+		await course_deleter.delete_course(ctx, channel)
 		await ctx.send(
 			embed=embed_success(
 				"Well done... All evidence of that course has been deleted from the"
@@ -94,6 +105,86 @@ class CourseManagerCog(commands.Cog):
 			)
 		)
 
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="activate",
+		description="Move an inactive course channel to the active courses list.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="course",
+				description=(
+					"The channel corresponding to the course you want to activate."
+				),
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=True,
+			)
+		],
+	)
+	async def activate_course(self, ctx: SlashContext, course: discord.TextChannel):
+		await ctx.defer()
+		await course_activator.activate_course(ctx, course)
+		await ctx.send(embed=embed_success(f"Successfully activated #{course.name}."))
+
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="deactivate",
+		description="Move an active course channel to the inactive courses list.",
+		guild_ids=[config.guild_id],
+		options=[
+			create_option(
+				name="course",
+				description=(
+					"The channel corresponding to the course you want to deactivate."
+				),
+				option_type=SlashCommandOptionType.CHANNEL,
+				required=True,
+			)
+		],
+	)
+	@has_permissions(manage_channels=True)
+	async def deactivate_course(self, ctx: SlashContext, course: discord.TextChannel):
+		await ctx.defer()
+		await course_activator.deactivate_course(ctx, course)
+		await ctx.send(embed=embed_success(f"Successfully deactivated #{course.name}."))
+
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="deactivate-all",
+		description="Move all active course channels to the inactive courses list.",
+		guild_ids=[config.guild_id],
+	)
+	@has_permissions(manage_channels=True)
+	async def deactivate_all_courses(self, ctx: SlashContext):
+		await ctx.defer()
+		await course_activator.deactivate_all_courses(ctx)
+		await ctx.send(embed=embed_success("Successfully deactivated all courses."))
+
+	@cog_ext.cog_subcommand(
+		base="course",
+		name="sort",
+		description="Sort all course channels alphabetically.",
+		guild_ids=[config.guild_id],
+	)
+	@has_permissions(manage_channels=True)
+	async def sort_courses(self, ctx: SlashContext):
+		await ctx.defer()
+		await util.sort_courses()
+		await ctx.send(
+			embed=embed_success(
+				"I'm pretty bad at sorting asynchronously, but I think I did it"
+				" right..."
+			)
+		)
+
+	@tasks.loop(hours=24)
+	async def sort_courses_categories(self):
+		await util.sort_courses()
+
+	@sort_courses_categories.before_loop
+	async def before_sort(self):
+		await self.bot.wait_until_ready()
+
 
 def setup(bot):
-	bot.add_cog(CourseManagerCog())
+	bot.add_cog(CourseManagerCog(bot))

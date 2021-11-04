@@ -11,14 +11,22 @@ class ChannelOptingCog(commands.Cog):
 
 	def __init__(self):
 		self.__emoji = "❌"
-		self.__channel_messages = list(ChannelMessage.get_channel_messages())
+		self.__channel_messages = None
+		self.__manager = None
+		self.__ready = False
 
 	@commands.Cog.listener()
 	async def on_ready(self):
+		# skip if this function has already run
+		if self.__ready:
+			return
+		self.__ready = True
+
 		self.__manager = ChannelMessageManager(
 			get_discord_obj(config.guild().text_channels, "CHANNEL_DIRECTORY_CHANNEL"),
 			self.__emoji,
 		)
+		self.__channel_messages = list(await ChannelMessage.get_channel_messages())
 
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, reaction: discord.RawReactionActionEvent):

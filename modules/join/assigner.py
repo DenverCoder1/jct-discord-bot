@@ -1,7 +1,7 @@
 from functools import cache
 import random
 from utils import utils
-from database import sql_fetcher
+from database import sql
 import discord
 from pyluach.dates import HebrewDate
 import config
@@ -29,12 +29,21 @@ def __welcome_channel() -> discord.TextChannel:
 
 
 async def assign(member: discord.Member, name: str, campus_id: int, year: int):
+	"""Assigns a user who joined the server.
+
+	Sets the user's nickname to their full name, adds the role for the class they're in, and replaces the unassigned role with the assigned role. Following this, it welcomes the user in #off-topic.
+
+	Args:
+		member (discord.Member): The member to assign.
+		name (str): The member's full name.
+		campus_id (int): The ID of the campus they study in.
+		year (int): The index of the year they're in. This should be a number from 1 to 4.
+	"""
 	if __unassigned_role() in member.roles:
 		await member.edit(nick=name)
 		await __add_role(member, campus_id, year)
 		await member.add_roles(__student_role())
 		await member.remove_roles(__unassigned_role())
-		print(f"Removed Unassigned from {member} and added Student")
 		await server_welcome(member)
 
 
@@ -45,17 +54,12 @@ async def __add_role(member: discord.Member, campus_id: int, year: int):
 	last_elul = HebrewDate(last_elul_year, 6, 1)
 	base_year = last_elul.to_pydate().year
 	grad_year = base_year + 4 - year
-
-	query = sql_fetcher.fetch("modules", "join", "queries", "get_role.sql")
-	with config.conn as conn:
-		with conn.cursor() as cursor:
-			cursor.execute(query, {"campus_id": campus_id, "grad_year": grad_year})
-			role_id = cursor.fetchone()[0]
-
+	role_id = await sql.select.value(
+		"groups", "role", campus=campus_id, grad_year=grad_year
+	)
 	class_role = config.guild().get_role(role_id)
 	assert class_role is not None
 	await member.add_roles(class_role)
-	print(f"Gave {class_role.name} to {member.display_name}")
 
 
 async def server_welcome(member: discord.Member):

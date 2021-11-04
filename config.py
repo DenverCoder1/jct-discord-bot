@@ -1,7 +1,7 @@
 from typing import Optional
 from dotenv.main import load_dotenv
 import os
-import psycopg2
+import asyncpg
 import discord
 
 
@@ -11,7 +11,7 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN", "")
 
 guild_id = int(os.getenv("DISCORD_GUILD", ""))
-_guild: Optional[discord.Guild]  # To be loaded on ready
+_guild: Optional[discord.Guild] = None  # To be loaded on ready
 
 
 def guild() -> discord.Guild:
@@ -20,7 +20,7 @@ def guild() -> discord.Guild:
 
 
 # Connect to database
-conn = psycopg2.connect(os.getenv("DATABASE_URL", ""), sslmode="require")
+conn: asyncpg.Connection = None
 
 # Google client configuration
 google_config = {

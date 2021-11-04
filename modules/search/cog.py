@@ -1,3 +1,4 @@
+from typing import List
 from ..error.friendly_error import FriendlyError
 from discord.ext import commands
 from discord_slash import cog_ext
@@ -31,15 +32,14 @@ class SearchCog(commands.Cog):
 	async def search(self, ctx: SlashContext, query: str):
 		await ctx.defer()
 
-		links = search(query)
+		links: List[str] = [link for link in search(query) if link.startswith("http")]
 		if not links:
 			raise FriendlyError("We searched far and wide, but nothing turned up.", ctx)
-		link = links[0]
 
 		wiki_links = [link for link in links if "wikipedia.org" in link[:30]]
 		wiki_intro = (
 			sf.get_wiki_intro(wiki_links[0])
-			if wiki_links and wiki_links[0] != link
+			if wiki_links and wiki_links[0] != links[0]
 			else None
 		)
 

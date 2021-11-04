@@ -8,7 +8,7 @@ class GraduationCog(commands.Cog):
 
 	@Scheduler.schedule()
 	async def on_winter_semester_start(self):
-		groups = graduation.get_graduating_groups()
+		groups = await graduation.get_graduating_groups()
 		await graduation.add_alumni_role(groups)
 
 

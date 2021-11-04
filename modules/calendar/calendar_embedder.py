@@ -4,7 +4,8 @@ from typing import Dict, Generator, Optional, Sequence
 from utils import utils
 from utils.embedder import build_embed, MAX_EMBED_DESCRIPTION_LENGTH
 from discord.ext import commands
-from utils.utils import one, wait_for_reaction
+from utils.utils import one
+from utils.reactions import wait_for_reaction
 from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
@@ -171,7 +172,10 @@ class CalendarEmbedder:
 			# get event details and add enumeration emoji if available
 			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
 			# make sure embed doesn't exceed max length (unless it won't fit on its own page)
-			if len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH and i > 0:
+			if (
+				len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH
+				and i > 0
+			):
 				break
 			# add event to embed
 			description += event_details
@@ -185,10 +189,7 @@ class CalendarEmbedder:
 		# add page number and timezone info
 		footer = self.__footer_text(page_num=page_num)
 		return build_embed(
-			title=title,
-			description=description,
-			footer=footer,
-			colour=colour
+			title=title, description=description, footer=footer, colour=colour
 		)
 
 	def embed_links(
@@ -219,10 +220,7 @@ class CalendarEmbedder:
 		# add timezone info
 		footer = self.__footer_text()
 		return build_embed(
-			title=title,
-			description=description,
-			footer=footer,
-			colour=colour
+			title=title, description=description, footer=footer, colour=colour
 		)
 
 	def __format_paragraph(self, text: str, limit: int = 100) -> str:

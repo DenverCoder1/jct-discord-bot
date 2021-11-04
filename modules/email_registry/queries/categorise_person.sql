@@ -1,5 +1,5 @@
 INSERT INTO person_category (person, category)
-VALUES (%(person_id)s,
+VALUES ($1,
     (SELECT id
 	    FROM categories
-		WHERE channel = %(channel_id)s))
+		WHERE channel = $2))

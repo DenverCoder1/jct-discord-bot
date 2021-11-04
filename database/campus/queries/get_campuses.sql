@@ -1,1 +1,0 @@
-SELECT id, name, channel FROM campuses

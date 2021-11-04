@@ -1,19 +1,30 @@
+import asyncio
 import os
+import asyncpg
 import discord
+import database.preloaded
 from discord_slash import SlashCommand
 import config
 from discord.ext import commands
 from utils.scheduler import Scheduler
 
 
-def main():
+async def main():
+	# Connect to the database
+	config.conn = await asyncpg.connect(os.getenv("DATABASE_URL", ""), ssl="require")
+	# Preload necessary data from the database
+	await database.preloaded.load()
+
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
 	intents = discord.Intents.default()
 	intents.guilds = True
 	intents.members = True
 
+	activity = discord.Game("with students' patience")
+
 	# empty space effectively disables prefix since discord strips trailing spaces
-	bot = commands.Bot(" ", intents=intents)
+	bot = commands.Bot(" ", intents=intents, activity=activity)
+
 	setattr(bot, "slash", SlashCommand(bot, override_type=True, sync_commands=True))
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
@@ -24,15 +35,17 @@ def main():
 	@bot.event
 	async def on_ready():
 		"""When discord is connected"""
+		# skip if this function has already run
+		if config._guild is not None:
+			return
 		print(f"{bot.user.name} has connected to Discord!")
 		config._guild = bot.get_guild(config.guild_id)
-		await bot.change_presence(activity=discord.Game("with students' patience"))
 		# Start Scheduler
 		Scheduler(bot)
 
 	# Run Discord bot
-	bot.run(config.token)
+	await bot.start(config.token)
 
 
 if __name__ == "__main__":
-	main()
+	asyncio.run(main())

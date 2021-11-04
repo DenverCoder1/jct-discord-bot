@@ -1,8 +1,8 @@
 import discord
 import config
 from functools import cached_property
-from typing import Iterable
-from database import sql_fetcher
+from typing import Collection
+from database import sql
 
 
 class Campus:
@@ -29,22 +29,19 @@ class Campus:
 		return channel
 
 	@classmethod
-	def get_campus(cls, campus_id: int) -> "Campus":
+	async def get_campus(cls, campus_id: int) -> "Campus":
 		"""Fetch a single campus from the database with the specified id."""
-		query = sql_fetcher.fetch("database", "campus", "queries", "get_campus.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query, {"campus_id": campus_id})
-				return cls(*cursor.fetchone())
+		record = await sql.select.one(
+			"campuses", ("id", "name", "channel"), id=campus_id
+		)
+		assert record is not None
+		return cls(*record)
 
 	@classmethod
-	def get_campuses(cls) -> Iterable["Campus"]:
+	async def get_campuses(cls) -> Collection["Campus"]:
 		"""Fetch a list of campuses from the database."""
-		query = sql_fetcher.fetch("database", "campus", "queries", "get_campuses.sql")
-		with config.conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(query)
-				return [cls(*tup) for tup in cursor.fetchall()]
+		records = await sql.select.many("campuses", ("id", "name", "channel"))
+		return [cls(*record) for record in records]
 
 	def __eq__(self, other):
 		"""Compares them by ID"""

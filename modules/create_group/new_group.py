@@ -1,17 +1,17 @@
 from database.group import Group
 import discord
-import psycopg2.extensions as sql
-from database import sql_fetcher
 from database.campus import Campus
-from .group_channel_creator import GroupChannelCreator
+from modules.calendar.calendar import Calendar
+from . import group_channel_creator
 import config
+from database import sql
 
 
 class NewGroup:
-	def __init__(self, campus: Campus, year: int, conn: sql.connection):
+	def __init__(self, campus: Campus, year: int, calendar: Calendar):
 		self.__campus = campus
 		self.__year = year
-		self.__conn = conn
+		self.__calendar = calendar
 		self.__role: discord.Role
 		self.__channel: discord.TextChannel
 
@@ -39,12 +39,17 @@ class NewGroup:
 			raise AttributeError()
 		return self.__channel
 
+	@property
+	def calendar(self) -> Calendar:
+		"""The new group's calendar."""
+		return self.__calendar
+
 	async def add_to_system(self):
 		await self.__create_role()
 		await self.__move_role()
 		await self.__create_group_channel()
 		await self.__add_to_campus_channel()
-		self.__add_to_database()
+		await self.__add_to_database()
 
 	def __get_colour(self) -> discord.Colour:
 		colours = [
@@ -65,15 +70,17 @@ class NewGroup:
 		)
 
 	async def __move_role(self):
-		roles = [group.role for group in Group.get_groups()]
+		roles = [group.role for group in await Group.get_groups()]
 		positions = [role.position for role in roles]
 		new_position = min(positions) - 1
 		position_dict = {self.role: new_position}
 		await config.guild().edit_role_positions(position_dict)
 
 	async def __create_group_channel(self):
-		self.__channel = await GroupChannelCreator.create_group_channel(
-			f"📚{self.__year}-{self.__campus.name.lower()}", [self.__role]
+		self.__channel = await group_channel_creator.create_group_channel(
+			f"📚︱{self.__year}-{self.__campus.name.lower()}",
+			[self.__role],
+			"Here you can discuss schedules, links, and courses your class is taking.",
 		)
 
 	async def __add_to_campus_channel(self):
@@ -81,15 +88,11 @@ class NewGroup:
 			target=self.__role, view_channel=True,
 		)
 
-	def __add_to_database(self):
-		query = sql_fetcher.fetch("modules", "create_group", "queries", "add_group.sql")
-		with self.__conn as conn:
-			with conn.cursor() as cursor:
-				cursor.execute(
-					query,
-					{
-						"year": self.__year,
-						"campus_id": self.__campus.id,
-						"role_id": self.__role.id,
-					},
-				)
+	async def __add_to_database(self):
+		await sql.insert(
+			"groups",
+			grad_year=self.year,
+			campus=self.campus.id,
+			role=self.role.id,
+			calendar=self.calendar.id,
+		)
