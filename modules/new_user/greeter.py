@@ -21,18 +21,18 @@ class Greeter:
 
 	async def server_greet(self, member: discord.Member):
 		channel = self.__intro_channel()
-		await utils.delayed_send(channel, 2, f"Hey {member.mention}!")
-		await utils.delayed_send(channel, 4, "Welcome to the server!")
+		await utils.delayed_send(channel, 4, f"Hey {member.mention}!")
+		await utils.delayed_send(channel, 8, "Welcome to the server!")
 		await utils.delayed_send(
-			channel, 4, "Please type `/join` and enter the details it asks you for"
+			channel, 8, "Please type `/join` and enter the details it asks you for"
 		)
 		await utils.delayed_send(
-			channel, 3, "If you have any trouble tag @Admin and tell them your problem"
+			channel, 8, "If you have any trouble tag @Admin and tell them your problem"
 		)
 		await utils.delayed_send(
-			channel, 2, "But just so you dont have to, here's a GIF!"
+			channel, 6, "But just so you dont have to, here's a GIF!"
 		)
-		await channel.send("https://i.imgur.com/5So77B6.gif")
+		await utils.delayed_send(channel, 5, "https://i.imgur.com/5So77B6.gif")
 
 	async def private_greet(self, member: discord.Member):
 		"""privately messages the user who joined"""
