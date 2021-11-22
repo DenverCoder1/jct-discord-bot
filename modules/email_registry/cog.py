@@ -157,6 +157,12 @@ class EmailRegistryCog(commands.Cog):
 				required=True,
 			),
 			create_option(
+				name="email",
+				description="The email address of the person you want to add.",
+				option_type=SlashCommandOptionType.STRING,
+				required=False,
+			),
+			create_option(
 				name="channels",
 				description="Mention the channels this person is associated with.",
 				option_type=SlashCommandOptionType.STRING,
@@ -166,12 +172,19 @@ class EmailRegistryCog(commands.Cog):
 	)
 	@commands.has_guild_permissions(manage_roles=True)
 	async def add_person(
-		self, ctx: SlashContext, first_name: str, last_name: str, channels: str = ""
+		self,
+		ctx: SlashContext,
+		first_name: str,
+		last_name: str,
+		email: Optional[str] = None,
+		channels: str = "",
 	):
 		await ctx.defer()
 		person = await person_adder.add_person(
 			first_name, last_name, extract_channel_mentions(channels), ctx
 		)
+		if email is not None:
+			person = await email_adder.add_email(person, email, ctx)
 		await ctx.send(embed=person_embedder.gen_embed(person))
 
 	@cog_ext.cog_subcommand(
