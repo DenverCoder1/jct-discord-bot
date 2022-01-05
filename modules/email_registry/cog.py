@@ -170,7 +170,6 @@ class EmailRegistryCog(commands.Cog):
 			),
 		],
 	)
-	@commands.has_guild_permissions(manage_roles=True)
 	async def add_person(
 		self,
 		ctx: SlashContext,
