@@ -1,4 +1,4 @@
-# JCT Discord Bot
+# Abbot Engelborg
 
 Bot for JCT ESP CompSci Discord server
 
