@@ -1,11 +1,7 @@
 from typing import Optional
-from discord_slash import cog_ext
-from discord_slash.context import SlashContext
-from discord_slash.model import SlashCommandOptionType
-from discord_slash.utils.manage_commands import create_option
 from .xkcd_fetcher import XKCDFetcher
 from .xkcd_embedder import XKCDEmbedder
-from discord.ext import commands
+from nextcord.ext import commands
 import config
 
 
@@ -34,7 +30,7 @@ class XKCDCog(commands.Cog):
 			)
 		],
 	)
-	async def xkcd(self, ctx: SlashContext, comic_id: Optional[int] = None):
+	async def xkcd(self, interaction: nextcord.Interaction, comic_id: Optional[int] = None):
 		await ctx.defer()
 		comic = (
 			self.xkcd_fetcher.get_comic_by_id(comic_id)
@@ -49,7 +45,7 @@ class XKCDCog(commands.Cog):
 		description="Get the latest xkcd comix.",
 		guild_ids=[config.guild_id],
 	)
-	async def xkcd_latest(self, ctx: SlashContext):
+	async def xkcd_latest(self, interaction: nextcord.Interaction):
 		await ctx.defer()
 		comic = self.xkcd_fetcher.get_latest()
 		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
@@ -68,7 +64,7 @@ class XKCDCog(commands.Cog):
 			)
 		],
 	)
-	async def xkcd_search(self, ctx: SlashContext, query: str):
+	async def xkcd_search(self, interaction: nextcord.Interaction, query: str):
 		await ctx.defer()
 		comic = self.xkcd_fetcher.search_relevant(query)
 		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))

@@ -1,4 +1,4 @@
-from discord.abc import Messageable
+from nextcord.abc import Messageable
 from database import sql
 from ..error.friendly_error import FriendlyError
 from database.person import Person

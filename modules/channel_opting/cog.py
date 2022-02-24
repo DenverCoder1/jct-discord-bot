@@ -1,8 +1,8 @@
 from .channel_message_manager import ChannelMessageManager
 from utils.utils import get_discord_obj
 from database.channel_message import ChannelMessage
-from discord.ext import commands
-import discord
+from nextcord.ext import commands
+import nextcord
 import config
 
 
@@ -29,21 +29,21 @@ class ChannelOptingCog(commands.Cog):
 		self.__channel_messages = list(await ChannelMessage.get_channel_messages())
 
 	@commands.Cog.listener()
-	async def on_raw_reaction_add(self, reaction: discord.RawReactionActionEvent):
+	async def on_raw_reaction_add(self, reaction: nextcord.RawReactionActionEvent):
 		await self.__manager.process_reaction(reaction, self.__channel_messages)
 
 	@commands.Cog.listener()
-	async def on_raw_reaction_remove(self, reaction: discord.RawReactionActionEvent):
+	async def on_raw_reaction_remove(self, reaction: nextcord.RawReactionActionEvent):
 		await self.__manager.process_reaction(reaction, self.__channel_messages)
 
 	@commands.Cog.listener()
-	async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
+	async def on_guild_channel_create(self, channel: nextcord.abc.GuildChannel):
 		if channel.guild != config.guild():
 			return
 		await self.__manager.create_channel_message(self.__channel_messages, channel)
 
 	@commands.Cog.listener()
-	async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+	async def on_guild_channel_delete(self, channel: nextcord.abc.GuildChannel):
 		if channel.guild != config.guild():
 			return
 		await self.__manager.delete_channel_message(self.__channel_messages, channel)

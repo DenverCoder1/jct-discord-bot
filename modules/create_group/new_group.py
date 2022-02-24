@@ -1,5 +1,5 @@
 from database.group import Group
-import discord
+import nextcord
 from database.campus import Campus
 from modules.calendar.calendar import Calendar
 from . import group_channel_creator
@@ -12,8 +12,8 @@ class NewGroup:
 		self.__campus = campus
 		self.__year = year
 		self.__calendar = calendar
-		self.__role: discord.Role
-		self.__channel: discord.TextChannel
+		self.__role: nextcord.Role
+		self.__channel: nextcord.TextChannel
 
 	@property
 	def campus(self) -> Campus:
@@ -26,14 +26,14 @@ class NewGroup:
 		return self.__year
 
 	@property
-	def role(self) -> discord.Role:
+	def role(self) -> nextcord.Role:
 		"""The new group's newly created role."""
 		if not self.__role:
 			raise AttributeError()
 		return self.__role
 
 	@property
-	def channel(self) -> discord.TextChannel:
+	def channel(self) -> nextcord.TextChannel:
 		"""The new group's newly created role."""
 		if not self.__channel:
 			raise AttributeError()
@@ -51,19 +51,19 @@ class NewGroup:
 		await self.__add_to_campus_channel()
 		await self.__add_to_database()
 
-	def __get_colour(self) -> discord.Colour:
+	def __get_colour(self) -> nextcord.Colour:
 		colours = [
-			discord.Colour.from_rgb(255, 77, 149),
-			discord.Colour.from_rgb(235, 154, 149),
-			discord.Colour.from_rgb(75, 147, 213),
-			discord.Colour.from_rgb(110, 213, 144),
+			nextcord.Colour.from_rgb(255, 77, 149),
+			nextcord.Colour.from_rgb(235, 154, 149),
+			nextcord.Colour.from_rgb(75, 147, 213),
+			nextcord.Colour.from_rgb(110, 213, 144),
 		]
 		return colours[self.__year % len(colours)]
 
 	async def __create_role(self):
 		self.__role = await config.guild().create_role(
 			name=f"{self.__campus.name} {self.__year}",
-			permissions=discord.Permissions.none(),
+			permissions=nextcord.Permissions.none(),
 			colour=self.__get_colour(),
 			hoist=True,
 			mentionable=True,

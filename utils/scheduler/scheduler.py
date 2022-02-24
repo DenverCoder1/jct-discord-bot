@@ -1,7 +1,7 @@
 import threading
 import datetime as dt
 from typing import Dict
-from discord.ext import commands
+from nextcord.ext import commands
 from .func_instance import FuncInstance
 from .event import Event
 from pyluach import dates

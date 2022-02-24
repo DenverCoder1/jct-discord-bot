@@ -1,16 +1,15 @@
-import discord
-from discord_slash.context import SlashContext
+import nextcord
 from modules.course_management.util import is_course
 from ..error.friendly_error import FriendlyError
 from database import sql
 
 
-async def delete_course(ctx: SlashContext, channel: discord.TextChannel):
+async def delete_course(interaction: nextcord.Interaction, channel: nextcord.TextChannel):
 	await __delete_channel(ctx, channel)
 	await __delete_from_database(channel.id)
 
 
-async def __delete_channel(ctx: SlashContext, channel: discord.TextChannel):
+async def __delete_channel(interaction: nextcord.Interaction, channel: nextcord.TextChannel):
 	if is_course(channel):
 		await channel.delete()
 	else:

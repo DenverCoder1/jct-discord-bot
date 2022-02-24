@@ -1,14 +1,11 @@
 from utils.embedder import embed_success
 from modules.email_registry import person_remover
-from discord.channel import TextChannel
+from nextcord.channel import TextChannel
 import config
-import discord
+import nextcord
 from database.person import Person
 from typing import Any, Callable, Coroutine, Iterable, Optional
-from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.model import SlashCommandOptionType
-from discord_slash.utils.manage_commands import create_option
+from nextcord.ext import commands
 from . import person_embedder
 from . import categoriser
 from . import person_finder
@@ -46,15 +43,15 @@ class EmailRegistryCog(commands.Cog):
 	)
 	async def get_email(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		name: Optional[str] = None,
-		channel: Optional[discord.TextChannel] = None,
+		channel: Optional[nextcord.TextChannel] = None,
 	):
 		await ctx.defer()  # let discord know the response may take more than 3 seconds
 		people = await person_finder.search(
 			name,
 			channel
-			or (ctx.channel if isinstance(ctx.channel, discord.TextChannel) else None),
+			or (ctx.channel if isinstance(ctx.channel, nextcord.TextChannel) else None),
 		)
 		people = {person for person in people if person.emails}
 		if not people:
@@ -102,10 +99,10 @@ class EmailRegistryCog(commands.Cog):
 	)
 	async def add_email(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		email: str,
 		name: Optional[str] = None,
-		channel: Optional[discord.TextChannel] = None,
+		channel: Optional[nextcord.TextChannel] = None,
 	):
 		await ctx.defer()
 		# search for professor's details
@@ -129,7 +126,7 @@ class EmailRegistryCog(commands.Cog):
 		],
 	)
 	@commands.has_guild_permissions(manage_roles=True)
-	async def remove_email(self, ctx: SlashContext, email: str):
+	async def remove_email(self, interaction: nextcord.Interaction, email: str):
 		await ctx.defer()
 		# search for professor's details
 		person = await person_finder.search_one(ctx, email=email)
@@ -172,7 +169,7 @@ class EmailRegistryCog(commands.Cog):
 	)
 	async def add_person(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		first_name: str,
 		last_name: str,
 		email: Optional[str] = None,
@@ -216,7 +213,7 @@ class EmailRegistryCog(commands.Cog):
 	@commands.has_guild_permissions(manage_roles=True)
 	async def remove_person(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		name: Optional[str] = None,
 		channel: Optional[TextChannel] = None,
 		email: Optional[str] = None,
@@ -259,7 +256,7 @@ class EmailRegistryCog(commands.Cog):
 	)
 	@commands.has_guild_permissions(manage_roles=True)
 	async def link_person_to_category(
-		self, ctx: SlashContext, name_or_email: str, channel_mentions: str
+		self, interaction: nextcord.Interaction, name_or_email: str, channel_mentions: str
 	):
 		await self.__link_unlink(
 			ctx, name_or_email, channel_mentions, categoriser.categorise_person
@@ -297,7 +294,7 @@ class EmailRegistryCog(commands.Cog):
 	)
 	@commands.has_guild_permissions(manage_roles=True)
 	async def unlink_person_from_category(
-		self, ctx: SlashContext, name_or_email: str, channel_mentions: str
+		self, interaction: nextcord.Interaction, name_or_email: str, channel_mentions: str
 	):
 		await self.__link_unlink(
 			ctx, name_or_email, channel_mentions, categoriser.decategorise_person
@@ -305,7 +302,7 @@ class EmailRegistryCog(commands.Cog):
 
 	async def __link_unlink(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		name_or_email: str,
 		channel_mentions: str,
 		func: Callable[[SlashContext, int, Iterable[str]], Coroutine[Any, Any, Person]],

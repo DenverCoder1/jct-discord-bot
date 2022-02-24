@@ -1,6 +1,5 @@
-import discord
+import nextcord
 from utils.utils import one
-from discord_slash.context import SlashContext
 from typing import Optional, Set
 from .weighted_set import WeightedSet
 from database.person import Person
@@ -16,7 +15,7 @@ __search_weights = {
 
 async def search(
 	name: Optional[str] = None,
-	channel: Optional[discord.TextChannel] = None,
+	channel: Optional[nextcord.TextChannel] = None,
 	email: Optional[str] = None,
 ) -> Set[Person]:
 	"""returns a list of people who best match the name and channel"""
@@ -44,7 +43,7 @@ async def search(
 async def search_one(
 	sender: SlashContext,
 	name: Optional[str] = None,
-	channel: Optional[discord.TextChannel] = None,
+	channel: Optional[nextcord.TextChannel] = None,
 	email: Optional[str] = None,
 ) -> Person:
 	"""
@@ -55,7 +54,7 @@ async def search_one(
 	:param name: The name of the person you want to search for (first, last, or both).
 	:type name: Optional[str]
 	:param channel: A channel the person is linked to.
-	:type channel: Optional[discord.TextChannel]
+	:type channel: Optional[nextcord.TextChannel]
 	:param email: The email of the person you want to search for.
 	:type email: Optional[str]
 	"""

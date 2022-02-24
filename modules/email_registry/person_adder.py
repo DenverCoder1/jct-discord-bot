@@ -1,4 +1,3 @@
-from discord_slash.context import SlashContext
 from database.person import Person
 import config
 from typing import Iterable
@@ -7,7 +6,7 @@ from database import sql, sql_fetcher
 
 
 async def add_person(
-	name: str, surname: str, channel_mentions: Iterable[str], ctx: SlashContext,
+	name: str, surname: str, channel_mentions: Iterable[str], interaction: nextcord.Interaction,
 ) -> Person:
 	person_id = await sql.insert(
 		"people", returning="id", name=name.capitalize(), surname=surname.capitalize()

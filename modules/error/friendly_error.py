@@ -1,6 +1,5 @@
 from typing import Optional, Union
-import discord
-from discord_slash.context import SlashContext
+import nextcord
 import utils.embedder
 
 
@@ -13,7 +12,7 @@ class FriendlyError(Exception):
 	----------
 	msg: :class:`str`
 			The message to display to the user.
-	sender: :class:`Union[discord.TextChannel, SlashContext]`
+	sender: :class:`Union[nextcord.TextChannel, SlashContext]`
 			An object which can be used to call send (TextChannel or SlashContext).
 	member: Optional[:class:`Member`]
 			The member who caused the error.
@@ -30,8 +29,8 @@ class FriendlyError(Exception):
 	def __init__(
 		self,
 		msg: str,
-		messageable: discord.abc.Messageable,
-		member: Union[discord.Member, discord.User, None] = None,
+		messageable: nextcord.abc.Messageable,
+		member: Union[nextcord.Member, nextcord.User, None] = None,
 		inner: Optional[BaseException] = None,
 		description: Optional[str] = None,
 		image: Optional[str] = None,

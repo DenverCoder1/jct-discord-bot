@@ -2,7 +2,6 @@ from modules.error.friendly_error import FriendlyError
 from utils.utils import one
 from database.group import Group
 from typing import Dict, Iterable, Optional
-from discord_slash.context import SlashContext
 
 
 class Calendar:
@@ -53,7 +52,7 @@ class Calendar:
 	@classmethod
 	async def get_calendar(
 		cls,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		groups: Optional[Iterable[Group]] = None,
 		group_id: Optional[int] = None,
 	) -> "Calendar":

@@ -1,6 +1,5 @@
-from discord.channel import TextChannel
+from nextcord.channel import TextChannel
 from modules.email_registry.person_finder import search_one
-from discord_slash.context import SlashContext
 from database.person import Person
 import config
 from typing import Optional
@@ -8,7 +7,7 @@ from database import sql
 
 
 async def remove_person(
-	ctx: SlashContext,
+	interaction: nextcord.Interaction,
 	name: Optional[str] = None,
 	channel: Optional[TextChannel] = None,
 	email: Optional[str] = None,

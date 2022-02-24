@@ -2,7 +2,7 @@ from typing import Optional
 from dotenv.main import load_dotenv
 import os
 import asyncpg
-import discord
+import nextcord
 
 
 load_dotenv()
@@ -11,10 +11,10 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN", "")
 
 guild_id = int(os.getenv("DISCORD_GUILD", ""))
-_guild: Optional[discord.Guild] = None  # To be loaded on ready
+_guild: Optional[nextcord.Guild] = None  # To be loaded on ready
 
 
-def guild() -> discord.Guild:
+def guild() -> nextcord.Guild:
 	assert _guild is not None
 	return _guild
 

@@ -1,9 +1,8 @@
 from asyncpg.exceptions import UniqueViolationError
-import discord
-from discord.abc import Messageable
-import discord.utils
+import nextcord
+from nextcord.abc import Messageable
+import nextcord.utils
 import config
-from discord_slash.context import SlashContext
 from modules.course_management.util import ACTIVE_COURSES_CATEGORY, sort_single_course
 from ..email_registry import categoriser
 from ..email_registry import person_finder
@@ -15,7 +14,7 @@ from utils.utils import get_discord_obj
 
 
 async def add_course(
-	ctx: SlashContext, course_name: str, professors: Iterable[str], channel_name: str,
+	interaction: nextcord.Interaction, course_name: str, professors: Iterable[str], channel_name: str,
 ):
 	channel = await __create_channel(ctx, channel_name, course_name)
 	await __add_to_database(ctx, channel, course_name)
@@ -24,13 +23,13 @@ async def add_course(
 
 
 async def __create_channel(
-	ctx: SlashContext, channel_name: str, course_name: str = ""
-) -> discord.TextChannel:
+	interaction: nextcord.Interaction, channel_name: str, course_name: str = ""
+) -> nextcord.TextChannel:
 	# find courses category
 	category = get_discord_obj(config.guild().categories, ACTIVE_COURSES_CATEGORY)
 
 	# make sure the channel doesn't already exist
-	if discord.utils.get(category.text_channels, name=channel_name) is not None:
+	if nextcord.utils.get(category.text_channels, name=channel_name) is not None:
 		raise FriendlyError(
 			"this channel already exists. Please try again.", ctx, ctx.author,
 		)
@@ -44,7 +43,7 @@ async def __create_channel(
 
 
 async def __add_to_database(
-	messageable: Messageable, channel: discord.TextChannel, course_name: str
+	messageable: Messageable, channel: nextcord.TextChannel, course_name: str
 ):
 	try:
 		await sql.insert(
@@ -70,7 +69,7 @@ async def __add_to_database(
 
 
 async def __link_professors(
-	ctx: SlashContext, channel: discord.TextChannel, professors: Iterable[str],
+	interaction: nextcord.Interaction, channel: nextcord.TextChannel, professors: Iterable[str],
 ):
 	for professor_name in professors:
 		try:

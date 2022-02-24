@@ -1,6 +1,4 @@
-from discord.ext import commands
-from discord_slash import cog_ext
-from discord_slash.context import SlashContext
+from nextcord.ext import commands
 import os
 import config
 import random
@@ -21,7 +19,7 @@ class PingCog(commands.Cog):
 		description="A command which simply acknowledges the user's ping.",
 		guild_ids=[config.guild_id],
 	)
-	async def ping(self, ctx: SlashContext):
+	async def ping(self, interaction: nextcord.Interaction):
 		# log in console that a ping was received
 		print("Received ping")
 		await ctx.send(

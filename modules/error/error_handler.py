@@ -2,8 +2,8 @@ from typing import Optional
 from .quiet_warning import QuietWarning
 from .error_logger import ErrorLogger
 from .friendly_error import FriendlyError
-import discord.ext.commands.errors as discord_err
-import discord
+import nextcord.ext.commands.errors as discord_err
+import nextcord
 
 
 class ErrorHandler:
@@ -15,7 +15,7 @@ class ErrorHandler:
 		self.logger = error_logger
 
 	async def handle(
-		self, error: BaseException, message: Optional[discord.Message] = None
+		self, error: BaseException, message: Optional[nextcord.Message] = None
 	):
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
@@ -38,7 +38,7 @@ class ErrorHandler:
 				await self.handle(friendly_err, message)
 
 	async def __handle_friendly(
-		self, error: FriendlyError, message: Optional[discord.Message] = None
+		self, error: FriendlyError, message: Optional[nextcord.Message] = None
 	):
 		if error.inner:
 			self.logger.log_to_file(error.inner, message)
