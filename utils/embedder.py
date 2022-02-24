@@ -1,6 +1,6 @@
-import discord
+import nextcord
 from typing import Optional, Union
-from discord.embeds import EmptyEmbed, _EmptyEmbed
+from nextcord.embeds import EmptyEmbed, _EmptyEmbed
 from utils import utils
 
 MAX_EMBED_DESCRIPTION_LENGTH = 4096
@@ -14,9 +14,9 @@ def embed_success(
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
 	image: Optional[str] = None,
-) -> discord.Embed:
+) -> nextcord.Embed:
 	"""Embed a success message and an optional description, footer, and url"""
-	return build_embed(title, description, footer, url, discord.Colour.green(), image)
+	return build_embed(title, description, footer, url, nextcord.Colour.green(), image)
 
 
 def embed_warning(
@@ -25,9 +25,9 @@ def embed_warning(
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
 	image: Optional[str] = None,
-) -> discord.Embed:
+) -> nextcord.Embed:
 	"""Embed a warning message and an optional description, footer, and url"""
-	return build_embed(title, description, footer, url, discord.Colour.gold(), image)
+	return build_embed(title, description, footer, url, nextcord.Colour.gold(), image)
 
 
 def embed_error(
@@ -36,9 +36,9 @@ def embed_error(
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
 	image: Optional[str] = None,
-) -> discord.Embed:
+) -> nextcord.Embed:
 	"""Embed an error message and an optional description, footer, and url"""
-	return build_embed(title, description, footer, url, discord.Colour.red(), image)
+	return build_embed(title, description, footer, url, nextcord.Colour.red(), image)
 
 
 def build_embed(
@@ -46,12 +46,12 @@ def build_embed(
 	description: Optional[str] = None,
 	footer: Optional[str] = None,
 	url: Union[str, _EmptyEmbed] = EmptyEmbed,
-	colour: discord.Colour = discord.Colour.blurple(),
+	colour: nextcord.Colour = nextcord.Colour.blurple(),
 	image: Optional[str] = None,
-) -> discord.Embed:
+) -> nextcord.Embed:
 	"""Embed a message and an optional description, footer, and url"""
 	# create the embed
-	embed = discord.Embed(title=utils.trim(title, MAX_EMBED_FIELD_TITLE_LENGTH), url=url, colour=colour)
+	embed = nextcord.Embed(title=utils.trim(title, MAX_EMBED_FIELD_TITLE_LENGTH), url=url, colour=colour)
 	if description:
 		embed.description = utils.trim(description, MAX_EMBED_DESCRIPTION_LENGTH)
 	if footer:

@@ -1,5 +1,4 @@
 from typing import Iterable
-from discord_slash.context import SlashContext
 from ..error.friendly_error import FriendlyError
 from database.person import Person
 from database import sql_fetcher
@@ -8,7 +7,7 @@ import config
 
 
 async def categorise_person(
-	ctx: SlashContext, person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction, person_id: int, channel_mentions: Iterable[str]
 ) -> Person:
 	"""Adds the person to the categories linked to the channels mentioned. Returns the updated person."""
 	return await __add_remove_categories(
@@ -17,7 +16,7 @@ async def categorise_person(
 
 
 async def decategorise_person(
-	ctx: SlashContext, person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction, person_id: int, channel_mentions: Iterable[str]
 ) -> Person:
 	"""Removes the person from the categories linked to the channels mentioned. Returns the updated person."""
 	return await __add_remove_categories(
@@ -26,7 +25,7 @@ async def decategorise_person(
 
 
 async def __add_remove_categories(
-	ctx: SlashContext, sql_file: str, person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction, sql_file: str, person_id: int, channel_mentions: Iterable[str]
 ) -> Person:
 	query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 	async with config.conn.transaction():

@@ -1,5 +1,4 @@
-discord.py==1.7.3
-discord-py-slash-command==3.0.1
+nextcord==2.0.0a8
 python-dotenv==0.19.2
 googlesearch-python==1.0.1
 beautifulsoup4==4.9.3

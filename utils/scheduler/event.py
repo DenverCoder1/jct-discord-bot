@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import DefaultDict, List
 from .func_instance import FuncInstance
-from discord.ext import commands
+from nextcord.ext import commands
 
 
 class Event:

@@ -27,7 +27,7 @@ Please check out the [style guide](style_guide.md).
 Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of your command or feature) for whatever you feature you want to add. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
 
 ```py
-from discord.ext import commands
+from nextcord.ext import commands
 
 class MyFeatureCog(commands.Cog):
 	"""A cog which has no features and does nothing"""
@@ -102,7 +102,7 @@ from modules.error.friendly_error import FriendlyError
 raise FriendlyError("user friendly error message", channel, member)
 ```
 
-where `channel` is of type `discord.TextChannel` and `member` is of type `discord.Member`. Optionally, you can also pass as internal Exception, if applicable, and the error will be logged to `err.log`.
+where `channel` is of type `nextcord.TextChannel` and `member` is of type `nextcord.Member`. Optionally, you can also pass as internal Exception, if applicable, and the error will be logged to `err.log`.
 
 When raising a `FriendlyError`, the message passed to it will be sent to the channel provided, tagging `member` if a member was passed.
 
@@ -114,11 +114,10 @@ To run the bot locally, you may want to first disable the hosted version of the 
 
 You will also need the `.env` file in the project's root directory. Again, ask [Jonah Lawrence](https://github.com/DenverCoder1) for this file, or check the pinned messages in the `#jct-bot-development` Discord channel.
 
-You will need to make sure you have the `discord.py` and `python-dotenv` libraries installed. You can install them by typing the following commands in your terminal.
+You will need to make sure you have all necessary dependencies installed. You can install them by typing the following command in your terminal.
 
 ```
-pip install discord.py
-pip install python-dotenv
+pip install -r requirements.txt
 ```
 
 Now you should be able to run the bot locally. Well done!

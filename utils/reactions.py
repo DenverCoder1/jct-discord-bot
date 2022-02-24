@@ -1,17 +1,17 @@
 import asyncio
-import discord
+import nextcord
 from typing import Collection, Optional, Sequence
-from discord.errors import NotFound
-from discord.ext import commands
+from nextcord.errors import NotFound
+from nextcord.ext import commands
 from modules.error.friendly_error import FriendlyError
 from utils.utils import one
 
 
 async def wait_for_reaction(
 	bot: commands.Bot,
-	message: discord.Message,
+	message: nextcord.Message,
 	emoji_list: Sequence[str],
-	allowed_users: Optional[Collection[discord.Member]] = None,
+	allowed_users: Optional[Collection[nextcord.Member]] = None,
 	timeout: int = 60,
 ) -> int:
 	"""Add reactions to message and wait for user to react with one.
@@ -21,11 +21,11 @@ async def wait_for_reaction(
 	<bot>: str - the bot user
 	<message>: str - the message to apply reactions to
 	<emoji_list>: Iterable[str] - list of emojis as strings to add as reactions
-	[allowed_users]: Iterable[discord.Member] - if specified, only reactions from these users are accepted
+	[allowed_users]: Iterable[nextcord.Member] - if specified, only reactions from these users are accepted
 	[timeout]: int - number of seconds to wait before timing out
 	"""
 
-	def validate_reaction(reaction: discord.Reaction, user: discord.Member) -> bool:
+	def validate_reaction(reaction: nextcord.Reaction, user: nextcord.Member) -> bool:
 		"""Validates that:
 		- The reaction is on the message currently being checked
 		- The emoji is one of the emojis on the list

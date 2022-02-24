@@ -3,10 +3,10 @@ import re
 import csv
 from asyncio import sleep
 import dateparser
-import discord
+import nextcord
 from datetime import datetime, timedelta
 from typing import Any, Dict, Iterable, Optional, TypeVar
-from discord.abc import Messageable
+from nextcord.abc import Messageable
 
 
 class IdNotFoundError(Exception):
@@ -15,7 +15,7 @@ class IdNotFoundError(Exception):
 
 
 def get_discord_obj(iterable, label: str) -> Any:
-	obj = discord.utils.get(iterable, id=get_id(label))
+	obj = nextcord.utils.get(iterable, id=get_id(label))
 	if not obj:
 		raise IdNotFoundError()
 	return obj

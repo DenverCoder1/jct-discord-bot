@@ -3,15 +3,14 @@ import re
 from typing import Dict, Generator, Optional, Sequence
 from utils import utils
 from utils.embedder import build_embed, MAX_EMBED_DESCRIPTION_LENGTH
-from discord.ext import commands
+from nextcord.ext import commands
 from utils.utils import one
 from utils.reactions import wait_for_reaction
-from discord_slash.context import SlashContext
 from modules.error.friendly_error import FriendlyError
 from .calendar import Calendar
 from .event import Event
 from more_itertools import peekable
-import discord
+import nextcord
 
 
 class CalendarEmbedder:
@@ -34,7 +33,7 @@ class CalendarEmbedder:
 
 	async def embed_event_pages(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		events_list: Sequence[Event],
 		query: str,
 		results_per_page: int,
@@ -56,7 +55,7 @@ class CalendarEmbedder:
 					page_num=page_num,
 					max_results=results_per_page,
 				)
-				sender = ctx.send if ctx.message is None else ctx.message.edit
+				sender = interaction.send if interaction.message is None else interaction.message.edit
 				await sender(embed=embed)
 				# set emoji and page based on whether there are more events
 				if events:
@@ -84,7 +83,7 @@ class CalendarEmbedder:
 
 	async def get_event_choice(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		events_list: Sequence[Event],
 		calendar: Calendar,
 		query: str,
@@ -97,7 +96,7 @@ class CalendarEmbedder:
 		"""
 		# no events found
 		if not events_list:
-			raise FriendlyError(f'No events were found for "{query}".', ctx, ctx.author)
+			raise FriendlyError(f'No events were found for "{query}".', interaction, interaction.user)
 		# if only 1 event found, get the event at index 0
 		if len(events_list) == 1:
 			return one(events_list)
@@ -112,19 +111,20 @@ class CalendarEmbedder:
 				f"Please specify which event you would like to {action}."
 				f'\n\nShowing results for "{query}"'
 			),
-			colour=discord.Colour.gold(),
+			colour=nextcord.Colour.gold(),
 			enumeration=self.number_emoji,
 		)
-		await ctx.send(embed=embed)
+		await interaction.send(embed=embed)
+		message = await interaction.original_message()
 		# get the number of events that were displayed
 		next_event = events.peek(None)
 		num_events = events_list.index(next_event) if next_event else len(events_list)
 		# ask user to pick an event with emojis
 		selection_index = await wait_for_reaction(
 			bot=self.bot,
-			message=ctx.message,
+			message=message,
 			emoji_list=self.number_emoji[:num_events],
-			allowed_users=[ctx.author],
+			allowed_users=[interaction.user],
 		)
 		# get the event selected by the user
 		return events_list[selection_index]
@@ -135,11 +135,11 @@ class CalendarEmbedder:
 		events: peekable[Event],
 		calendar: Calendar,
 		description: str = "",
-		colour: discord.Colour = discord.Colour.blue(),
+		colour: nextcord.Colour = nextcord.Colour.blue(),
 		enumeration: Sequence[str] = (),
 		page_num: Optional[int] = None,
 		max_results: int = 10,
-	) -> discord.Embed:
+	) -> nextcord.Embed:
 		"""Generates an embed with event summaries, links, and dates for each event in the given list
 
 		Arguments:
@@ -148,7 +148,7 @@ class CalendarEmbedder:
 		:param events: :class:`peekable[Event]` the events to display
 		:param calendar: :class:`Calendar` the calendar the events are from
 		:param description: :class:`Optional[str]` the description to embed below the title
-		:param colour: :class:`Optional[discord.Colour]` the embed colour
+		:param colour: :class:`Optional[nextcord.Colour]` the embed colour
 		:param enumeration: :class:`Optional[Iterable[str]]` list of emojis to display alongside events (for reaction choices)
 		:param page_num: :class:`Optional[int]` page number to display in the footer
 		:param max_results: :class:`int` maximum results to display in the list
@@ -196,8 +196,8 @@ class CalendarEmbedder:
 		self,
 		title: str,
 		links: Dict[str, str],
-		colour: discord.Colour = discord.Colour.dark_blue(),
-	) -> discord.Embed:
+		colour: nextcord.Colour = nextcord.Colour.dark_blue(),
+	) -> nextcord.Embed:
 		"""Embed a list of links given a mapping of link text to urls"""
 		# add links to embed
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
@@ -210,8 +210,8 @@ class CalendarEmbedder:
 		title: str,
 		event: Event,
 		calendar: Calendar,
-		colour: discord.Colour = discord.Colour.green(),
-	) -> discord.Embed:
+		colour: nextcord.Colour = nextcord.Colour.green(),
+	) -> nextcord.Embed:
 		"""Embed an event with the summary, link, and dates"""
 		# add overview of event to the embed
 		description = self.__format_event(event)

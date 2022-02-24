@@ -1,11 +1,7 @@
 import config
 import sys
-from discord_slash.model import SlashCommandOptionType
-from discord_slash import cog_ext
-from discord_slash.utils.manage_commands import create_option
-from discord_slash.context import SlashContext
 from utils import utils
-from discord.ext import commands
+from nextcord.ext import commands
 from .error_handler import ErrorHandler
 from .error_logger import ErrorLogger
 
@@ -30,7 +26,7 @@ class ErrorLogCog(commands.Cog):
 			),
 		],
 	)
-	async def logs(self, ctx: SlashContext, num_lines: int = 50):
+	async def logs(self, interaction: nextcord.Interaction, num_lines: int = 50):
 		await ctx.send(self.logger.read_logs(num_lines))
 
 	@commands.Cog.listener()
@@ -39,7 +35,7 @@ class ErrorLogCog(commands.Cog):
 		await self.handler.handle(error, ctx.message)
 
 	@commands.Cog.listener()
-	async def on_slash_command_error(self, ctx: SlashContext, error: Exception):
+	async def on_slash_command_error(self, interaction: nextcord.Interaction, error: Exception):
 		"""When a slash exception is raised, log it in err.log and bot log channel"""
 		await self.handler.handle(error, ctx.message)
 

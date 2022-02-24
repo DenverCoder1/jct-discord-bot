@@ -1,9 +1,5 @@
 from typing import Optional
-from discord_slash import cog_ext
-from discord_slash.model import SlashCommandOptionType
-from discord_slash.context import SlashContext
-from discord_slash.utils.manage_commands import create_choice, create_option
-from discord.ext import commands
+from nextcord.ext import commands
 from modules.markdown import tip_formatter
 import config
 
@@ -33,7 +29,7 @@ class FormattingCog(commands.Cog):
 			),
 		],
 	)
-	async def markdown(self, ctx: SlashContext, format: Optional[str] = None):
+	async def markdown(self, interaction: nextcord.Interaction, format: Optional[str] = None):
 		if not format:
 			message = tip_formatter.all_markdown_tips()
 		else:

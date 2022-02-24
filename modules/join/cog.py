@@ -3,11 +3,8 @@ from database import preloaded
 from database.campus import Campus
 from utils import embedder, utils
 from . import assigner
-from discord.ext import commands
+from nextcord.ext import commands
 import config
-from discord_slash import cog_ext, SlashContext
-from discord_slash.model import SlashCommandOptionType
-from discord_slash.utils.manage_commands import create_option, create_choice
 
 
 class JoinCog(commands.Cog):
@@ -61,7 +58,7 @@ class JoinCog(commands.Cog):
 	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
 	async def join(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction,
 		first_name: str,
 		last_name: str,
 		campus: str,

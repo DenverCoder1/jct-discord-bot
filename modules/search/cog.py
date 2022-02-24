@@ -1,10 +1,6 @@
 from typing import List
 from ..error.friendly_error import FriendlyError
-from discord.ext import commands
-from discord_slash import cog_ext
-from discord_slash.context import SlashContext
-from discord_slash.model import SlashCommandOptionType
-from discord_slash.utils.manage_commands import create_option
+from nextcord.ext import commands
 from googlesearch import search
 import modules.search.search_functions as sf
 import config
@@ -30,7 +26,7 @@ class SearchCog(commands.Cog):
 			),
 		],
 	)
-	async def search(self, ctx: SlashContext, query: str):
+	async def search(self, interaction: nextcord.Interaction, query: str):
 		await ctx.defer()
 
 		links: List[str] = [link for link in search(query) if link.startswith("http")]
