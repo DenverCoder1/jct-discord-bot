@@ -65,7 +65,7 @@ class JoinCog(commands.Cog):
 		year: str,
 	):
 		# TODO: campus and year should really take integer options, but mobile has a bug
-		await ctx.defer()
+		await interaction.response.defer()
 		await assigner.assign(
 			ctx.author,
 			f"{first_name.title()} {last_name.title()}",

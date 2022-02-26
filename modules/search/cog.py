@@ -4,6 +4,8 @@ from nextcord.ext import commands
 from googlesearch import search
 import modules.search.search_functions as sf
 import config
+import nextcord
+from nextcord import SlashOption
 
 
 class SearchCog(commands.Cog):
@@ -13,25 +15,23 @@ class SearchCog(commands.Cog):
 		self.bot = bot
 		self.last_paragraph = {}
 
-	@cog_ext.cog_slash(
+	@nextcord.slash_command(
 		name="search",
 		description="Search the web for anything you want.",
 		guild_ids=[config.guild_id],
-		options=[
-			create_option(
-				name="query",
-				description="Your search query",
-				option_type=SlashCommandOptionType.STRING,
-				required=True,
-			),
-		],
 	)
-	async def search(self, interaction: nextcord.Interaction, query: str):
-		await ctx.defer()
+	async def search(
+		self,
+		interaction: nextcord.Interaction,
+		query: str = SlashOption(description="Your search query", required=True),
+	):
+		await interaction.response.defer()
 
 		links: List[str] = [link for link in search(query) if link.startswith("http")]
 		if not links:
-			raise FriendlyError("We searched far and wide, but nothing turned up.", ctx)
+			raise FriendlyError(
+				"We searched far and wide, but nothing turned up.", interaction.send
+			)
 
 		wiki_links = [link for link in links if "wikipedia.org" in link[:30]]
 		wiki_intro = (
@@ -40,7 +40,7 @@ class SearchCog(commands.Cog):
 			else None
 		)
 
-		await ctx.send(content=sf.format_message(query, links[0], wiki_intro))
+		await interaction.send(content=sf.format_message(query, links[0], wiki_intro))
 
 
 # setup functions for bot

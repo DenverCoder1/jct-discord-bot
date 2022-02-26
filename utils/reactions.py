@@ -58,7 +58,7 @@ async def wait_for_reaction(
 		# raise timeout error as friendly error
 		raise FriendlyError(
 			f"You did not react within {timeout} seconds",
-			message.channel,
+			message.channel.send,
 			one(allowed_users) if allowed_users and len(allowed_users) == 1 else None,
 			error,
 		)

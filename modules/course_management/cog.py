@@ -31,14 +31,23 @@ class CourseManagerCog(commands.Cog):
 		self,
 		interaction: nextcord.Interaction,
 		course_name: str = SlashOption(
-			description='The full name of the course. (eg. "Advanced Object Oriented Programming and Design")'
+			description=(
+				'The full name of the course. (eg. "Advanced Object Oriented'
+				' Programming and Design")'
+			)
 		),
 		professors: str = SlashOption(
-			description='A comma separated string of names of professors who teach the course. (eg. "shahar golan, eitan")',
+			description=(
+				"A comma separated string of names of professors who teach the course."
+				' (eg. "shahar golan, eitan")'
+			),
 			default="",
 		),
 		channel_name: str = SlashOption(
-			description="The name of the channel. (eg. object-oriented-programming) (default is course name)",
+			description=(
+				"The name of the channel. (eg. object-oriented-programming) (default is"
+				" course name)"
+			),
 		),
 	):
 		await interaction.response.defer()
@@ -76,7 +85,7 @@ class CourseManagerCog(commands.Cog):
 	async def delete_course(
 		self, interaction: nextcord.Interaction, channel: nextcord.TextChannel
 	):
-		await ctx.defer()
+		await interaction.response.defer()
 		await course_deleter.delete_course(ctx, channel)
 		await ctx.send(
 			embed=embed_success(
@@ -104,7 +113,7 @@ class CourseManagerCog(commands.Cog):
 	async def activate_course(
 		self, interaction: nextcord.Interaction, course: nextcord.TextChannel
 	):
-		await ctx.defer()
+		await interaction.response.defer()
 		await course_activator.activate_course(ctx, course)
 		await ctx.send(embed=embed_success(f"Successfully activated #{course.name}."))
 
@@ -128,7 +137,7 @@ class CourseManagerCog(commands.Cog):
 	async def deactivate_course(
 		self, interaction: nextcord.Interaction, course: nextcord.TextChannel
 	):
-		await ctx.defer()
+		await interaction.response.defer()
 		await course_activator.deactivate_course(ctx, course)
 		await ctx.send(embed=embed_success(f"Successfully deactivated #{course.name}."))
 
@@ -140,7 +149,7 @@ class CourseManagerCog(commands.Cog):
 	)
 	@has_permissions(manage_channels=True)
 	async def deactivate_all_courses(self, interaction: nextcord.Interaction):
-		await ctx.defer()
+		await interaction.response.defer()
 		await course_activator.deactivate_all_courses(ctx)
 		await ctx.send(embed=embed_success("Successfully deactivated all courses."))
 
@@ -152,7 +161,7 @@ class CourseManagerCog(commands.Cog):
 	)
 	@has_permissions(manage_channels=True)
 	async def sort_courses(self, interaction: nextcord.Interaction):
-		await ctx.defer()
+		await interaction.response.defer()
 		await util.sort_courses()
 		await ctx.send(
 			embed=embed_success(

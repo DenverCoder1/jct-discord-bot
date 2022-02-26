@@ -1,0 +1,3 @@
+black-with-tabs
+mypy
+types-Markdown

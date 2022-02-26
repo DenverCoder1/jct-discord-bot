@@ -30,8 +30,10 @@ class XKCDCog(commands.Cog):
 			)
 		],
 	)
-	async def xkcd(self, interaction: nextcord.Interaction, comic_id: Optional[int] = None):
-		await ctx.defer()
+	async def xkcd(
+		self, interaction: nextcord.Interaction, comic_id: Optional[int] = None
+	):
+		await interaction.response.defer()
 		comic = (
 			self.xkcd_fetcher.get_comic_by_id(comic_id)
 			if comic_id
@@ -46,7 +48,7 @@ class XKCDCog(commands.Cog):
 		guild_ids=[config.guild_id],
 	)
 	async def xkcd_latest(self, interaction: nextcord.Interaction):
-		await ctx.defer()
+		await interaction.response.defer()
 		comic = self.xkcd_fetcher.get_latest()
 		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
 
@@ -65,7 +67,7 @@ class XKCDCog(commands.Cog):
 		],
 	)
 	async def xkcd_search(self, interaction: nextcord.Interaction, query: str):
-		await ctx.defer()
+		await interaction.response.defer()
 		comic = self.xkcd_fetcher.search_relevant(query)
 		await ctx.send(embed=self.xkcd_embedder.gen_embed(comic))
 

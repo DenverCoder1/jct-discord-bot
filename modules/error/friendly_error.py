@@ -1,6 +1,7 @@
-from typing import Optional, Union
+from typing import Any, Callable, Optional, Union
 import nextcord
 import utils.embedder
+from mypy_extensions import DefaultNamedArg
 
 
 class FriendlyError(Exception):
@@ -12,8 +13,8 @@ class FriendlyError(Exception):
 	----------
 	msg: :class:`str`
 			The message to display to the user.
-	sender: :class:`Union[nextcord.TextChannel, SlashContext]`
-			An object which can be used to call send (TextChannel or SlashContext).
+	send_func: :class:`Callable`
+			A function with a similar signature to any `send` function which will be used to send the message.
 	member: Optional[:class:`Member`]
 			The member who caused the error.
 	inner: Optional[:class:`Exception`]
@@ -22,39 +23,35 @@ class FriendlyError(Exception):
 			Description for the FriendlyError embed.
 	image: Optional[:class:`str`]
 			Image for the FriendlyError embed.
-	hidden: :class:`bool`
+	ephemeral: :class:`bool`
 			Whether the message is hidden, which means message content will only be seen to the author.
 	"""
 
 	def __init__(
 		self,
 		msg: str,
-		messageable: nextcord.abc.Messageable,
+		send_func: Callable[[DefaultNamedArg(nextcord.Embed, "embed")], Any,],
 		member: Union[nextcord.Member, nextcord.User, None] = None,
 		inner: Optional[BaseException] = None,
 		description: Optional[str] = None,
 		image: Optional[str] = None,
-		hidden: bool = False,
+		ephemeral: bool = False,
 	):
-		self.sender = messageable
+		self.send = send_func
 		self.member = member
 		self.inner = inner
 		self.description = description
 		self.image = image
-		self.hidden = hidden
+		self.ephemeral = ephemeral
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
 		return f"Sorry {self.member.display_name}, " if self.member else ""
 
 	async def reply(self):
-		if isinstance(self.sender, SlashContext) and self.sender.message is not None:
-			sender = self.sender.channel  # slash command has already been answered
-		else:
-			sender = self.sender
-		await sender.send(
+		await self.send(
 			embed=utils.embedder.embed_error(
 				str(self), description=self.description, image=self.image
 			),
-			hidden=self.hidden,
+			**{"ephemeral": self.ephemeral} if self.ephemeral else {},
 		)

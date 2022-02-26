@@ -1,6 +1,5 @@
-from __future__ import annotations
 import re
-from typing import Dict, Generator, Optional, Sequence
+from typing import Callable, Dict, Generator, Optional, Sequence
 from utils import utils
 from utils.embedder import build_embed, MAX_EMBED_DESCRIPTION_LENGTH
 from nextcord.ext import commands
@@ -55,8 +54,13 @@ class CalendarEmbedder:
 					page_num=page_num,
 					max_results=results_per_page,
 				)
-				sender = interaction.send if interaction.message is None else interaction.message.edit
-				await sender(embed=embed)
+				sender = (
+					interaction.send
+					if interaction.message is None
+					else interaction.message.edit
+				)
+				message = await sender(embed=embed)  # type: ignore
+				assert isinstance(message, nextcord.Message)
 				# set emoji and page based on whether there are more events
 				if events:
 					next_emoji = "⏬"
@@ -71,11 +75,12 @@ class CalendarEmbedder:
 					# reset the peekable generator
 					events = peekable(events_list)
 				# wait for author to respond to go to next page
+				assert isinstance(interaction.user, nextcord.Member)
 				await wait_for_reaction(
 					bot=self.bot,
-					message=ctx.message,
+					message=message,
 					emoji_list=[next_emoji],
-					allowed_users=[ctx.author],
+					allowed_users=[interaction.user],
 				)
 			# time window exceeded
 			except FriendlyError:
@@ -96,7 +101,11 @@ class CalendarEmbedder:
 		"""
 		# no events found
 		if not events_list:
-			raise FriendlyError(f'No events were found for "{query}".', interaction, interaction.user)
+			raise FriendlyError(
+				f'No events were found for "{query}".',
+				interaction.send,
+				interaction.user,
+			)
 		# if only 1 event found, get the event at index 0
 		if len(events_list) == 1:
 			return one(events_list)
@@ -119,6 +128,7 @@ class CalendarEmbedder:
 		# get the number of events that were displayed
 		next_event = events.peek(None)
 		num_events = events_list.index(next_event) if next_event else len(events_list)
+		assert isinstance(interaction.user, nextcord.Member)
 		# ask user to pick an event with emojis
 		selection_index = await wait_for_reaction(
 			bot=self.bot,

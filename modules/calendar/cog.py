@@ -31,15 +31,17 @@ class CalendarCog(commands.Cog):
 		pass
 
 	@calendar.subcommand(
-		name="links",
-		description="Get the links to add or view the calendar",
+		name="links", description="Get the links to add or view the calendar",
 	)
 	async def calendar_links(
 		self,
 		interaction: nextcord.Interaction,
 		group_id: int = SlashOption(
 			name="class_name",
-			description="Calendar to show links for (eg. Lev 2023). Leave blank if you have only one class role.",
+			description=(
+				"Calendar to show links for (eg. Lev 2023). Leave blank if you have"
+				" only one class role."
+			),
 			required=False,
 			choices={group.name: group.id for group in preloaded.groups},
 		),
@@ -56,14 +58,16 @@ class CalendarCog(commands.Cog):
 		await interaction.send(embed=embed)
 
 	@calendar.subcommand(
-		name="events",
-		description="Display upcoming events from the Google Calendar",
+		name="events", description="Display upcoming events from the Google Calendar",
 	)
 	async def events(
 		self,
 		interaction: nextcord.Interaction,
 		query: str = SlashOption(
-			description="Query or channel mention to search for within event titles (if not specified, shows all events)",
+			description=(
+				"Query or channel mention to search for within event titles (if not"
+				" specified, shows all events)"
+			),
 			required=False,
 			default="",
 		),
@@ -75,7 +79,8 @@ class CalendarCog(commands.Cog):
 		group_id: int = SlashOption(
 			name="class_name",
 			description=(
-				"Calendar to show events for (eg. Lev 2023). Leave blank if you have only one class role."
+				"Calendar to show events for (eg. Lev 2023). Leave blank if you have"
+				" only one class role."
 			),
 			required=False,
 			choices={group.name: group.id for group in preloaded.groups},
@@ -103,14 +108,19 @@ class CalendarCog(commands.Cog):
 			description='Title of the event (eg. "HW 1 #statistics")'
 		),
 		start: str = SlashOption(
-			description='The start date of the event in Israel Time (eg. "April 15, 2pm")'
+			description=(
+				'The start date of the event in Israel Time (eg. "April 15, 2pm")'
+			)
 		),
 		end: str = SlashOption(
 			description='The end date of the event in Israel Time (eg. "3pm")',
 			required=False,
 		),
 		description: str = SlashOption(
-			description='The description of the event (eg. "Submission box: https://moodle.jct.ac.il/123")',
+			description=(
+				'The description of the event (eg. "Submission box:'
+				' https://moodle.jct.ac.il/123")'
+			),
 			required=False,
 			default="",
 		),
@@ -143,7 +153,7 @@ class CalendarCog(commands.Cog):
 				calendar.id, title, start, end, description, location
 			)
 		except ValueError as error:
-			raise FriendlyError(str(error), interaction, interaction.user, error)
+			raise FriendlyError(str(error), interaction.send, interaction.user, error)
 		embed = self.embedder.embed_event(
 			f":white_check_mark: Event added to {calendar.name} calendar successfully",
 			event,
@@ -152,8 +162,7 @@ class CalendarCog(commands.Cog):
 		await interaction.send(embed=embed)
 
 	@calendar.subcommand(
-		name="update",
-		description="Update events in the Google Calendar",
+		name="update", description="Update events in the Google Calendar",
 	)
 	async def event_update(
 		self,
@@ -162,11 +171,16 @@ class CalendarCog(commands.Cog):
 			description="Query or channel mention to search for within event titles"
 		),
 		title: str = SlashOption(
-			description='New title of the event (eg. "HW 1 #statistics"). ${title} refers to old title.',
+			description=(
+				'New title of the event (eg. "HW 1 #statistics"). ${title} refers to'
+				" old title."
+			),
 			required=False,
 		),
 		start: str = SlashOption(
-			description='New start date of the event in Israel Time (eg. "April 15, 2pm")',
+			description=(
+				'New start date of the event in Israel Time (eg. "April 15, 2pm")'
+			),
 			required=False,
 		),
 		end: str = SlashOption(
@@ -174,11 +188,17 @@ class CalendarCog(commands.Cog):
 			required=False,
 		),
 		description: str = SlashOption(
-			description='eg. "[Submission](https://...)". ${description} refers to old  description. Use \\n for newlines.")',
+			description=(
+				'eg. "[Submission](https://...)". ${description} refers to old '
+				' description. Use \\n for newlines.")'
+			),
 			required=False,
 		),
 		location: str = SlashOption(
-			description='The location of the event (eg. "Brause 305"). ${location} refers to old location.',
+			description=(
+				'The location of the event (eg. "Brause 305"). ${location} refers to'
+				" old location."
+			),
 			required=False,
 		),
 		group_id: int = SlashOption(
@@ -221,16 +241,12 @@ class CalendarCog(commands.Cog):
 			).replace("${location}", event_to_update.location or "")
 		try:
 			event = self.service.update_event(
-				calendar.id,
-				event_to_update,
-				title,
-				start,
-				end,
-				description,
-				location,
+				calendar.id, event_to_update, title, start, end, description, location,
 			)
 		except ValueError as error:
-			raise FriendlyError(error.args[0], interaction, interaction.user, error)
+			raise FriendlyError(
+				error.args[0], interaction.send, interaction.user, error
+			)
 		embed = self.embedder.embed_event(
 			":white_check_mark: Event updated successfully", event, calendar
 		)
@@ -240,11 +256,10 @@ class CalendarCog(commands.Cog):
 			if not interaction.response.is_done()
 			else interaction.edit_original_message
 		)
-		await sender(embed=embed)
+		await sender(embed=embed)  # type: ignore
 
 	@calendar.subcommand(
-		name="delete",
-		description="Delete events from the Google Calendar",
+		name="delete", description="Delete events from the Google Calendar",
 	)
 	async def event_delete(
 		self,
@@ -279,7 +294,9 @@ class CalendarCog(commands.Cog):
 		try:
 			self.service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
-			raise FriendlyError(error.args[0], interaction, interaction.user, error)
+			raise FriendlyError(
+				error.args[0], interaction.send, interaction.user, error
+			)
 		embed = self.embedder.embed_event(
 			"🗑 Event deleted successfully", event_to_delete, calendar
 		)
@@ -289,7 +306,7 @@ class CalendarCog(commands.Cog):
 			if not interaction.response.is_done()
 			else interaction.edit_original_message
 		)
-		await sender(embed=embed)
+		await sender(embed=embed)  # type: ignore
 
 	@calendar.subcommand(
 		name="grant",
@@ -311,28 +328,31 @@ class CalendarCog(commands.Cog):
 			required=False,
 		),
 	):
-		await interaction.response.defer(hidden=True)
+		await interaction.response.defer(ephemeral=True)
 		# get calendar from selected class_role or author
 		calendar = await Calendar.get_calendar(
-			interaction, await Group.get_groups(), group_id
+			interaction, await Group.get_groups(), group_id, True
 		)
 		# validate email address
 		if not is_email(email):
 			raise FriendlyError(
-				"Invalid email address", interaction, interaction.user, hidden=True
+				"Invalid email address",
+				interaction.send,
+				interaction.user,
+				ephemeral=True,
 			)
 		# add manager to calendar
 		if self.service.add_manager(calendar.id, email):
 			embed = embed_success(
 				f":office_worker: Successfully added manager to {calendar.name}."
 			)
-			await interaction.send(embed=embed, hidden=True)
+			await interaction.send(embed=embed, ephemeral=True)
 			return
 		raise FriendlyError(
 			"An error occurred while applying changes.",
-			interaction,
+			interaction.send,
 			interaction.user,
-			hidden=True,
+			ephemeral=True,
 		)
 
 
