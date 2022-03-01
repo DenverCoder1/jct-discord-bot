@@ -114,14 +114,24 @@ To run the bot locally, you may want to first disable the hosted version of the 
 
 You will also need the `.env` file in the project's root directory. Again, ask [Jonah Lawrence](https://github.com/DenverCoder1) for this file, or check the pinned messages in the `#jct-bot-development` Discord channel.
 
-You will need to make sure you have the `discord.py` and `python-dotenv` libraries installed. You can install them by typing the following commands in your terminal.
+You will need to make sure you have the all the necessary libraries installed. The best way to do this is to install everything you need into a virtual environment. You can do this by typing the following commands in your terminal.
 
 ```
-pip install discord.py
-pip install python-dotenv
+python -m venv .venv  # creates a virtual environment in a folder called .venv
+
+# activate the virtual environment (use only one of these two commands)
+source .venv/bin/activate # for bash/zsh (you'll need this one if you're on linux or mac, or if you're using bash on windows)
+.venv\Scripts\activate # for cmd.exe (you'll probably need this one if you're on windows and don't know what bash is)
+
+# install everything you need
+pip install -r requirements.txt
+pip install -r requirements.dev.txt
 ```
 
 Now you should be able to run the bot locally. Well done!
+```sh
+python bot.py
+```
 
 ### 5 - Creating a Pull Request
 
