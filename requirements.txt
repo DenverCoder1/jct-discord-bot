@@ -6,7 +6,7 @@ beautifulsoup4==4.9.3
 google-api-python-client==2.42.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.5.1
-dateparser==1.1.0
+dateparser==1.1.1
 pyluach==1.4.0
 fuzzywuzzy==0.18.0
 python-Levenshtein==0.12.2
