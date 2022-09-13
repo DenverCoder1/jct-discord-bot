@@ -1,8 +1,6 @@
-from typing import Optional
 from .xkcd_fetcher import XKCDFetcher
 from .xkcd_embedder import XKCDEmbedder
 from nextcord.ext import commands
-import config
 import nextcord
 
 
@@ -14,7 +12,7 @@ class XKCDCog(commands.Cog):
 		self.xkcd_fetcher = XKCDFetcher()
 		self.xkcd_embedder = XKCDEmbedder()
 
-	@nextcord.command(name="xkcd")
+	@nextcord.slash_command(name="xkcd")
 	async def xkcd(self, interaction: nextcord.Interaction):
 		"""This is a base command for all xkcd commands and is not invoked"""
 		pass
@@ -22,25 +20,16 @@ class XKCDCog(commands.Cog):
 	@xkcd.subcommand(name="latest", description="Displays the latest xkcd comic")
 	async def latest(self, interaction: nextcord.Interaction):
 		"""Displays the latest xkcd comic"""
-		interaction.response.defer()
-		try:
-			comic = await self.xkcd_fetcher.get_latest()
-		except ConnectionError as e:
-			interaction.response.send_message(e, ephemeral=True)
-			return
-
-		await interaction.response.send_message(
-			embed=self.xkcd_embedder.gen_embed(comic)
-		)
+		await interaction.response.defer()
+		comic = self.xkcd_fetcher.get_latest()
+		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="random", description="Displays a random xkcd comic")
 	async def random(self, interaction: nextcord.Interaction):
 		"""Displays a random xkcd comic"""
-		interaction.response.defer()
-		comic = await self.xkcd_fetcher.get_random()
-		await interaction.response.send_message(
-			embed=self.xkcd_embedder.gen_embed(comic)
-		)
+		await interaction.response.defer()
+		comic = self.xkcd_fetcher.get_random()
+		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="get", description="Gets a specific xkcd comic")
 	async def get(
@@ -51,28 +40,16 @@ class XKCDCog(commands.Cog):
 		),
 	):
 		"""Displays an xkcd comic by number"""
-		interaction.response.defer()
-		try:
-			comic = await self.xkcd_fetcher.get_comic_by_id(number)
-		except ConnectionError as e:
-			await interaction.response.send_message(e, ephemeral=True)
-			return
-		await interaction.response.send_message(
-			embed=self.xkcd_embedder.gen_embed(comic)
-		)
+		await interaction.response.defer()
+		comic = self.xkcd_fetcher.get_comic_by_id(number)
+		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="search", description="Searches for a relevant xkcd comic")
 	async def search(self, interaction: nextcord.Interaction, query: str):
 		"""Searches for a relevant xkcd comic"""
-		interaction.response.defer()
-		try:
-			comic = await self.xkcd_fetcher.search_relevant(query)
-		except ConnectionError as e:
-			await interaction.response.send_message(e, ephemeral=True)
-			return
-		await interaction.response.send_message(
-			embed=self.xkcd_embedder.gen_embed(comic)
-		)
+		await interaction.response.defer()
+		comic = self.xkcd_fetcher.search_relevant(query)
+		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 
 def setup(bot: commands.Bot):
