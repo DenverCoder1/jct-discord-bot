@@ -36,13 +36,17 @@ class XKCDCog(commands.Cog):
 	async def get(
 		self,
 		interaction: nextcord.Interaction,
-		number: int = nextcord.SlashOption(
-			description="The number of the comic to display"
+		ID: int = nextcord.SlashOption(
+			description="The ID of the comic to display"
 		),
 	):
-		"""Gets a specific xkcd comic"""
+		"""Gets a specific xkcd comic
+		
+			Args:
+				ID (int): The ID of the comic to display
+		"""
 		await interaction.response.defer()
-		comic = self.xkcd_fetcher.get_comic_by_id(number)
+		comic = self.xkcd_fetcher.get_comic_by_id(ID)
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="search")
