@@ -9,7 +9,9 @@ class XKCDFetcher:
 		response = requests.get(f"https://xkcd.com/{comic_id}/info.0.json")
 		if response.status_code != 200:
 			# xkcd API did not return a 200 response code
-			raise ConnectionError("Could not find a comic with that id.")
+			raise ConnectionError(
+				"Could not find a comic with an id of " + str(comic_id)
+			)
 		# load json from response
 		comic = response.json()
 		return Comic(comic["num"], comic["safe_title"], comic["alt"], comic["img"])
