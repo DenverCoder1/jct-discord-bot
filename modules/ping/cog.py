@@ -1,4 +1,5 @@
 from nextcord.ext import commands
+import nextcord
 import os
 import config
 import random
@@ -14,15 +15,10 @@ class PingCog(commands.Cog):
 		with open(os.path.join("modules", "ping", "responses.txt")) as responses:
 			self.lines = responses.readlines()
 
-	@cog_ext.cog_slash(
-		name="ping",
-		description="A command which simply acknowledges the user's ping.",
-		guild_ids=[config.guild_id],
-	)
+	@nextcord.slash_command(name="ping", guild_ids=[config.guild_id])
 	async def ping(self, interaction: nextcord.Interaction):
-		# log in console that a ping was received
-		print("Received ping")
-		await ctx.send(
+		"""Responds with a random acknowledgement"""
+		await interaction.send(
 			f"**{getpass.getuser()} @ {socket.gethostname()} $**"
 			f" {random.choice(self.lines)}"
 		)
