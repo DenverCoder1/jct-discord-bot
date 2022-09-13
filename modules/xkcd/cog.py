@@ -1,6 +1,7 @@
 from .xkcd_fetcher import XKCDFetcher
 from .xkcd_embedder import XKCDEmbedder
 from nextcord.ext import commands
+import config
 import nextcord
 
 
@@ -12,7 +13,7 @@ class XKCDCog(commands.Cog):
 		self.xkcd_fetcher = XKCDFetcher()
 		self.xkcd_embedder = XKCDEmbedder()
 
-	@nextcord.slash_command(name="xkcd")
+	@nextcord.slash_command(name="xkcd", guild_ids=[config.guild_id])
 	async def xkcd(self, interaction: nextcord.Interaction):
 		"""This is a base command for all xkcd commands and is not invoked"""
 		pass
