@@ -2,6 +2,7 @@ from modules.error.friendly_error import FriendlyError
 from utils.utils import one
 from database.group import Group
 from typing import Dict, Iterable, Optional
+import nextcord
 
 
 class Calendar:
@@ -64,24 +65,24 @@ class Calendar:
 		else:
 			# get the group from the user's role
 			member_groups = [
-				group for group in groups if group.role in ctx.author.roles
+				group for group in groups if group.role in interaction.user.roles
 			]
 			# no group roles found
 			if not member_groups:
 				raise FriendlyError(
 					"Could not find your class role.",
-					ctx,
-					ctx.author,
-					hidden=ctx._deferred_hidden,
+					interaction,
+					interaction.user,
+					hidden=True,
 				)
 			# multiple group roles found
 			if len(member_groups) > 1:
 				raise FriendlyError(
 					"You must specify which calendar since you have multiple class"
 					" roles.",
-					ctx,
-					ctx.author,
-					hidden=ctx._deferred_hidden,
+					interaction,
+					interaction.user,
+					hidden=True,
 				)
 			# only one group found
 			group = one(member_groups)

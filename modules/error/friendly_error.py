@@ -12,8 +12,8 @@ class FriendlyError(Exception):
 	----------
 	msg: :class:`str`
 			The message to display to the user.
-	sender: :class:`Union[nextcord.TextChannel, nextcord.Interaction]`
-			An object which can be used to call send (TextChannel or nextcord.Interaction).
+	sender: :class:`Union[nextcord.TextChannel, SlashContext]`
+			An object which can be used to call send (TextChannel or SlashContext).
 	member: Optional[:class:`Member`]
 			The member who caused the error.
 	inner: Optional[:class:`Exception`]
@@ -48,10 +48,7 @@ class FriendlyError(Exception):
 		return f"Sorry {self.member.display_name}, " if self.member else ""
 
 	async def reply(self):
-		if (
-			isinstance(self.sender, nextcord.Interaction)
-			and self.sender.message is not None
-		):
+		if isinstance(self.sender, nextcord.Interaction) and self.sender.message is not None:
 			sender = self.sender.channel  # slash command has already been answered
 		else:
 			sender = self.sender
