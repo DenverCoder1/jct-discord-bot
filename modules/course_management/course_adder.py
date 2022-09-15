@@ -14,11 +14,14 @@ from utils.utils import get_discord_obj
 
 
 async def add_course(
-	interaction: nextcord.Interaction, course_name: str, professors: Iterable[str], channel_name: str,
+	interaction: nextcord.Interaction,
+	course_name: str,
+	professors: Iterable[str],
+	channel_name: str,
 ):
-	channel = await __create_channel(ctx, channel_name, course_name)
-	await __add_to_database(ctx, channel, course_name)
-	await __link_professors(ctx, channel, professors)
+	channel = await __create_channel(interaction, channel_name, course_name)
+	await __add_to_database(interaction, channel, course_name)
+	await __link_professors(interaction, channel, professors)
 	return channel
 
 
@@ -31,7 +34,9 @@ async def __create_channel(
 	# make sure the channel doesn't already exist
 	if nextcord.utils.get(category.text_channels, name=channel_name) is not None:
 		raise FriendlyError(
-			"this channel already exists. Please try again.", ctx, ctx.author,
+			"this channel already exists. Please try again.",
+			interaction,
+			interaction.user,
 		)
 
 	new_channel = await category.create_text_channel(
@@ -69,14 +74,18 @@ async def __add_to_database(
 
 
 async def __link_professors(
-	interaction: nextcord.Interaction, channel: nextcord.TextChannel, professors: Iterable[str],
+	interaction: nextcord.Interaction,
+	channel: nextcord.TextChannel,
+	professors: Iterable[str],
 ):
 	for professor_name in professors:
 		try:
-			professor = await person_finder.search_one(ctx, professor_name)
-			await categoriser.categorise_person(ctx, professor.id, (channel.mention,))
+			professor = await person_finder.search_one(interaction, professor_name)
+			await categoriser.categorise_person(
+				interaction, professor.id, (channel.mention,)
+			)
 		except FriendlyError:
-			await ctx.send(
+			await interaction.send(
 				embed=embedder.embed_warning(
 					title=(
 						f'Unable to determine who you meant by "{professor_name}".'
