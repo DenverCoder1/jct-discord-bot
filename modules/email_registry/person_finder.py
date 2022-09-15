@@ -41,7 +41,7 @@ async def search(
 
 
 async def search_one(
-	sender: SlashContext,
+	sender: nextcord.Interaction,
 	name: Optional[str] = None,
 	channel: Optional[nextcord.TextChannel] = None,
 	email: Optional[str] = None,
@@ -50,7 +50,7 @@ async def search_one(
 	Returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one.
 
 	:param sender: An object with the send method where friendly errors will be sent to.
-	:type sender: SlashContext
+	:type sender: nextcord.Interaction
 	:param name: The name of the person you want to search for (first, last, or both).
 	:type name: Optional[str]
 	:param channel: A channel the person is linked to.
