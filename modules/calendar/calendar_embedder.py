@@ -55,7 +55,11 @@ class CalendarEmbedder:
 					page_num=page_num,
 					max_results=results_per_page,
 				)
-				sender = interaction.send if interaction.message is None else interaction.message.edit
+				sender = (
+					interaction.send
+					if interaction.message is None
+					else interaction.message.edit
+				)
 				await sender(embed=embed)
 				# set emoji and page based on whether there are more events
 				if events:
@@ -73,9 +77,9 @@ class CalendarEmbedder:
 				# wait for author to respond to go to next page
 				await wait_for_reaction(
 					bot=self.bot,
-					message=ctx.message,
+					message=interaction.message,
 					emoji_list=[next_emoji],
-					allowed_users=[ctx.author],
+					allowed_users=[interaction.user],
 				)
 			# time window exceeded
 			except FriendlyError:
@@ -96,7 +100,9 @@ class CalendarEmbedder:
 		"""
 		# no events found
 		if not events_list:
-			raise FriendlyError(f'No events were found for "{query}".', interaction, interaction.user)
+			raise FriendlyError(
+				f'No events were found for "{query}".', interaction, interaction.user
+			)
 		# if only 1 event found, get the event at index 0
 		if len(events_list) == 1:
 			return one(events_list)

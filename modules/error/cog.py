@@ -2,6 +2,7 @@ import config
 import sys
 from utils import utils
 from nextcord.ext import commands
+import nextcord
 from .error_handler import ErrorHandler
 from .error_logger import ErrorLogger
 
@@ -13,21 +14,10 @@ class ErrorLogCog(commands.Cog):
 		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL"))
 		self.handler = ErrorHandler(self.logger)
 
-	@cog_ext.cog_slash(
-		name="logs",
-		description="Show recent logs from err.log.",
-		guild_ids=[config.guild_id],
-		options=[
-			create_option(
-				name="num_lines",
-				description="Default is 50.",
-				option_type=SlashCommandOptionType.INTEGER,
-				required=False,
-			),
-		],
-	)
+	@nextcord.slash_command(name="logs", guild_ids=[config.guild_id])
 	async def logs(self, interaction: nextcord.Interaction, num_lines: int = 50):
-		await ctx.send(self.logger.read_logs(num_lines))
+		"""Show recent logs from err.log."""
+		await interaction.send(self.logger.read_logs(num_lines))
 
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx: commands.Context, error: Exception):
@@ -37,7 +27,7 @@ class ErrorLogCog(commands.Cog):
 	@commands.Cog.listener()
 	async def on_slash_command_error(self, interaction: nextcord.Interaction, error: Exception):
 		"""When a slash exception is raised, log it in err.log and bot log channel"""
-		await self.handler.handle(error, ctx.message)
+		await self.handler.handle(error, interaction.message)
 
 	@commands.Cog.listener()
 	async def on_error(self, event, *args, **kwargs):

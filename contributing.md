@@ -28,7 +28,7 @@ Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of yo
 
 ```py
 from nextcord.ext import commands
-
+import nextcord
 class MyFeatureCog(commands.Cog):
 	"""A cog which has no features and does nothing"""
 	def __init__(self, bot: commands.Bot):
@@ -38,8 +38,8 @@ class MyFeatureCog(commands.Cog):
 Then as methods to that class, add any functions you need for the bot. For example:
 
 ````py
-	@commands.command(name='my_feature')
-	async def my_feature(self, ctx: commands.Context, n: int, word: str):
+	@nextcord.command(name='my_feature')
+	async def my_feature(self, interaction: nextcord.Interaction, n: int, word: str):
 		"""A command which takes two arguments and does nothing
 
 		Usage:
@@ -57,7 +57,7 @@ Then as methods to that class, add any functions you need for the bot. For examp
 		print('Executing command "my_feature".')
 
 		# reply with a message
-		await ctx.send(f"Command received with num {n} and word {word}.")
+		await interaction.send(f"Command received with num {n} and word {word}.")
 ````
 
 Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
