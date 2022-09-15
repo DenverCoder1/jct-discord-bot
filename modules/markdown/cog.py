@@ -2,6 +2,7 @@ from typing import Optional
 from nextcord.ext import commands
 from modules.markdown import tip_formatter
 import config
+import nextcord
 
 
 class FormattingCog(commands.Cog):
@@ -10,31 +11,26 @@ class FormattingCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@cog_ext.cog_slash(
-		name="markdown",
-		description="Command to display markdown tips for Discord messages.",
-		guild_ids=[config.guild_id],
-		options=[
-			create_option(
-				name="format",
-				description="The format to display information about (default is all)",
-				option_type=SlashCommandOptionType.STRING,
-				required=False,
-				choices=[
-					*[
-						create_choice(name=tip_formatter.formats[key].name, value=key)
-						for key in tip_formatter.formats
-					]
-				],
-			),
-		],
-	)
-	async def markdown(self, interaction: nextcord.Interaction, format: Optional[str] = None):
+	@nextcord.slash_command(name="markdown", guild_ids=[config.guild_id])
+	async def markdown(
+		self,
+		interaction: nextcord.Interaction,
+		format: Optional[str] = nextcord.SlashOption(
+			choices={
+				tip_formatter.formats[key].name: key for key in tip_formatter.formats
+			}
+		),
+	):
+		"""Command to display markdown tips for Discord messages.
+
+		Args:
+			format (str): The format to display information about (default is all).
+		"""
 		if not format:
 			message = tip_formatter.all_markdown_tips()
 		else:
 			message = tip_formatter.individual_info(format)
-		await ctx.send(message)
+		await interaction.send(message)
 
 
 # setup functions for bot
