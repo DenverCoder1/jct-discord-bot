@@ -1,3 +1,3 @@
-from .insert import insert
-from .delete import delete
 from . import select
+from .delete import delete
+from .insert import insert

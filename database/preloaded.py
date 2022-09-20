@@ -14,6 +14,7 @@ this module.
 from typing import Collection
 
 from database.campus import Campus
+
 from .group import Group
 
 groups: Collection[Group] = []
@@ -21,6 +22,6 @@ campuses: Collection[Campus] = []
 
 
 async def load():
-	global groups, campuses
-	groups = await Group.get_groups()
-	campuses = await Campus.get_campuses()
+    global groups, campuses
+    groups = await Group.get_groups()
+    campuses = await Campus.get_campuses()
