@@ -36,8 +36,8 @@ class EmailRegistryCog(commands.Cog):
 		"""Get the email address of the person you search for.
 		
 		Args:
-			name: The name of the person to search for
-			channel: The channel to search for the person in
+			name: First name, last name, or both. (eg. moti)
+			channel: Mention a course the professor teaches. (eg. #automata)
 		"""
 		await interaction.response.defer()
 		people = await person_finder.search(
