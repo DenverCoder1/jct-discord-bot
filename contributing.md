@@ -93,10 +93,10 @@ If when trying to have the bot perform some action based on something a user sai
 ```py
 from modules.error.friendly_error import FriendlyError
 #...
-raise FriendlyError("user friendly error message", channel, member)
+raise FriendlyError("user friendly error message", interaction, member)
 ```
 
-where `channel` is of type `nextcord.TextChannel` and `member` is of type `nextcord.Member`. Optionally, you can also pass as internal Exception, if applicable, and the error will be logged to `err.log`.
+where `interaction` is of type `nextcord.Interaction` or `nextcord.abc.Messageable` and `member` is of type `nextcord.Member`. Optionally, you can also pass an internal Exception, if applicable, and the error will be logged to `err.log`.
 
 When raising a `FriendlyError`, the message passed to it will be sent to the channel provided, tagging `member` if a member was passed.
 
