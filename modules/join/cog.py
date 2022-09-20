@@ -38,6 +38,7 @@ class JoinCog(commands.Cog):
         assert isinstance(
             interaction.user, nextcord.Member
         ), "Interaction user is not a guild member"
+        assert interaction.application_command
         await interaction.response.defer()
         await assigner.assign(
             interaction.user,

@@ -16,9 +16,7 @@ class Greeter:
 
     async def give_initial_role(self, member: nextcord.Member):
         label = "BOT_ROLE" if member.bot else "UNASSIGNED_ROLE"
-        role = member.guild.get_role(utils.get_id(label))
-        assert role is not None
-        await member.add_roles(role)
+        await member.add_roles(nextcord.Object(utils.get_id(label)))
 
     async def server_greet(self, member: nextcord.Member):
         channel = self.__intro_channel()
@@ -38,7 +36,7 @@ class Greeter:
         """privately messages the user who joined"""
         channel = self.__intro_channel()
         assert isinstance(channel, nextcord.TextChannel)
-        await (member.dm_channel or await member.create_dm()).send(
+        await member.send(
             utils.remove_tabs(
                 f"""
 				Hey, {member.mention}! Welcome!

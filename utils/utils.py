@@ -131,29 +131,15 @@ def trim(text: str, limit: int) -> str:
 async def delayed_send(
     messageable: Messageable,
     seconds: float,
-    content=None,
+    content: Optional[str] = None,
     *,
-    tts=False,
-    embed=None,
-    file=None,
-    files=None,
-    delete_after=None,
-    nonce=None,
-    allowed_mentions=None,
-    reference=None,
-    mention_author=None,
+    embeds: Optional[list[nextcord.Embed]] = None,
+    files: Optional[list[nextcord.File]] = None,
 ):
     async with messageable.typing():
         await sleep(seconds)
         await messageable.send(
             content,
-            tts=tts,
-            embed=embed,
-            file=file,
-            files=files,
-            delete_after=delete_after,
-            nonce=nonce,
-            allowed_mentions=allowed_mentions,
-            reference=reference,
-            mention_author=mention_author,
+            embeds=embeds or [],
+            files=files or [],
         )

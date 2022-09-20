@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, Optional, Sequence
 
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 

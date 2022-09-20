@@ -44,8 +44,8 @@ async def assign(member: nextcord.Member, name: str, campus_id: int, year: int):
     if __unassigned_role() in member.roles:
         await member.edit(nick=name)
         await __add_role(member, campus_id, year)
-        await member.add_roles(__student_role())
-        await member.remove_roles(__unassigned_role())
+        await member.add_roles(nextcord.Object(id=__student_role().id))
+        await member.remove_roles(nextcord.Object(id=__unassigned_role().id))
         await server_welcome(member)
 
 
@@ -57,7 +57,7 @@ async def __add_role(member: nextcord.Member, campus_id: int, year: int):
     base_year = last_elul.to_pydate().year
     grad_year = base_year + 4 - year
     role_id = await sql.select.value("groups", "role", campus=campus_id, grad_year=grad_year)
-    class_role = config.guild().get_role(role_id)
+    class_role = nextcord.Object(id=role_id)
     assert class_role is not None
     await member.add_roles(class_role)
 

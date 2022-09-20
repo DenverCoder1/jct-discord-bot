@@ -1,5 +1,7 @@
 black
 mypy
-types-Markdown
 pre-commit
 taskipy
+types-Markdown
+types-dateparser
+types-requests
