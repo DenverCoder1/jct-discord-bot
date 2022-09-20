@@ -45,6 +45,14 @@ This bot was created by the contribution of the following members. If you would 
         </a>
     </td>
     <td align="center">
+        <a href="https://github.com/benjitusk">
+            <img src="https://avatars.githubusercontent.com/u/35320919?v=4" width="100;" alt="benjitusk"/>
+            <br />
+            <sub><b>BenjiTusk</b></sub>
+        </a>
+    </td></tr>
+<tr>
+    <td align="center">
         <a href="https://github.com/etandinnerman">
             <img src="https://avatars.githubusercontent.com/u/48675226?v=4" width="100;" alt="etandinnerman"/>
             <br />
