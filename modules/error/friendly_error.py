@@ -1,7 +1,7 @@
 from typing import Optional, Union
-import discord
-from discord_slash.context import SlashContext
+import nextcord
 import utils.embedder
+from nextcord.ext import commands
 
 
 class FriendlyError(Exception):
@@ -13,7 +13,7 @@ class FriendlyError(Exception):
 	----------
 	msg: :class:`str`
 			The message to display to the user.
-	sender: :class:`Union[discord.TextChannel, SlashContext]`
+	sender: Union[:class:`nextcord.abc.Messageable`, :class:`nextcord.Interaction`]
 			An object which can be used to call send (TextChannel or SlashContext).
 	member: Optional[:class:`Member`]
 			The member who caused the error.
@@ -23,39 +23,36 @@ class FriendlyError(Exception):
 			Description for the FriendlyError embed.
 	image: Optional[:class:`str`]
 			Image for the FriendlyError embed.
-	hidden: :class:`bool`
-			Whether the message is hidden, which means message content will only be seen to the author.
+	ephemeral: :class:`bool`
+			Whether the message is ephemeral, which means message content will only be seen to the author.
 	"""
 
 	def __init__(
 		self,
 		msg: str,
-		messageable: discord.abc.Messageable,
-		member: Union[discord.Member, discord.User, None] = None,
+		sender: Union[nextcord.abc.Messageable, nextcord.Interaction[commands.Bot]],
+		member: Union[nextcord.Member, nextcord.User, None] = None,
 		inner: Optional[BaseException] = None,
 		description: Optional[str] = None,
 		image: Optional[str] = None,
-		hidden: bool = False,
+		ephemeral: bool = False,
 	):
-		self.sender = messageable
+		self.sender = sender
 		self.member = member
 		self.inner = inner
 		self.description = description
 		self.image = image
-		self.hidden = hidden
+		self.ephemeral = ephemeral
 		super().__init__(self.__mention() + msg)
 
 	def __mention(self) -> str:
 		return f"Sorry {self.member.display_name}, " if self.member else ""
 
 	async def reply(self):
-		if isinstance(self.sender, SlashContext) and self.sender.message is not None:
-			sender = self.sender.channel  # slash command has already been answered
-		else:
-			sender = self.sender
-		await sender.send(
-			embed=utils.embedder.embed_error(
-				str(self), description=self.description, image=self.image
-			),
-			hidden=self.hidden,
+		embed = utils.embedder.embed_error(
+			str(self), description=self.description, image=self.image
 		)
+		if isinstance(self.sender, nextcord.Interaction):
+			await self.sender.send(embed=embed, ephemeral=self.ephemeral)
+		else:
+			await self.sender.send(embed=embed)

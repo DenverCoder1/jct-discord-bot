@@ -1,5 +1,5 @@
 from database.campus import Campus
-import discord
+import nextcord
 import config
 from typing import Collection
 from functools import cached_property
@@ -32,9 +32,9 @@ class Group:
 		return self.__campus
 
 	@cached_property
-	def role(self) -> discord.Role:
+	def role(self) -> nextcord.Role:
 		"""The Role associated with this Group."""
-		role = discord.utils.get(config.guild().roles, id=self.__role_id)
+		role = nextcord.utils.get(config.guild().roles, id=self.__role_id)
 		assert role is not None
 		return role
 

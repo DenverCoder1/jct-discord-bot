@@ -1,23 +1,27 @@
-import discord
-from discord_slash.context import SlashContext
+import nextcord
 from modules.course_management.util import is_course
 from ..error.friendly_error import FriendlyError
 from database import sql
+from nextcord.ext import commands
 
 
-async def delete_course(ctx: SlashContext, channel: discord.TextChannel):
-	await __delete_channel(ctx, channel)
+async def delete_course(
+	interaction: nextcord.Interaction[commands.Bot], channel: nextcord.TextChannel
+):
+	await __delete_channel(interaction, channel)
 	await __delete_from_database(channel.id)
 
 
-async def __delete_channel(ctx: SlashContext, channel: discord.TextChannel):
+async def __delete_channel(
+	interaction: nextcord.Interaction[commands.Bot], channel: nextcord.TextChannel
+):
 	if is_course(channel):
 		await channel.delete()
 	else:
 		raise FriendlyError(
 			"You must provide a channel in the (active or inactive) courses category.",
-			ctx,
-			ctx.author,
+			interaction,
+			interaction.user,
 		)
 
 

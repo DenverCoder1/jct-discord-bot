@@ -1,11 +1,10 @@
 import asyncio
 import os
 import asyncpg
-import discord
+import nextcord
 import database.preloaded
-from discord_slash import SlashCommand
 import config
-from discord.ext import commands
+from nextcord.ext import commands
 from utils.scheduler import Scheduler
 
 
@@ -16,16 +15,13 @@ async def main():
 	await database.preloaded.load()
 
 	# allows privledged intents for monitoring members joining, roles editing, and role assignments (has to be enabled for the bot in Discord dev)
-	intents = discord.Intents.default()
+	intents = nextcord.Intents.default()
 	intents.guilds = True
 	intents.members = True
 
-	activity = discord.Game("with students' patience")
+	activity = nextcord.Game("with students' patience")
 
-	# empty space effectively disables prefix since discord strips trailing spaces
-	bot = commands.Bot(" ", intents=intents, activity=activity)
-
-	setattr(bot, "slash", SlashCommand(bot, override_type=True, sync_commands=True))
+	bot = commands.Bot(intents=intents, activity=activity)
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
 	for folder in os.listdir("modules"):

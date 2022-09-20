@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Optional
-from discord.ext import commands
+from nextcord.ext import commands
 import traceback
-import discord
+import nextcord
 import config
 
 
@@ -12,7 +12,7 @@ class ErrorLogger:
 		self.log_channel_id = log_channel_id
 
 	def log_to_file(
-		self, error: BaseException, message: Optional[discord.Message] = None
+		self, error: BaseException, message: Optional[nextcord.Message] = None
 	):
 		"""appends the date and logs text to a file"""
 		with open(self.log_file, "a", encoding="utf-8") as f:
@@ -22,16 +22,16 @@ class ErrorLogger:
 			f.write("--------------------------\n")
 
 	async def log_to_channel(
-		self, error: BaseException, message: Optional[discord.Message] = None
+		self, error: BaseException, message: Optional[nextcord.Message] = None
 	):
 		log_channel = config.guild().get_channel(self.log_channel_id)
-		assert isinstance(log_channel, discord.TextChannel)
+		assert isinstance(log_channel, nextcord.TextChannel)
 		if message is None:
 			await log_channel.send(f"```{self.__get_err_text(error)}```")
 		else:
 			channel = (
 				message.channel.mention
-				if isinstance(message.channel, discord.TextChannel)
+				if isinstance(message.channel, nextcord.TextChannel)
 				else "DM"
 			)
 			await log_channel.send(
@@ -40,7 +40,7 @@ class ErrorLogger:
 			)
 
 	def __get_err_text(
-		self, error: BaseException, message: Optional[discord.Message] = None
+		self, error: BaseException, message: Optional[nextcord.Message] = None
 	):
 		description = "".join(
 			traceback.format_exception(error.__class__, error, error.__traceback__)
@@ -49,7 +49,7 @@ class ErrorLogger:
 			return description
 		return self.__attach_context(description, message)
 
-	def __attach_context(self, description: str, message: discord.Message):
+	def __attach_context(self, description: str, message: nextcord.Message):
 		"""returns human readable command error for logging in log channel"""
 		return (
 			f"Author:\n{message.author} ({message.author.display_name})\n\n"

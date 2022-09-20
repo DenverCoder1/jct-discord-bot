@@ -1,6 +1,6 @@
 from .greeter import Greeter
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 import config
 
 
@@ -12,7 +12,7 @@ class NewUserCog(commands.Cog):
 		self.greeter = Greeter(bot)
 
 	@commands.Cog.listener()
-	async def on_member_join(self, member: discord.Member):
+	async def on_member_join(self, member: nextcord.Member):
 		"""Ask members who join to use the join command."""
 
 		# if joined a different guild, skip welcoming

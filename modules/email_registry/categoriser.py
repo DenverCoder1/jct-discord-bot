@@ -1,32 +1,40 @@
 from typing import Iterable
-from discord_slash.context import SlashContext
 from ..error.friendly_error import FriendlyError
 from database.person import Person
 from database import sql_fetcher
 from utils.mention import decode_channel_mention
 import config
+import nextcord
+from nextcord.ext import commands
 
 
 async def categorise_person(
-	ctx: SlashContext, person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction[commands.Bot],
+	person_id: int,
+	channel_mentions: Iterable[str],
 ) -> Person:
 	"""Adds the person to the categories linked to the channels mentioned. Returns the updated person."""
 	return await __add_remove_categories(
-		ctx, "categorise_person.sql", person_id, channel_mentions
+		interaction, "categorise_person.sql", person_id, channel_mentions
 	)
 
 
 async def decategorise_person(
-	ctx: SlashContext, person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction[commands.Bot],
+	person_id: int,
+	channel_mentions: Iterable[str],
 ) -> Person:
 	"""Removes the person from the categories linked to the channels mentioned. Returns the updated person."""
 	return await __add_remove_categories(
-		ctx, "decategorise_person.sql", person_id, channel_mentions
+		interaction, "decategorise_person.sql", person_id, channel_mentions
 	)
 
 
 async def __add_remove_categories(
-	ctx: SlashContext, sql_file: str, person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction[commands.Bot],
+	sql_file: str,
+	person_id: int,
+	channel_mentions: Iterable[str],
 ) -> Person:
 	query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
 	async with config.conn.transaction():
@@ -35,8 +43,8 @@ async def __add_remove_categories(
 			if channel_id is None:
 				raise FriendlyError(
 					f'Expected a channel mention in place of "{channel}".',
-					ctx,
-					ctx.author,
+					interaction,
+					interaction.user,
 				)
 			await config.conn.execute(query, person_id, channel_id)
 	return await Person.get_person(person_id)

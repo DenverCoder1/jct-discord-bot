@@ -1,5 +1,5 @@
 from modules.graduation import graduation
-from discord.ext import commands
+from nextcord.ext import commands
 from utils.scheduler import Scheduler
 
 

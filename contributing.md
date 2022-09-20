@@ -27,8 +27,8 @@ Please check out the [style guide](style_guide.md).
 Create a file `/modules/my_feature/cog.py` (where _my_feature_ is the name of your command or feature) for whatever you feature you want to add. Create a class which inherits from `commands.Cog`, and define its constructor as follows.
 
 ```py
-from discord.ext import commands
-
+from nextcord.ext import commands
+import nextcord
 class MyFeatureCog(commands.Cog):
 	"""A cog which has no features and does nothing"""
 	def __init__(self, bot: commands.Bot):
@@ -37,28 +37,22 @@ class MyFeatureCog(commands.Cog):
 
 Then as methods to that class, add any functions you need for the bot. For example:
 
-````py
-	@commands.command(name='my_feature')
-	async def my_feature(self, ctx: commands.Context, n: int, word: str):
+```py
+	@nextcord.slash_command()
+	async def my_feature(self, interaction: nextcord.Interaction[commands.Bot], n: int, word: str):
 		"""A command which takes two arguments and does nothing
 
-		Usage:
-		```
-		++my_feature num, word
-		```
-		Arguments:
-
-			> **num**: A number with no meaning
-			> **word**: Any word you like
-
+		Args:
+			n: A number with no meaning
+			word: Any word you like
 		"""
 
 		# log in console that a ping was received
 		print('Executing command "my_feature".')
 
 		# reply with a message
-		await ctx.send(f"Command received with num {n} and word {word}.")
-````
+		await interaction.send(f"Command received with num {n} and word {word}.")
+```
 
 Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
 
@@ -99,10 +93,10 @@ If when trying to have the bot perform some action based on something a user sai
 ```py
 from modules.error.friendly_error import FriendlyError
 #...
-raise FriendlyError("user friendly error message", channel, member)
+raise FriendlyError("user friendly error message", interaction, member)
 ```
 
-where `channel` is of type `discord.TextChannel` and `member` is of type `discord.Member`. Optionally, you can also pass as internal Exception, if applicable, and the error will be logged to `err.log`.
+where `interaction` is of type `nextcord.Interaction` or `nextcord.abc.Messageable` and `member` is of type `nextcord.Member`. Optionally, you can also pass an internal Exception, if applicable, and the error will be logged to `err.log`.
 
 When raising a `FriendlyError`, the message passed to it will be sent to the channel provided, tagging `member` if a member was passed.
 
@@ -125,10 +119,11 @@ source .venv/bin/activate # for bash/zsh (you'll need this one if you're on linu
 
 # install everything you need
 pip install -r requirements.txt
-pip install -r requirements.dev.txt
+pip install -r requirements-dev.txt
 ```
 
 Now you should be able to run the bot locally. Well done!
+
 ```sh
 python bot.py
 ```

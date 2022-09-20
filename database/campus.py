@@ -1,4 +1,4 @@
-import discord
+import nextcord
 import config
 from functools import cached_property
 from typing import Collection
@@ -22,9 +22,9 @@ class Campus:
 		return self.__name
 
 	@cached_property
-	def channel(self) -> discord.TextChannel:
+	def channel(self) -> nextcord.TextChannel:
 		"""The channel associated with this Campus."""
-		channel = discord.utils.get(config.guild().text_channels, id=self.__channel_id)
+		channel = nextcord.utils.get(config.guild().text_channels, id=self.__channel_id)
 		assert channel is not None
 		return channel
 

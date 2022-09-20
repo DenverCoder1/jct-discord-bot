@@ -1,5 +1,5 @@
 from typing import Iterable, Optional
-import discord
+import nextcord
 import config
 from functools import cached_property, cache
 from database import sql
@@ -21,7 +21,7 @@ class ChannelMessage:
 		return self.__message_id
 
 	@cached_property
-	async def message(self) -> discord.Message:
+	async def message(self) -> nextcord.Message:
 		"""The message that controls another channel by reacting to it."""
 		return await self.__host_channel().fetch_message(self.__message_id)
 
@@ -31,22 +31,22 @@ class ChannelMessage:
 		return self.__referenced_channel_id
 
 	@cached_property
-	def referenced_channel(self) -> Optional[discord.TextChannel]:
+	def referenced_channel(self) -> Optional[nextcord.TextChannel]:
 		"""The channel that this message controls, or None if the channel has been deleted."""
 		return self.__get_channel(self.__referenced_channel_id)
 
 	@cache
-	def __host_channel(self) -> discord.TextChannel:
+	def __host_channel(self) -> nextcord.TextChannel:
 		channel = self.__get_channel(self.__host_channel_id)
 		assert channel is not None
 		return channel
 
 	@staticmethod
-	def __get_channel(channel_id: int) -> Optional[discord.TextChannel]:
+	def __get_channel(channel_id: int) -> Optional[nextcord.TextChannel]:
 		"""
 		Returns a channel with the given ID, or None if it doesn't exist or is deleted.
 		"""
-		channel = discord.utils.get(config.guild().text_channels, id=channel_id)
+		channel = nextcord.utils.get(config.guild().text_channels, id=channel_id)
 		return channel
 
 	@classmethod

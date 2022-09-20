@@ -1,7 +1,7 @@
 from . import group_channel_creator
 from .group_creator import create_groups
 from utils.scheduler import Scheduler
-from discord.ext import commands
+from nextcord.ext import commands
 import datetime
 
 

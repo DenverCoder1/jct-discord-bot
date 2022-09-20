@@ -1,13 +1,9 @@
-import asyncio
 from database import preloaded
-from database.campus import Campus
 from utils import embedder, utils
 from . import assigner
-from discord.ext import commands
+from nextcord.ext import application_checks, commands
+import nextcord
 import config
-from discord_slash import cog_ext, SlashContext
-from discord_slash.model import SlashCommandOptionType
-from discord_slash.utils.manage_commands import create_option, create_choice
 
 
 class JoinCog(commands.Cog):
@@ -17,68 +13,40 @@ class JoinCog(commands.Cog):
 		self.bot = bot
 		self.assigner = None
 
-	@cog_ext.cog_slash(
-		name="join",
-		description=(
-			"Join command to get new users' information and place them in the right"
-			" roles."
-		),
-		guild_ids=[config.guild_id],
-		options=[
-			create_option(
-				name="first_name",
-				description="Your first name",
-				option_type=SlashCommandOptionType.STRING,
-				required=True,
-			),
-			create_option(
-				name="last_name",
-				description="Your last name",
-				option_type=SlashCommandOptionType.STRING,
-				required=True,
-			),
-			create_option(
-				name="campus",
-				description="Your campus (Lev or Tal)",
-				option_type=SlashCommandOptionType.STRING,
-				required=True,
-				choices=[
-					create_choice(name=campus.name, value=str(campus.id))
-					for campus in preloaded.campuses
-				],
-			),
-			create_option(
-				name="year",
-				description="Your year",
-				option_type=SlashCommandOptionType.STRING,
-				required=True,
-				choices=[
-					create_choice(name=f"Year {i}", value=str(i)) for i in range(1, 5)
-				],
-			),
-		],
-	)
-	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
+	@nextcord.slash_command("join", guild_ids=[config.guild_id])
+	@application_checks.has_role(utils.get_id("UNASSIGNED_ROLE"))
 	async def join(
 		self,
-		ctx: SlashContext,
+		interaction: nextcord.Interaction[commands.Bot],
 		first_name: str,
 		last_name: str,
-		campus: str,
-		year: str,
+		campus: int = nextcord.SlashOption(
+			choices={campus.name: campus.id for campus in preloaded.campuses}
+		),
+		year: int = nextcord.SlashOption(choices={f"Year {i}": i for i in range(1, 5)}),
 	):
-		# TODO: campus and year should really take integer options, but mobile has a bug
-		await ctx.defer()
+		"""Join command to get new users' information and place them in the right roles.
+
+		Args:
+			first_name: Your first name.
+			last_name: Your last name.
+			campus: Your campus (Lev or Tal).
+			year: Your year.
+		"""
+		assert isinstance(
+			interaction.user, nextcord.Member
+		), "Interaction user is not a guild member"
+		await interaction.response.defer()
 		await assigner.assign(
-			ctx.author,
-			f"{first_name.title()} {last_name.title()}",
-			int(campus),
-			int(year),
+			interaction.user, f"{first_name.title()} {last_name.title()}", campus, year,
 		)
-		await ctx.send(
+		await interaction.send(
 			embeds=[
 				embedder.embed_success(
-					title=f"**{ctx.author.display_name}** used **/{ctx.invoked_with}**"
+					title=(
+						f"**{interaction.user.display_name}** used"
+						f" **/{interaction.application_command.name}**"
+					)
 				)
 			]
 		)

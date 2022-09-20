@@ -1,10 +1,10 @@
 from utils.embedder import build_embed
-import discord
+import nextcord
 from .comic import Comic
 
 
 class XKCDEmbedder:
-	def gen_embed(self, comic: Comic) -> discord.Embed:
+	def gen_embed(self, comic: Comic) -> nextcord.Embed:
 		embed = build_embed(
 			title=f"{comic.num}: {comic.title}",
 			footer=comic.alt,

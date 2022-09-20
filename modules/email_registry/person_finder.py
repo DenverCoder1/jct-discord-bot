@@ -1,10 +1,10 @@
-import discord
+import nextcord
 from utils.utils import one
-from discord_slash.context import SlashContext
 from typing import Optional, Set
 from .weighted_set import WeightedSet
 from database.person import Person
 from ..error.friendly_error import FriendlyError
+from nextcord.ext import commands
 
 
 __search_weights = {
@@ -16,7 +16,7 @@ __search_weights = {
 
 async def search(
 	name: Optional[str] = None,
-	channel: Optional[discord.TextChannel] = None,
+	channel: Optional[nextcord.TextChannel] = None,
 	email: Optional[str] = None,
 ) -> Set[Person]:
 	"""returns a list of people who best match the name and channel"""
@@ -42,20 +42,20 @@ async def search(
 
 
 async def search_one(
-	sender: SlashContext,
+	sender: nextcord.Interaction[commands.Bot],
 	name: Optional[str] = None,
-	channel: Optional[discord.TextChannel] = None,
+	channel: Optional[nextcord.TextChannel] = None,
 	email: Optional[str] = None,
 ) -> Person:
 	"""
 	Returns a single person who best match the query, or raise a FriendlyError if it couldn't find exactly one.
 
 	:param sender: An object with the send method where friendly errors will be sent to.
-	:type sender: SlashContext
+	:type sender: nextcord.Interaction
 	:param name: The name of the person you want to search for (first, last, or both).
 	:type name: Optional[str]
 	:param channel: A channel the person is linked to.
-	:type channel: Optional[discord.TextChannel]
+	:type channel: Optional[nextcord.TextChannel]
 	:param email: The email of the person you want to search for.
 	:type email: Optional[str]
 	"""
