@@ -1,8 +1,6 @@
+import config
 from typing import Optional
 import nextcord
-import nextcord
-import config
-from nextcord import SlashOption
 from nextcord.ext import commands
 from .calendar import Calendar
 from .calendar_service import CalendarService
@@ -35,7 +33,7 @@ class CalendarCog(commands.Cog):
 	async def calendar_links(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
-		group_id: Optional[int] = SlashOption(
+		group_id: Optional[int] = nextcord.SlashOption(
 			name="class_name", choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
@@ -57,7 +55,7 @@ class CalendarCog(commands.Cog):
 		interaction: nextcord.Interaction[commands.Bot],
 		query: str = "",
 		results_per_page: int = 5,
-		group_id: Optional[int] = SlashOption(
+		group_id: Optional[int] = nextcord.SlashOption(
 			name="class_name", choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
@@ -91,7 +89,7 @@ class CalendarCog(commands.Cog):
 		end: Optional[str] = None,
 		description: str = "",
 		location: str = "",
-		group_id: Optional[int] = SlashOption(
+		group_id: Optional[int] = nextcord.SlashOption(
 			name="class_name", choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
@@ -135,7 +133,7 @@ class CalendarCog(commands.Cog):
 		end: Optional[str] = None,
 		description: Optional[str] = None,
 		location: Optional[str] = None,
-		group_id: Optional[int] = SlashOption(
+		group_id: Optional[int] = nextcord.SlashOption(
 			name="class_name", choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
@@ -201,7 +199,7 @@ class CalendarCog(commands.Cog):
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
 		query: str,
-		group_id: Optional[int] = SlashOption(
+		group_id: Optional[int] = nextcord.SlashOption(
 			name="class_name", choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
@@ -243,7 +241,7 @@ class CalendarCog(commands.Cog):
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
 		email: str,
-		group_id: Optional[int] = SlashOption(
+		group_id: Optional[int] = nextcord.SlashOption(
 			name="class_name", choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
