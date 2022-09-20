@@ -21,7 +21,6 @@ async def main():
 
 	activity = nextcord.Game("with students' patience")
 
-	# empty space effectively disables prefix since discord strips trailing spaces
 	bot = commands.Bot(intents=intents, activity=activity)
 
 	# Get the modules of all cogs whose directory structure is modules/<module_name>/cog.py
