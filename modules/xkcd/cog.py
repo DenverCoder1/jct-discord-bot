@@ -1,3 +1,4 @@
+from ..error.friendly_error import FriendlyError
 from .xkcd_fetcher import XKCDFetcher
 from .xkcd_embedder import XKCDEmbedder
 from nextcord.ext import commands
@@ -22,14 +23,30 @@ class XKCDCog(commands.Cog):
 	async def latest(self, interaction: nextcord.Interaction):
 		"""Displays the latest xkcd comic"""
 		await interaction.response.defer()
-		comic = self.xkcd_fetcher.get_latest()
+		try:
+			comic = self.xkcd_fetcher.get_latest()
+		except ConnectionError as e:
+			raise FriendlyError(
+				e.args[0],
+				interaction,
+				inner=e,
+				description="Please try again later.",
+			)
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="random")
 	async def random(self, interaction: nextcord.Interaction):
 		"""Displays a random xkcd comic"""
 		await interaction.response.defer()
-		comic = self.xkcd_fetcher.get_random()
+		try:
+			comic = self.xkcd_fetcher.get_random()
+		except ConnectionError as e:
+			raise FriendlyError(
+				e.args[0],
+				interaction,
+				inner=e,
+				description="Please try again later.",
+			)
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="get")
@@ -44,14 +61,32 @@ class XKCDCog(commands.Cog):
 				id (int): The ID of the comic to display
 		"""
 		await interaction.response.defer()
-		comic = self.xkcd_fetcher.get_comic_by_id(number)
+		try:
+			comic = self.xkcd_fetcher.get_comic_by_id(number)
+		except ConnectionError as e:
+			raise FriendlyError(
+				e.args[0],
+				interaction,
+				inner=e,
+				description="Please try again later, or try a different comic.",
+			)
+
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="search")
 	async def search(self, interaction: nextcord.Interaction, query: str):
 		"""Searches for a relevant xkcd comic"""
 		await interaction.response.defer()
-		comic = self.xkcd_fetcher.search_relevant(query)
+		try:
+			comic = self.xkcd_fetcher.search_relevant(query)
+		except ConnectionError as e:
+			raise FriendlyError(
+				e,
+				interaction,
+				inner=e,
+				description="Please try again later.",
+			)
+
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 
