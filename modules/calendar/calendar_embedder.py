@@ -76,7 +76,7 @@ class CalendarEmbedder:
 					bot=self.bot,
 					message=message,
 					emoji_list=[next_emoji],
-					allowed_users=[interaction.user] if interaction.user else None,  # type: ignore
+					allowed_users=[interaction.user] if isinstance(interaction.user, nextcord.Member) else None
 				)
 			# time window exceeded
 			except FriendlyError:
