@@ -80,7 +80,7 @@ class CalendarCog(commands.Cog):
 			interaction, events, full_query, results_per_page, calendar
 		)
 
-	@calendar.subcommand(name="add", description="Add events to the Google Calendar")
+	@calendar.subcommand(name="add")
 	async def event_add(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
@@ -121,9 +121,7 @@ class CalendarCog(commands.Cog):
 		)
 		await interaction.send(embed=embed)
 
-	@calendar.subcommand(
-		name="update", description="Update events in the Google Calendar",
-	)
+	@calendar.subcommand(name="update")
 	async def event_update(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
@@ -192,9 +190,7 @@ class CalendarCog(commands.Cog):
 		)
 		await sender(embed=embed)
 
-	@calendar.subcommand(
-		name="delete", description="Delete events from the Google Calendar",
-	)
+	@calendar.subcommand(name="delete")
 	async def event_delete(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
@@ -234,9 +230,7 @@ class CalendarCog(commands.Cog):
 		)
 		await sender(embed=embed)
 
-	@calendar.subcommand(
-		name="grant", description="Add a Google account as a manager of your class's calendar",
-	)
+	@calendar.subcommand(name="grant")
 	async def calendar_grant(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
