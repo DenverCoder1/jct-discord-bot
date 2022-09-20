@@ -28,7 +28,11 @@ class ErrorLogCog(commands.Cog):
 
 	@nextcord.slash_command(name="logs", guild_ids=[config.guild_id])
 	async def logs(self, interaction: nextcord.Interaction[commands.Bot], num_lines: int = 50):
-		"""Show recent logs from err.log."""
+		"""Show recent logs from err.log.
+
+		Args:
+			num_lines: The number of lines to show (default is 50).
+		"""
 		await interaction.send(self.logger.read_logs(num_lines))
 
 
