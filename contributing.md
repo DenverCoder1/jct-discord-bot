@@ -38,19 +38,13 @@ class MyFeatureCog(commands.Cog):
 Then as methods to that class, add any functions you need for the bot. For example:
 
 ````py
-	@nextcord.command(name='my_feature')
-	async def my_feature(self, interaction: nextcord.Interaction, n: int, word: str):
+	@nextcord.slash_command()
+	async def my_feature(self, interaction: nextcord.Interaction[commands.Bot], n: int, word: str):
 		"""A command which takes two arguments and does nothing
 
-		Usage:
-		```
-		++my_feature num, word
-		```
-		Arguments:
-
-			> **num**: A number with no meaning
-			> **word**: Any word you like
-
+		Args:
+			n: A number with no meaning
+			word: Any word you like
 		"""
 
 		# log in console that a ping was received

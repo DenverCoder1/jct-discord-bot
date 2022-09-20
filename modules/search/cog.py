@@ -15,11 +15,11 @@ class SearchCog(commands.Cog):
 		self.last_paragraph = {}
 
 	@nextcord.slash_command(name="search", guild_ids=[config.guild_id])
-	async def search(self, interaction: nextcord.Interaction, query: str):
+	async def search(self, interaction: nextcord.Interaction[commands.Bot], query: str):
 		"""Search the web for anything you want.
 		
-			Args:
-				query (str): The query to search for.
+		Args:
+			query (str): The query to search for.
 		"""
 		if query == "who asked":
 			await interaction.send(

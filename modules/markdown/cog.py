@@ -14,11 +14,9 @@ class FormattingCog(commands.Cog):
 	@nextcord.slash_command(name="markdown", guild_ids=[config.guild_id])
 	async def markdown(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		format: Optional[str] = nextcord.SlashOption(
-			choices={
-				tip_formatter.formats[key].name: key for key in tip_formatter.formats
-			}
+			choices={tip_formatter.formats[key].name: key for key in tip_formatter.formats}
 		),
 	):
 		"""Command to display markdown tips for Discord messages.

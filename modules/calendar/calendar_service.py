@@ -105,38 +105,24 @@ class CalendarService:
 			"location": location,
 			"description": md_to_html(description),
 			"start": (
-				{
-					"dateTime": start_date.isoformat("T", "seconds"),
-					"timeZone": self.timezone,
-				}
+				{"dateTime": start_date.isoformat("T", "seconds"), "timeZone": self.timezone,}
 				if not all_day
 				else {"date": start_date.date().isoformat()}
 			),
 			"end": (
-				{
-					"dateTime": end_date.isoformat("T", "seconds"),
-					"timeZone": self.timezone,
-				}
+				{"dateTime": end_date.isoformat("T", "seconds"), "timeZone": self.timezone,}
 				if not all_day
 				else {"date": end_date.date().isoformat()}
 			),
 		}
 		# Add event to the calendar
-		event = (
-			self.service.events()
-			.insert(calendarId=calendar_id, body=event_details)
-			.execute()
-		)
+		event = self.service.events().insert(calendarId=calendar_id, body=event_details).execute()
 		return self.__dict_to_event(event)
 
 	def delete_event(self, calendar_id: str, event: Event) -> None:
 		"""Delete an event from a calendar given the calendar id and event object"""
 		# delete event
-		response = (
-			self.service.events()
-			.delete(calendarId=calendar_id, eventId=event.id)
-			.execute()
-		)
+		response = self.service.events().delete(calendarId=calendar_id, eventId=event.id).execute()
 		# response should be empty if successful
 		if response != "":
 			raise ConnectionError("Couldn't delete event.", response)
@@ -158,8 +144,7 @@ class CalendarService:
 		start_delta = new_start_date - event.start
 		# parse new end date if provided
 		new_end_date = parse_date(
-			new_end,
-			base=(new_start_date if new_start_date != event.start else event.end),
+			new_end, base=(new_start_date if new_start_date != event.start else event.end),
 		) or (event.end + start_delta)
 		# check that new time range is valid
 		if new_end_date < new_start_date:
@@ -176,18 +161,12 @@ class CalendarService:
 			"location": new_location or event.location or "",
 			"description": md_to_html(new_description or event.description or ""),
 			"start": (
-				{
-					"dateTime": new_start_date.isoformat("T", "seconds"),
-					"timeZone": self.timezone,
-				}
+				{"dateTime": new_start_date.isoformat("T", "seconds"), "timeZone": self.timezone,}
 				if not all_day
 				else {"date": new_start_date.date().isoformat()}
 			),
 			"end": (
-				{
-					"dateTime": new_end_date.isoformat("T", "seconds"),
-					"timeZone": self.timezone,
-				}
+				{"dateTime": new_end_date.isoformat("T", "seconds"), "timeZone": self.timezone,}
 				if not all_day
 				else {"date": new_end_date.date().isoformat()}
 			),
@@ -217,9 +196,7 @@ class CalendarService:
 	def add_manager(self, calendar_id: str, email: str) -> bool:
 		"""Gives write access to a user for a calendar given an email address"""
 		rule = {"scope": {"type": "user", "value": email,}, "role": "writer"}
-		created_rule = (
-			self.service.acl().insert(calendarId=calendar_id, body=rule).execute()
-		)
+		created_rule = self.service.acl().insert(calendarId=calendar_id, body=rule).execute()
 		# returns True if the rule was applied successfully
 		return created_rule["id"] == f"user:{email}"
 
@@ -237,9 +214,7 @@ class CalendarService:
 			end=self.__get_endpoint_datetime(details, "end"),
 		)
 
-	def __get_endpoint_datetime(
-		self, details: Dict[str, Any], endpoint: str
-	) -> datetime:
+	def __get_endpoint_datetime(self, details: Dict[str, Any], endpoint: str) -> datetime:
 		"""Returns a datetime given 'start' or 'end' as the endpoint"""
 		dt = parse_date(
 			details[endpoint].get("dateTime") or details[endpoint]["date"],

@@ -21,9 +21,7 @@ async def sort_courses() -> None:
 		if not category.text_channels:
 			return
 		start_position = category.text_channels[0].position
-		for i, channel in enumerate(
-			sorted(category.text_channels, key=lambda c: c.name)
-		):
+		for i, channel in enumerate(sorted(category.text_channels, key=lambda c: c.name)):
 			await channel.edit(position=start_position + i)
 
 

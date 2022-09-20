@@ -1,6 +1,4 @@
-import asyncio
 from database import preloaded
-from database.campus import Campus
 from utils import embedder, utils
 from . import assigner
 from nextcord.ext import commands
@@ -15,13 +13,11 @@ class JoinCog(commands.Cog):
 		self.bot = bot
 		self.assigner = None
 
-
-
 	@nextcord.slash_command("join", guild_ids=[config.guild_id])
 	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
 	async def join(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		first_name: str,
 		last_name: str,
 		campus: int = nextcord.SlashOption(choices={
@@ -32,12 +28,13 @@ class JoinCog(commands.Cog):
 	):
 		"""Join command to get new users' information and place them in the right roles.
 		
-			Args:
-				first_name (str): Your first name.
-				last_name (str): Your last name.
-				campus (str): Your campus (Lev or Tal).
-				year (int): The user's year.
+		Args:
+			first_name (str): Your first name.
+			last_name (str): Your last name.
+			campus (str): Your campus (Lev or Tal).
+			year (int): The user's year.
 		"""
+		assert isinstance(interaction.user, nextcord.Member), "Interaction user is not a guild member"
 		await interaction.response.defer()
 		await assigner.assign(
 			interaction.user,

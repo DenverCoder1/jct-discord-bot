@@ -3,6 +3,7 @@ from utils.utils import one
 from database.group import Group
 from typing import Dict, Iterable, Optional
 import nextcord
+from nextcord.ext import commands
 
 
 class Calendar:
@@ -33,10 +34,7 @@ class Calendar:
 
 	def view_url(self, timezone: str) -> str:
 		"""The url to view the calendar"""
-		return (
-			"https://calendar.google.com/calendar/u/0/embed"
-			f"?src={self.__id}&ctz={timezone}"
-		)
+		return f"https://calendar.google.com/calendar/u/0/embed?src={self.__id}&ctz={timezone}"
 
 	def ical_url(self) -> str:
 		"""The iCal url for the calendar"""
@@ -53,7 +51,7 @@ class Calendar:
 	@classmethod
 	async def get_calendar(
 		cls,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		groups: Optional[Iterable[Group]] = None,
 		group_id: Optional[int] = None,
 	) -> "Calendar":
@@ -64,25 +62,26 @@ class Calendar:
 			group = one(group for group in groups if group.id == group_id)
 		else:
 			# get the group from the user's role
-			member_groups = [
-				group for group in groups if group.role in interaction.user.roles
-			]
+			member_groups = (
+				[group for group in groups if group.role in interaction.user.roles]
+				if isinstance(interaction.user, nextcord.Member)
+				else []
+			)
 			# no group roles found
 			if not member_groups:
 				raise FriendlyError(
 					"Could not find your class role.",
 					interaction,
 					interaction.user,
-					hidden=True,
+					ephemeral=True,
 				)
 			# multiple group roles found
 			if len(member_groups) > 1:
 				raise FriendlyError(
-					"You must specify which calendar since you have multiple class"
-					" roles.",
+					"You must specify which calendar since you have multiple class roles.",
 					interaction,
 					interaction.user,
-					hidden=True,
+					ephemeral=True,
 				)
 			# only one group found
 			group = one(member_groups)

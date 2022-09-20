@@ -11,10 +11,11 @@ from typing import Iterable
 from utils import embedder
 from database import sql, sql_fetcher
 from utils.utils import get_discord_obj
+from nextcord.ext import commands
 
 
 async def add_course(
-	interaction: nextcord.Interaction,
+	interaction: nextcord.Interaction[commands.Bot],
 	course_name: str,
 	professors: Iterable[str],
 	channel_name: str,
@@ -26,7 +27,7 @@ async def add_course(
 
 
 async def __create_channel(
-	interaction: nextcord.Interaction, channel_name: str, course_name: str = ""
+	interaction: nextcord.Interaction[commands.Bot], channel_name: str, course_name: str = ""
 ) -> nextcord.TextChannel:
 	# find courses category
 	category = get_discord_obj(config.guild().categories, ACTIVE_COURSES_CATEGORY)
@@ -34,32 +35,24 @@ async def __create_channel(
 	# make sure the channel doesn't already exist
 	if nextcord.utils.get(category.text_channels, name=channel_name) is not None:
 		raise FriendlyError(
-			"this channel already exists. Please try again.",
-			interaction,
-			interaction.user,
+			"this channel already exists. Please try again.", interaction, interaction.user,
 		)
 
 	new_channel = await category.create_text_channel(
-		channel_name,
-		topic=f"Here you can discuss anything related to the course {course_name}.",
+		channel_name, topic=f"Here you can discuss anything related to the course {course_name}.",
 	)
 	await sort_single_course(new_channel)
 	return new_channel
 
 
 async def __add_to_database(
-	messageable: Messageable, channel: nextcord.TextChannel, course_name: str
+	interaction: nextcord.Interaction[commands.Bot], channel: nextcord.TextChannel, course_name: str
 ):
 	try:
-		await sql.insert(
-			"categories", returning="id", name=course_name, channel=channel.id
-		)
+		await sql.insert("categories", returning="id", name=course_name, channel=channel.id)
 	except UniqueViolationError as e:
 		await channel.delete(
-			reason=(
-				"The command that created this channel ultimately failed,"
-				" so it was deleted."
-			)
+			reason="The command that created this channel ultimately failed, so it was deleted."
 		)
 		raise FriendlyError(
 			"A course with this name already exists in the database.",
@@ -68,22 +61,20 @@ async def __add_to_database(
 				" will have to be deleted from the database manually. Ask a"
 				" bot dev to do this."
 			),
-			messageable=messageable,
+			sender=interaction,
 			inner=e,
 		)
 
 
 async def __link_professors(
-	interaction: nextcord.Interaction,
+	interaction: nextcord.Interaction[commands.Bot],
 	channel: nextcord.TextChannel,
 	professors: Iterable[str],
 ):
 	for professor_name in professors:
 		try:
 			professor = await person_finder.search_one(interaction, professor_name)
-			await categoriser.categorise_person(
-				interaction, professor.id, (channel.mention,)
-			)
+			await categoriser.categorise_person(interaction, professor.id, (channel.mention,))
 		except FriendlyError:
 			await interaction.send(
 				embed=embedder.embed_warning(

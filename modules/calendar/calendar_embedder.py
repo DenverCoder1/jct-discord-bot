@@ -33,7 +33,7 @@ class CalendarEmbedder:
 
 	async def embed_event_pages(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		events_list: Sequence[Event],
 		query: str,
 		results_per_page: int,
@@ -44,6 +44,8 @@ class CalendarEmbedder:
 		events = peekable(events_list)
 		# set start index
 		page_num = 1
+		# message reference for editing
+		message: Optional[nextcord.Message] = None
 		while True:
 			try:
 				# create embed
@@ -56,11 +58,9 @@ class CalendarEmbedder:
 					max_results=results_per_page,
 				)
 				sender = (
-					interaction.send
-					if interaction.message is None
-					else interaction.message.edit
+					interaction.followup.send if not message else interaction.edit_original_message
 				)
-				await sender(embed=embed)
+				message = await sender(embed=embed)
 				# set emoji and page based on whether there are more events
 				if events:
 					next_emoji = "⏬"
@@ -77,9 +77,9 @@ class CalendarEmbedder:
 				# wait for author to respond to go to next page
 				await wait_for_reaction(
 					bot=self.bot,
-					message=interaction.message,
+					message=message,  # type: ignore
 					emoji_list=[next_emoji],
-					allowed_users=[interaction.user],
+					allowed_users=[interaction.user] if interaction.user else None,  # type: ignore
 				)
 			# time window exceeded
 			except FriendlyError:
@@ -87,7 +87,7 @@ class CalendarEmbedder:
 
 	async def get_event_choice(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		events_list: Sequence[Event],
 		calendar: Calendar,
 		query: str,
@@ -130,7 +130,7 @@ class CalendarEmbedder:
 			bot=self.bot,
 			message=message,
 			emoji_list=self.number_emoji[:num_events],
-			allowed_users=[interaction.user],
+			allowed_users=[interaction.user] if interaction.user else None,  # type: ignore
 		)
 		# get the event selected by the user
 		return events_list[selection_index]
@@ -178,10 +178,7 @@ class CalendarEmbedder:
 			# get event details and add enumeration emoji if available
 			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
 			# make sure embed doesn't exceed max length (unless it won't fit on its own page)
-			if (
-				len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH
-				and i > 0
-			):
+			if len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH and i > 0:
 				break
 			# add event to embed
 			description += event_details
@@ -194,9 +191,7 @@ class CalendarEmbedder:
 			page_num = None
 		# add page number and timezone info
 		footer = self.__footer_text(page_num=page_num)
-		return build_embed(
-			title=title, description=description, footer=footer, colour=colour
-		)
+		return build_embed(title=title, description=description, footer=footer, colour=colour)
 
 	def embed_links(
 		self,
@@ -207,9 +202,7 @@ class CalendarEmbedder:
 		"""Embed a list of links given a mapping of link text to urls"""
 		# add links to embed
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
-		return build_embed(
-			title=title, description="\n".join(description), colour=colour
-		)
+		return build_embed(title=title, description="\n".join(description), colour=colour)
 
 	def embed_event(
 		self,
@@ -225,9 +218,7 @@ class CalendarEmbedder:
 		description += self.__calendar_links(calendar)
 		# add timezone info
 		footer = self.__footer_text()
-		return build_embed(
-			title=title, description=description, footer=footer, colour=colour
-		)
+		return build_embed(title=title, description=description, footer=footer, colour=colour)
 
 	def __format_paragraph(self, text: str, limit: int = 100) -> str:
 		"""Trims a string of text to approximately `limit` displayed characters,

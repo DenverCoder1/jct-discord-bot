@@ -15,12 +15,12 @@ class XKCDCog(commands.Cog):
 		self.xkcd_embedder = XKCDEmbedder()
 
 	@nextcord.slash_command(name="xkcd", guild_ids=[config.guild_id])
-	async def xkcd(self, interaction: nextcord.Interaction):
+	async def xkcd(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""This is a base command for all xkcd commands and is not invoked"""
 		pass
 
 	@xkcd.subcommand(name="latest")
-	async def latest(self, interaction: nextcord.Interaction):
+	async def latest(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""Displays the latest xkcd comic"""
 		await interaction.response.defer()
 		try:
@@ -35,7 +35,7 @@ class XKCDCog(commands.Cog):
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="random")
-	async def random(self, interaction: nextcord.Interaction):
+	async def random(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""Displays a random xkcd comic"""
 		await interaction.response.defer()
 		try:
@@ -52,13 +52,13 @@ class XKCDCog(commands.Cog):
 	@xkcd.subcommand(name="get")
 	async def get(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		number: int = nextcord.SlashOption(name="id"),
 	):
 		"""Gets a specific xkcd comic
 		
-			Args:
-				id (int): The ID of the comic to display
+		Args:
+			number: The ID of the comic to display
 		"""
 		await interaction.response.defer()
 		try:
@@ -74,8 +74,12 @@ class XKCDCog(commands.Cog):
 		await interaction.send(embed=self.xkcd_embedder.gen_embed(comic))
 
 	@xkcd.subcommand(name="search")
-	async def search(self, interaction: nextcord.Interaction, query: str):
-		"""Searches for a relevant xkcd comic"""
+	async def search(self, interaction: nextcord.Interaction[commands.Bot], query: str):
+		"""Searches for a relevant xkcd comic
+
+		Args:
+			query: The query to search for
+		"""
 		await interaction.response.defer()
 		try:
 			comic = self.xkcd_fetcher.search_relevant(query)

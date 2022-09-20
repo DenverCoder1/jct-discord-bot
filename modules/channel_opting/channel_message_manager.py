@@ -11,25 +11,19 @@ class ChannelMessageManager:
 		self.__emoji = emoji
 
 	async def process_reaction(
-		self,
-		reaction: nextcord.RawReactionActionEvent,
-		channel_messages: List[ChannelMessage],
+		self, reaction: nextcord.RawReactionActionEvent, channel_messages: List[ChannelMessage],
 	):
 		if reaction.emoji.name == self.__emoji:
 			try:
 				channel_message = one(
-					cm
-					for cm in channel_messages
-					if cm.message_id == reaction.message_id
+					cm for cm in channel_messages if cm.message_id == reaction.message_id
 				)
 				allowed: Optional[bool]
 				if reaction.event_type == "REACTION_ADD":
 					member = reaction.member
 					allowed = False
 				else:
-					member = nextcord.utils.get(
-						self.__host_channel.members, id=reaction.user_id
-					)
+					member = nextcord.utils.get(self.__host_channel.members, id=reaction.user_id)
 					allowed = None
 				if not member or member.bot:
 					return
@@ -46,9 +40,7 @@ class ChannelMessageManager:
 			return
 		message = await self.__send_channel_message(channel)
 		channel_messages.append(
-			await ChannelMessage.add_to_database(
-				message.id, channel.id, self.__host_channel.id
-			)
+			await ChannelMessage.add_to_database(message.id, channel.id, self.__host_channel.id)
 		)
 
 	async def delete_channel_message(
@@ -66,9 +58,7 @@ class ChannelMessageManager:
 		except StopIteration:
 			pass
 
-	async def __send_channel_message(
-		self, channel: nextcord.TextChannel
-	) -> nextcord.Message:
+	async def __send_channel_message(self, channel: nextcord.TextChannel) -> nextcord.Message:
 		embed = build_embed(
 			title=channel.name.replace("-", " ").title(),
 			footer=f"Click {self.__emoji} to opt out of this channel.",

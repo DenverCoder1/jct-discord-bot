@@ -4,10 +4,11 @@ from database.person import Person
 import nextcord
 from typing import Optional
 from database import sql
+from nextcord.ext import commands
 
 
 async def remove_person(
-	interaction: nextcord.Interaction,
+	interaction: nextcord.Interaction[commands.Bot],
 	name: Optional[str] = None,
 	channel: Optional[TextChannel] = None,
 	email: Optional[str] = None,

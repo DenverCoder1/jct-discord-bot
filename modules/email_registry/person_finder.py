@@ -4,6 +4,7 @@ from typing import Optional, Set
 from .weighted_set import WeightedSet
 from database.person import Person
 from ..error.friendly_error import FriendlyError
+from nextcord.ext import commands
 
 
 __search_weights = {
@@ -41,7 +42,7 @@ async def search(
 
 
 async def search_one(
-	sender: nextcord.Interaction,
+	sender: nextcord.Interaction[commands.Bot],
 	name: Optional[str] = None,
 	channel: Optional[nextcord.TextChannel] = None,
 	email: Optional[str] = None,

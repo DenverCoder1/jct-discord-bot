@@ -17,29 +17,27 @@ class CourseManagerCog(commands.Cog):
 		self.sort_courses_categories.start()
 		self.bot = bot
 
-	@nextcord.slash_command(name="course", guild_ids=[config.guild_id])
-	async def course(self, interaction: nextcord.Interaction):
+	@nextcord.slash_command(guild_ids=[config.guild_id])
+	async def course(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""This is a base command for all course commands and is not invoked"""
 		pass
 
-	@course.subcommand(name="add", description="Add a new course to the database and create a channel for it.")
+	@course.subcommand(name="add")
 	@has_permissions(manage_channels=True)
 	async def add_course(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		course_name: str,
 		channel_name: str,
-		professors: str = SlashOption(default=""),
+		professors: str = "",
 	):
 		"""Add a new course to the database and create a channel for it.
 		
-			Args:
-				course_name: The full name of the course. (eg. "Advanced Object Oriented Programming and Design")
-				channel_name: The name of the channel. (eg. object-oriented-programming) (default is course name)
-				professors: A comma separated string of names of professors who teach the course. (eg. "shahar golan, eitan")
+		Args:
+			course_name: The full name of the course. (eg. "Advanced Object Oriented Programming and Design")
+			channel_name: The name of the channel. (eg. object-oriented-programming) (default is course name)
+			professors: A comma separated string of names of professors who teach the course. (eg. "shahar golan, eitan")
 		"""
-
-
 		await interaction.response.defer()
 		professors_split = [professor.strip() for professor in professors.split(",")]
 		if not channel_name:
@@ -54,12 +52,12 @@ class CourseManagerCog(commands.Cog):
 	@course.subcommand(name="delete")
 	@has_permissions(manage_channels=True)
 	async def delete_course(
-		self, interaction: nextcord.Interaction, channel: nextcord.TextChannel
+		self, interaction: nextcord.Interaction[commands.Bot], channel: nextcord.TextChannel
 	):
 		"""Delete course from the database and delete its channel. (For discontinued courses).
 
-			Args:
-				channel: The channel corresponding to the course you want to delete.
+		Args:
+			channel: The channel corresponding to the course you want to delete.
 		"""
 		await interaction.response.defer()
 		await course_deleter.delete_course(interaction, channel)
@@ -73,12 +71,12 @@ class CourseManagerCog(commands.Cog):
 	@course.subcommand(name="activate")
 	@has_permissions(manage_channels=True)
 	async def activate_course(
-		self, interaction: nextcord.Interaction, course: nextcord.TextChannel
+		self, interaction: nextcord.Interaction[commands.Bot], course: nextcord.TextChannel
 	):
 		"""Move an inactive course channel to the active courses list.
 
-			Args:
-				course: The channel corresponding to the course you want to activate.
+		Args:
+			course: The channel corresponding to the course you want to activate.
 		"""
 		await interaction.response.defer()
 		await course_activator.activate_course(interaction, course)
@@ -86,11 +84,11 @@ class CourseManagerCog(commands.Cog):
 
 	@course.subcommand(name="deactivate")
 	@has_permissions(manage_channels=True)
-	async def deactivate_course(self, interaction: nextcord.Interaction, course: nextcord.TextChannel):
+	async def deactivate_course(self, interaction: nextcord.Interaction[commands.Bot], course: nextcord.TextChannel):
 		"""Move an active course channel to the inactive courses list.
 
-			Args:
-				course: The channel corresponding to the course you want to deactivate.
+		Args:
+			course: The channel corresponding to the course you want to deactivate.
 		"""
 		await interaction.response.defer()
 		await course_activator.deactivate_course(interaction, course)
@@ -98,7 +96,7 @@ class CourseManagerCog(commands.Cog):
 
 	@course.subcommand(name="deactivate-all")
 	@has_permissions(manage_channels=True)
-	async def deactivate_all_courses(self, interaction: nextcord.Interaction):
+	async def deactivate_all_courses(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""Move all active course channels to the inactive courses list."""
 		await interaction.response.defer()
 		await course_activator.deactivate_all_courses(interaction)
@@ -106,7 +104,7 @@ class CourseManagerCog(commands.Cog):
 
 	@course.subcommand(name="sort")
 	@has_permissions(manage_channels=True)
-	async def sort_courses(self, interaction: nextcord.Interaction):
+	async def sort_courses(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""Sort all course channels alphabetically."""
 		await interaction.response.defer()
 		await util.sort_courses()

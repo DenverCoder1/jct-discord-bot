@@ -22,22 +22,22 @@ class EmailRegistryCog(commands.Cog):
 		self.bot = bot
 
 	@nextcord.slash_command(name="email", guild_ids=[config.guild_id])
-	async def email(self, interaction: nextcord.Interaction):
+	async def email(self, interaction: nextcord.Interaction[commands.Bot]):
 		"""This is a base command for the email registr and is not invoked"""
 		pass
 
 	@email.subcommand(name="of")
 	async def get_email(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		name: Optional[str] = None,
 		channel: Optional[nextcord.TextChannel] = None,
 	):
 		"""Get the email address of the person you search for.
 		
-			Args:
-				name: The name of the person to search for
-				channel: The channel to search for the person in
+		Args:
+			name: The name of the person to search for
+			channel: The channel to search for the person in
 		"""
 		await interaction.response.defer()
 		people = await person_finder.search(
@@ -66,17 +66,17 @@ class EmailRegistryCog(commands.Cog):
 	@email.subcommand(name="add")
 	async def add_email(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		email: str,
 		name: Optional[str] = None,
 		channel: Optional[nextcord.TextChannel] = None,
 	):
 		"""Add the email of a professor with this command.
 
-			Args:
-				email: The email address you wish to add to the person.
-				name: First name, last name, or both. (eg. moti)
-				channel: Mention a course the professor teaches. (eg. #automata)
+		Args:
+			email: The email address you wish to add to the person.
+			name: First name, last name, or both. (eg. moti)
+			channel: Mention a course the professor teaches. (eg. #automata)
 		"""
 		await interaction.response.defer()
 		# search for professor's details
@@ -87,35 +87,35 @@ class EmailRegistryCog(commands.Cog):
 
 	@email.subcommand(name="remove")
 	@commands.has_guild_permissions(manage_roles=True)
-	async def remove_email(self, interaction: nextcord.Interaction, email: str):
+	async def remove_email(self, interaction: nextcord.Interaction[commands.Bot], email: str):
 		"""Remove the email of a professor with this command.
 
-			Args:
-				email: The email address you wish to remove from its owner.
+		Args:
+			email: The email address you wish to remove from its owner.
 		"""
 		await interaction.response.defer()
 		# search for professor's details
 		person = await person_finder.search_one(interaction, email=email)
 		# add/remove the emails to the database
-		person = await email_adder.remove_email(person, email, interaction)
+		person = await email_adder.remove_email(person, email)
 		await interaction.send(embed=person_embedder.gen_embed(person))
 
 	@email.subcommand(name="person")
 	async def add_person(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		first_name: str,
 		last_name: str,
 		email: Optional[str] = None,
-		channels: Optional[str] = "",
+		channels: str = "",
 	):
 		"""Add a faculty member to the email registry.
 
-			Args:
-				first_name: The first name of the person you want to add.
-				last_name: The last name of the person you want to add.
-				email: The email address of the person you want to add.
-				channels: Mention the channels this person is associated with.
+		Args:
+			first_name: The first name of the person you want to add.
+			last_name: The last name of the person you want to add.
+			email: The email address of the person you want to add.
+			channels: Mention the channels this person is associated with.
 		"""
 		await interaction.response.defer()
 		person = await person_adder.add_person(
@@ -129,17 +129,17 @@ class EmailRegistryCog(commands.Cog):
 	@commands.has_guild_permissions(manage_roles=True)
 	async def remove_person(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		name: Optional[str] = None,
 		channel: Optional[TextChannel] = None,
 		email: Optional[str] = None,
 	):
 		"""Remove a faculty member from the email registry.
 		
-			Args:
-				name: The name of the person you want to remove.
-				channel: A channel this person is associated with.
-				email: The email address of the person you want to remove.
+		Args:
+			name: The name of the person you want to remove.
+			channel: A channel this person is associated with.
+			email: The email address of the person you want to remove.
 		"""
 
 		await interaction.response.defer()
@@ -151,13 +151,13 @@ class EmailRegistryCog(commands.Cog):
 	@email.subcommand(name="link")
 	@commands.has_guild_permissions(manage_roles=True)
 	async def link_person_to_category(
-		self, interaction: nextcord.Interaction, name_or_email: str, channel_mentions: str
+		self, interaction: nextcord.Interaction[commands.Bot], name_or_email: str, channel_mentions: str
 	):
 		"""Link a person to a category (for example a professor to a course they teach).
 		
-			Args:
-				name_or_email: First name, last name, or both, (eg. moti). Alternatively, you may use the person's email.
-				channel_mentions: Mention one or more course channels the professor teaches. (eg. #automata #computability)
+		Args:
+			name_or_email: First name, last name, or both, (eg. moti). Alternatively, you may use the person's email.
+			channel_mentions: Mention one or more course channels the professor teaches. (eg. #automata #computability)
 		"""
 
 		await self.__link_unlink(
@@ -167,13 +167,13 @@ class EmailRegistryCog(commands.Cog):
 	@email.subcommand(name="unlink")
 	@commands.has_guild_permissions(manage_roles=True)
 	async def unlink_person_from_category(
-		self, interaction: nextcord.Interaction, name_or_email: str, channel_mentions: str
+		self, interaction: nextcord.Interaction[commands.Bot], name_or_email: str, channel_mentions: str
 	):
 		"""Unlink a person from a category (for example a professor from a course they no longer teach).
 
-			Args:
-				name_or_email: First name, last name, or both, (eg. moti). Alternatively, you may use the person's email.
-				channel_mentions: Mention the course channels to unlink from the specified person. (eg. #automata #tcp-ip)
+		Args:
+			name_or_email: First name, last name, or both, (eg. moti). Alternatively, you may use the person's email.
+			channel_mentions: Mention the course channels to unlink from the specified person. (eg. #automata #tcp-ip)
 		"""
 
 		await self.__link_unlink(
@@ -182,7 +182,7 @@ class EmailRegistryCog(commands.Cog):
 
 	async def __link_unlink(
 		self,
-		interaction: nextcord.Interaction,
+		interaction: nextcord.Interaction[commands.Bot],
 		name_or_email: str,
 		channel_mentions: str,
 		func: Callable[[nextcord.Interaction, int, Iterable[str]], Coroutine[Any, Any, Person]],

@@ -54,9 +54,7 @@ async def __add_role(member: nextcord.Member, campus_id: int, year: int):
 	last_elul = HebrewDate(last_elul_year, 6, 1)
 	base_year = last_elul.to_pydate().year
 	grad_year = base_year + 4 - year
-	role_id = await sql.select.value(
-		"groups", "role", campus=campus_id, grad_year=grad_year
-	)
+	role_id = await sql.select.value("groups", "role", campus=campus_id, grad_year=grad_year)
 	class_role = config.guild().get_role(role_id)
 	assert class_role is not None
 	await member.add_roles(class_role)
