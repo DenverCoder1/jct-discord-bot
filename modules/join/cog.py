@@ -24,7 +24,7 @@ class JoinCog(commands.Cog):
 			campus.name:campus.id
 			for campus in preloaded.campuses
 		}),
-		year: str = nextcord.SlashOption(choices=[str(i) for i in range(1, 5)]),
+		year: str = nextcord.SlashOption(choices={f"Year {i}":str(i) for i in range(1, 5)}),
 	):
 		"""Join command to get new users' information and place them in the right roles.
 		
@@ -32,7 +32,7 @@ class JoinCog(commands.Cog):
 			first_name (str): Your first name.
 			last_name (str): Your last name.
 			campus (str): Your campus (Lev or Tal).
-			year (int): The user's year.
+			year (int): Your year.
 		"""
 		assert isinstance(interaction.user, nextcord.Member), "Interaction user is not a guild member"
 		await interaction.response.defer()
