@@ -127,7 +127,7 @@ class CalendarEmbedder:
 			bot=self.bot,
 			message=message,
 			emoji_list=self.number_emoji[:num_events],
-			allowed_users=[interaction.user] if interaction.user else None,  # type: ignore
+					allowed_users=[interaction.user] if isinstance(interaction.user, nextcord.Member) else None
 		)
 		# get the event selected by the user
 		return events_list[selection_index]
