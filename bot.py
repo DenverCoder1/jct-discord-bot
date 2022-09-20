@@ -36,6 +36,7 @@ async def main():
         # skip if this function has already run
         if config._guild is not None:
             return
+        assert bot.user is not None
         print(f"{bot.user.name} has connected to Discord!")
         config._guild = bot.get_guild(config.guild_id)
         # Start Scheduler

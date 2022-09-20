@@ -22,7 +22,7 @@ class SearchCog(commands.Cog):
         """Search the web for anything you want.
 
         Args:
-                query (str): The query to search for.
+            query (str): The query to search for.
         """
         if query == "who asked":
             await interaction.send(

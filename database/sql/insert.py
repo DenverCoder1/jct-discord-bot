@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import config
 
@@ -7,8 +7,8 @@ from . import util
 
 async def insert(
     table: str,
-    on_conflict: str = None,
-    returning: str = None,
+    on_conflict: Optional[str] = None,
+    returning: Optional[str] = None,
     **fields,
 ) -> Any:
     """Run an insert statement on the given table.

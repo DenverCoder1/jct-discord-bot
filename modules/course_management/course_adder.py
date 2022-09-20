@@ -61,9 +61,7 @@ async def __add_to_database(
         await sql.insert("categories", returning="id", name=course_name, channel=channel.id)
     except UniqueViolationError as e:
         await channel.delete(
-            reason=(
-                "The command that created this channel ultimately failed, so it was" " deleted."
-            )
+            reason="The command that created this channel ultimately failed, so it was deleted."
         )
         raise FriendlyError(
             "A course with this name already exists in the database.",

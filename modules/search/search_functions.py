@@ -1,7 +1,7 @@
 from typing import Optional
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from bs4.element import ResultSet
 
 from utils.utils import remove_tabs
@@ -26,7 +26,9 @@ def get_wiki(url: str) -> ResultSet:
     """Does basic setup and formatting of a given wiki page. Returns the plain text of the article."""
     wiki_info = requests.get(url)
     page = BeautifulSoup(wiki_info.content, "html.parser")
-    wiki_html = page.find(id="bodyContent").find_all("p")
+    body = page.find(id="bodyContent")
+    assert isinstance(body, Tag)
+    wiki_html = body.find_all("p")
     return wiki_html
 
 

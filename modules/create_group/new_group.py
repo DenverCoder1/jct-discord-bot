@@ -76,7 +76,7 @@ class NewGroup:
         positions = [role.position for role in roles]
         new_position = min(positions) - 1
         position_dict = {self.role: new_position}
-        await config.guild().edit_role_positions(position_dict)
+        await config.guild().edit_role_positions(position_dict)  # type: ignore
 
     async def __create_group_channel(self):
         self.__channel = await group_channel_creator.create_group_channel(
@@ -86,7 +86,7 @@ class NewGroup:
         )
 
     async def __add_to_campus_channel(self):
-        self.__campus.channel.set_permissions(
+        await self.__campus.channel.set_permissions(
             target=self.__role,
             view_channel=True,
         )

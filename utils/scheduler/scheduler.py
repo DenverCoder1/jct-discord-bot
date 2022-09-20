@@ -50,7 +50,7 @@ class Scheduler:
         secs = self.__secs_to_heb_date(7, 18, 16)
         self.__await_event(secs, "on_winter_semester_start", self.__await_winter_semester_start)
 
-    def __await_event(self, secs: int, event_name: str, on_complete):
+    def __await_event(self, secs: float, event_name: str, on_complete):
         if threading.TIMEOUT_MAX > secs:
             threading.Timer(
                 secs,

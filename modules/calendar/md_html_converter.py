@@ -1,7 +1,7 @@
 import re
 
 import lxml
-from lxml.html import HtmlElement
+import lxml.html
 from markdown import markdown
 from markdownify import markdownify
 
@@ -16,7 +16,7 @@ def html_to_md(html: str) -> str:
     return markdownify(lxml.html.tostring(root, encoding="unicode", method="html")).strip()
 
 
-def __format_links(root: HtmlElement) -> None:
+def __format_links(root: lxml.html.HtmlElement) -> None:
     """
     Set title attributes of <a> tags to match href if not yet defined.
     Shorten links.
@@ -27,10 +27,10 @@ def __format_links(root: HtmlElement) -> None:
         __shorten_link(a)
 
 
-def __default_link_title(a: HtmlElement) -> None:
+def __default_link_title(a: lxml.html.HtmlElement) -> None:
     """Sets title attributes of <a> tags to match href if title attribute is not set."""
-    if not a.get("title"):
-        a.set("title", a.get("href"))
+    if not a.get("title", None):
+        a.set("title", a.get("href", ""))
 
 
 # Group 1: The domain + up to 16 more characters
@@ -38,9 +38,9 @@ def __default_link_title(a: HtmlElement) -> None:
 __SHORT_LINK_REGEX = re.compile("https?://(?:www.)?([^/?#]*.{,16})(.*)")
 
 
-def __shorten_link(a: HtmlElement) -> None:
+def __shorten_link(a: lxml.html.HtmlElement) -> None:
     """If a link's label is the same as its URL, the label is shortened to the domain plus 16 characters and an elipsis where appropriate."""
-    if a.text == a.get("href"):
+    if a.text == a.get("href", ""):
         match = __SHORT_LINK_REGEX.match(a.text or "")
         assert match is not None
-        a.text = match.group(1) + "..." if match.group(2) else ""
+        a.text = f"{match.group(1)}..." if match.group(2) else ""  # type: ignore

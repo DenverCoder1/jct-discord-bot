@@ -32,22 +32,26 @@ class ChannelOptingCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction: nextcord.RawReactionActionEvent):
+        assert self.__manager is not None and self.__channel_messages is not None
         await self.__manager.process_reaction(reaction, self.__channel_messages)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, reaction: nextcord.RawReactionActionEvent):
+        assert self.__manager is not None and self.__channel_messages is not None
         await self.__manager.process_reaction(reaction, self.__channel_messages)
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel: nextcord.abc.GuildChannel):
         if channel.guild != config.guild():
             return
+        assert self.__manager is not None and self.__channel_messages is not None
         await self.__manager.create_channel_message(self.__channel_messages, channel)
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: nextcord.abc.GuildChannel):
         if channel.guild != config.guild():
             return
+        assert self.__manager is not None and self.__channel_messages is not None
         await self.__manager.delete_channel_message(self.__channel_messages, channel)
 
 

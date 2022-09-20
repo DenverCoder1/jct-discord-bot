@@ -44,20 +44,21 @@ async def assign(member: nextcord.Member, name: str, campus_id: int, year: int):
     if __unassigned_role() in member.roles:
         await member.edit(nick=name)
         await __add_role(member, campus_id, year)
-        await member.add_roles(nextcord.Object(id=__student_role().id))
-        await member.remove_roles(nextcord.Object(id=__unassigned_role().id))
+        await member.add_roles(nextcord.Object(__student_role().id))
+        await member.remove_roles(nextcord.Object(__unassigned_role().id))
         await server_welcome(member)
 
 
 async def __add_role(member: nextcord.Member, campus_id: int, year: int):
     """adds the right role to the user that used the command"""
     today = HebrewDate.today()
+    assert today is not None
     last_elul_year = today.year if today.month == 6 else today.year - 1
     last_elul = HebrewDate(last_elul_year, 6, 1)
     base_year = last_elul.to_pydate().year
     grad_year = base_year + 4 - year
     role_id = await sql.select.value("groups", "role", campus=campus_id, grad_year=grad_year)
-    await member.add_roles(nextcord.Object(id=role_id))
+    await member.add_roles(nextcord.Object(role_id))
 
 
 async def server_welcome(member: nextcord.Member):

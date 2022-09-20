@@ -68,6 +68,6 @@ class Fetcher(Protocol[T]):
 async def __select(table: str, columns: Iterable[str], fetcher: Fetcher[T], **conditions) -> T:
     filtered_columns, values, placeholders = util.prepare_kwargs(conditions)
     query = (
-        f"SELECT {', '.join(columns)} FROM" f" {table}{util.where(filtered_columns, placeholders)}"
+        f"SELECT {', '.join(columns)} FROM {table}{util.where(filtered_columns, placeholders)}"
     )
     return await fetcher(query, *values)
