@@ -1,4 +1,4 @@
-black-with-tabs
+black
 mypy
 types-Markdown
 pre-commit

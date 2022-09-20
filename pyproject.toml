@@ -28,3 +28,4 @@ black = { cmd = "task lint black", help = "Run black" }
 isort = { cmd = "task lint isort", help = "Run isort" }
 lint = { cmd = "pre-commit run --all-files", help = "Check all files for linting errors" }
 precommit = { cmd = "pre-commit install --install-hooks", help = "Install the precommit hook" }
+mypy = { cmd = "mypy .", help = "Run mypy" }
