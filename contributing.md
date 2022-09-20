@@ -37,7 +37,7 @@ class MyFeatureCog(commands.Cog):
 
 Then as methods to that class, add any functions you need for the bot. For example:
 
-````py
+```py
 	@nextcord.slash_command()
 	async def my_feature(self, interaction: nextcord.Interaction[commands.Bot], n: int, word: str):
 		"""A command which takes two arguments and does nothing
@@ -52,7 +52,7 @@ Then as methods to that class, add any functions you need for the bot. For examp
 
 		# reply with a message
 		await interaction.send(f"Command received with num {n} and word {word}.")
-````
+```
 
 Finally, (this part is important,) add a function (outside the class) to add an instance of the class you've created (which is a "cog") to the bot.
 
@@ -119,9 +119,11 @@ source .venv/bin/activate # for bash/zsh (you'll need this one if you're on linu
 
 # install everything you need
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
 
 Now you should be able to run the bot locally. Well done!
+
 ```sh
 python bot.py
 ```

@@ -2,6 +2,7 @@ from typing import List, Optional
 from utils.embedder import build_embed
 from utils.utils import one
 from database.channel_message import ChannelMessage
+from nextcord import PermissionOverwrite
 import nextcord
 
 
@@ -18,18 +19,22 @@ class ChannelMessageManager:
 				channel_message = one(
 					cm for cm in channel_messages if cm.message_id == reaction.message_id
 				)
-				allowed: Optional[bool]
+				is_allowed: Optional[bool]
 				if reaction.event_type == "REACTION_ADD":
 					member = reaction.member
-					allowed = False
+					is_allowed = False
 				else:
 					member = nextcord.utils.get(self.__host_channel.members, id=reaction.user_id)
-					allowed = None
+					is_allowed = None  # resets permission to default
 				if not member or member.bot:
 					return
 				channel = channel_message.referenced_channel
 				assert channel is not None
-				await channel.set_permissions(member, view_channel=allowed)
+				await channel.set_permissions(
+					member,
+					overwrite=PermissionOverwrite(view_channel=is_allowed),
+					reason="Channel opting",
+				)
 			except StopIteration:
 				pass
 

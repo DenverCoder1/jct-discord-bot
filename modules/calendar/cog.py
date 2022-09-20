@@ -237,11 +237,13 @@ class CalendarCog(commands.Cog):
 		"""
 		await interaction.response.defer(ephemeral=True)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
+		calendar = await Calendar.get_calendar(
+			interaction, await Group.get_groups(), group_id, ephemeral=True,
+		)
 		# validate email address
 		if not is_email(email):
 			raise FriendlyError(
-				"Invalid email address", interaction, interaction.user, ephemeral=True
+				"Invalid email address", interaction, interaction.user, ephemeral=True,
 			)
 		# add manager to calendar
 		if self.service.add_manager(calendar.id, email):

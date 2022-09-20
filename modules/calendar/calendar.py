@@ -54,8 +54,19 @@ class Calendar:
 		interaction: nextcord.Interaction[commands.Bot],
 		groups: Optional[Iterable[Group]] = None,
 		group_id: Optional[int] = None,
+		ephemeral: bool = False,
 	) -> "Calendar":
-		"""Returns Calendar given a Discord member or a specified group id"""
+		"""Returns Calendar given a Discord member or a specified group id
+		
+		Args:
+			interaction (nextcord.Interaction): The interaction object to use to report errors.
+			groups (Optional[Iterable[Group]], optional): The groups who might own the calendar. Defaults to all of them.
+			group_id (Optional[int], optional): The group id which owns the calendar we seek. Defaults to the user's group, if he has only one.
+			ephemeral: Whether to use ephemeral messages when sending errors. Defaults to False.
+		
+		Returns:
+			The calendar object.
+		"""
 		groups = groups or await Group.get_groups()
 		if group_id:
 			# get the group specified by the user given the group id
@@ -73,7 +84,7 @@ class Calendar:
 					"Could not find your class role.",
 					interaction,
 					interaction.user,
-					ephemeral=True,
+					ephemeral=ephemeral,
 				)
 			# multiple group roles found
 			if len(member_groups) > 1:
@@ -81,7 +92,7 @@ class Calendar:
 					"You must specify which calendar since you have multiple class roles.",
 					interaction,
 					interaction.user,
-					ephemeral=True,
+					ephemeral=ephemeral,
 				)
 			# only one group found
 			group = one(member_groups)
