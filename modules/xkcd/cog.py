@@ -81,7 +81,7 @@ class XKCDCog(commands.Cog):
 			comic = self.xkcd_fetcher.search_relevant(query)
 		except ConnectionError as e:
 			raise FriendlyError(
-				e,
+				e.args[0],
 				interaction,
 				inner=e,
 				description="Please try again later.",
