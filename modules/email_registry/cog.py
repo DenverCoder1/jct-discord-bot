@@ -5,7 +5,7 @@ import config
 import nextcord
 from database.person import Person
 from typing import Any, Callable, Coroutine, Iterable, Optional
-from nextcord.ext import commands
+from nextcord.ext import application_checks, commands
 from . import person_embedder
 from . import categoriser
 from . import person_finder
@@ -86,7 +86,7 @@ class EmailRegistryCog(commands.Cog):
 		await interaction.send(embed=person_embedder.gen_embed(person))
 
 	@email.subcommand(name="remove")
-	@commands.has_guild_permissions(manage_roles=True)
+	@application_checks.has_guild_permissions(manage_roles=True)
 	async def remove_email(self, interaction: nextcord.Interaction[commands.Bot], email: str):
 		"""Remove the email of a professor with this command.
 
@@ -126,7 +126,7 @@ class EmailRegistryCog(commands.Cog):
 		await interaction.send(embed=person_embedder.gen_embed(person))
 
 	@email.subcommand(name="remove")
-	@commands.has_guild_permissions(manage_roles=True)
+	@application_checks.has_guild_permissions(manage_roles=True)
 	async def remove_person(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
@@ -149,7 +149,7 @@ class EmailRegistryCog(commands.Cog):
 		)
 
 	@email.subcommand(name="link")
-	@commands.has_guild_permissions(manage_roles=True)
+	@application_checks.has_guild_permissions(manage_roles=True)
 	async def link_person_to_category(
 		self, interaction: nextcord.Interaction[commands.Bot], name_or_email: str, channel_mentions: str
 	):
@@ -165,7 +165,7 @@ class EmailRegistryCog(commands.Cog):
 		)
 
 	@email.subcommand(name="unlink")
-	@commands.has_guild_permissions(manage_roles=True)
+	@application_checks.has_guild_permissions(manage_roles=True)
 	async def unlink_person_from_category(
 		self, interaction: nextcord.Interaction[commands.Bot], name_or_email: str, channel_mentions: str
 	):

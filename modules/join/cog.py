@@ -1,7 +1,7 @@
 from database import preloaded
 from utils import embedder, utils
 from . import assigner
-from nextcord.ext import commands
+from nextcord.ext import application_checks, commands
 import nextcord
 import config
 
@@ -14,7 +14,7 @@ class JoinCog(commands.Cog):
 		self.assigner = None
 
 	@nextcord.slash_command("join", guild_ids=[config.guild_id])
-	@commands.has_role(utils.get_id("UNASSIGNED_ROLE"))
+	@application_checks.has_role(utils.get_id("UNASSIGNED_ROLE"))
 	async def join(
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
