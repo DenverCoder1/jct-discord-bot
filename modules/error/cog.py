@@ -14,17 +14,17 @@ class ErrorLogCog(commands.Cog):
 		self.logger = ErrorLogger("err.log", utils.get_id("BOT_LOG_CHANNEL"))
 		self.handler = ErrorHandler(self.logger)
 
-	@commands.Cog.listener()
-	async def on_error(self, event: str, *args, **kwargs):
-		_, error, _ = sys.exc_info()
-		if error:
-			await self.handler.handle(error)
+		@bot.event
+		async def on_error(event: str, *args, **kwargs):
+			_, error, _ = sys.exc_info()
+			if error:
+				await self.handler.handle(error)
 
-	@commands.Cog.listener()
-	async def on_application_command_error(
-		self, interaction: nextcord.Interaction[commands.Bot], error: Exception
-	):
-		await self.handler.handle(error, interaction.message)
+		@bot.event
+		async def on_application_command_error(
+			interaction: nextcord.Interaction[commands.Bot], error: Exception
+		):
+			await self.handler.handle(error, interaction.message)
 
 	@nextcord.slash_command(name="logs", guild_ids=[config.guild_id])
 	async def logs(self, interaction: nextcord.Interaction[commands.Bot], num_lines: int = 50):
