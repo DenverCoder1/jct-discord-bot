@@ -24,7 +24,7 @@ class ErrorLogCog(commands.Cog):
 		async def on_application_command_error(
 			interaction: nextcord.Interaction[commands.Bot], error: Exception
 		):
-			await self.handler.handle(error, interaction.message)
+			await self.handler.handle(error, interaction=interaction)
 
 	@nextcord.slash_command(name="logs", guild_ids=[config.guild_id])
 	async def logs(self, interaction: nextcord.Interaction[commands.Bot], num_lines: int = 50):
