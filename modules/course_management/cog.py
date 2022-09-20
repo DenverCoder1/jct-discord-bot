@@ -1,9 +1,7 @@
-from typing import Optional
 import nextcord
-from nextcord import SlashOption
 from modules.course_management import util
 from utils.embedder import embed_success
-from nextcord.ext.commands import has_permissions
+from nextcord.ext.application_checks import has_permissions
 from nextcord.ext import commands
 from . import course_adder
 from . import course_deleter
