@@ -24,7 +24,7 @@ class JoinCog(commands.Cog):
 			campus.name:campus.id
 			for campus in preloaded.campuses
 		}),
-		year: str = nextcord.SlashOption(choices={f"Year {i}":str(i) for i in range(1, 5)}),
+		year: int = nextcord.SlashOption(choices={f"Year {i}":i for i in range(1, 5)}),
 	):
 		"""Join command to get new users' information and place them in the right roles.
 		
@@ -39,8 +39,8 @@ class JoinCog(commands.Cog):
 		await assigner.assign(
 			interaction.user,
 			f"{first_name.title()} {last_name.title()}",
-			int(campus),
-			int(year),
+			campus,
+			year,
 		)
 		await interaction.send(
 			embeds=[
