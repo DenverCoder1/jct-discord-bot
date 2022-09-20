@@ -17,14 +17,13 @@ class ErrorHandler:
 	async def handle(
 		self, error: BaseException, message: Optional[nextcord.Message] = None
 	):
+		"""Given an error, will handle it appropriately"""
+		error: Exception = getattr(error, "original", error)
 		if isinstance(error, FriendlyError):
 			await self.__handle_friendly(error, message)
 
 		elif isinstance(error, QuietWarning):
 			self.__handle_quiet_warning(error)
-
-		elif isinstance(error, discord_err.CommandInvokeError):
-			await self.handle(error.original, message)
 
 		else:
 			self.logger.log_to_file(error, message)
