@@ -20,32 +20,33 @@ class JoinCog(commands.Cog):
 		interaction: nextcord.Interaction[commands.Bot],
 		first_name: str,
 		last_name: str,
-		campus: int = nextcord.SlashOption(choices={
-			campus.name:campus.id
-			for campus in preloaded.campuses
-		}),
-		year: int = nextcord.SlashOption(choices={f"Year {i}":i for i in range(1, 5)}),
+		campus: int = nextcord.SlashOption(
+			choices={campus.name: campus.id for campus in preloaded.campuses}
+		),
+		year: int = nextcord.SlashOption(choices={f"Year {i}": i for i in range(1, 5)}),
 	):
 		"""Join command to get new users' information and place them in the right roles.
-		
+
 		Args:
 			first_name: Your first name.
 			last_name: Your last name.
 			campus: Your campus (Lev or Tal).
 			year: Your year.
 		"""
-		assert isinstance(interaction.user, nextcord.Member), "Interaction user is not a guild member"
+		assert isinstance(
+			interaction.user, nextcord.Member
+		), "Interaction user is not a guild member"
 		await interaction.response.defer()
 		await assigner.assign(
-			interaction.user,
-			f"{first_name.title()} {last_name.title()}",
-			campus,
-			year,
+			interaction.user, f"{first_name.title()} {last_name.title()}", campus, year,
 		)
 		await interaction.send(
 			embeds=[
 				embedder.embed_success(
-					title=f"**{interaction.user.display_name}** used **/{interaction.application_command.name}**"
+					title=(
+						f"**{interaction.user.display_name}** used"
+						f" **/{interaction.application_command.name}**"
+					)
 				)
 			]
 		)

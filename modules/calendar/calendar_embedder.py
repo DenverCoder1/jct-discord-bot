@@ -76,7 +76,9 @@ class CalendarEmbedder:
 					bot=self.bot,
 					message=message,
 					emoji_list=[next_emoji],
-					allowed_users=[interaction.user] if isinstance(interaction.user, nextcord.Member) else None
+					allowed_users=[interaction.user]
+					if isinstance(interaction.user, nextcord.Member)
+					else None,
 				)
 			# time window exceeded
 			except FriendlyError:
@@ -127,7 +129,9 @@ class CalendarEmbedder:
 			bot=self.bot,
 			message=message,
 			emoji_list=self.number_emoji[:num_events],
-					allowed_users=[interaction.user] if isinstance(interaction.user, nextcord.Member) else None
+			allowed_users=[interaction.user]
+			if isinstance(interaction.user, nextcord.Member)
+			else None,
 		)
 		# get the event selected by the user
 		return events_list[selection_index]
@@ -175,7 +179,10 @@ class CalendarEmbedder:
 			# get event details and add enumeration emoji if available
 			event_details = f"\n{next(enumerator, '')} {self.__format_event(event)}"
 			# make sure embed doesn't exceed max length (unless it won't fit on its own page)
-			if len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH and i > 0:
+			if (
+				len(description + event_details + links) > MAX_EMBED_DESCRIPTION_LENGTH
+				and i > 0
+			):
 				break
 			# add event to embed
 			description += event_details
@@ -188,7 +195,9 @@ class CalendarEmbedder:
 			page_num = None
 		# add page number and timezone info
 		footer = self.__footer_text(page_num=page_num)
-		return build_embed(title=title, description=description, footer=footer, colour=colour)
+		return build_embed(
+			title=title, description=description, footer=footer, colour=colour
+		)
 
 	def embed_links(
 		self,
@@ -199,7 +208,9 @@ class CalendarEmbedder:
 		"""Embed a list of links given a mapping of link text to urls"""
 		# add links to embed
 		description = (f"\n**[{text}]({url})**" for text, url in links.items())
-		return build_embed(title=title, description="\n".join(description), colour=colour)
+		return build_embed(
+			title=title, description="\n".join(description), colour=colour
+		)
 
 	def embed_event(
 		self,
@@ -215,7 +226,9 @@ class CalendarEmbedder:
 		description += self.__calendar_links(calendar)
 		# add timezone info
 		footer = self.__footer_text()
-		return build_embed(title=title, description=description, footer=footer, colour=colour)
+		return build_embed(
+			title=title, description=description, footer=footer, colour=colour
+		)
 
 	def __format_paragraph(self, text: str, limit: int = 100) -> str:
 		"""Trims a string of text to approximately `limit` displayed characters,

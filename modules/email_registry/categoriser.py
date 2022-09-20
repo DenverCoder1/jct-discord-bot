@@ -9,7 +9,9 @@ from nextcord.ext import commands
 
 
 async def categorise_person(
-	interaction: nextcord.Interaction[commands.Bot], person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction[commands.Bot],
+	person_id: int,
+	channel_mentions: Iterable[str],
 ) -> Person:
 	"""Adds the person to the categories linked to the channels mentioned. Returns the updated person."""
 	return await __add_remove_categories(
@@ -18,7 +20,9 @@ async def categorise_person(
 
 
 async def decategorise_person(
-	interaction: nextcord.Interaction[commands.Bot], person_id: int, channel_mentions: Iterable[str]
+	interaction: nextcord.Interaction[commands.Bot],
+	person_id: int,
+	channel_mentions: Iterable[str],
 ) -> Person:
 	"""Removes the person from the categories linked to the channels mentioned. Returns the updated person."""
 	return await __add_remove_categories(

@@ -34,7 +34,9 @@ async def deactivate_all_courses(interaction: nextcord.Interaction[commands.Bot]
 
 
 async def __move_course(
-	interaction: nextcord.Interaction[commands.Bot], channel: nextcord.TextChannel, active: bool
+	interaction: nextcord.Interaction[commands.Bot],
+	channel: nextcord.TextChannel,
+	active: bool,
 ):
 	source_label = INACTIVE_COURSES_CATEGORY if active else ACTIVE_COURSES_CATEGORY
 	target_label = ACTIVE_COURSES_CATEGORY if active else INACTIVE_COURSES_CATEGORY

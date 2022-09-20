@@ -12,7 +12,9 @@ def md_to_html(md: str) -> str:
 def html_to_md(html: str) -> str:
 	root = lxml.html.fromstring(html)
 	__format_links(root)
-	return markdownify(lxml.html.tostring(root, encoding="unicode", method="html")).strip()
+	return markdownify(
+		lxml.html.tostring(root, encoding="unicode", method="html")
+	).strip()
 
 
 def __format_links(root: HtmlElement) -> None:

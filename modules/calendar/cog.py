@@ -34,7 +34,8 @@ class CalendarCog(commands.Cog):
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
 		group_id: Optional[int] = nextcord.SlashOption(
-			name="class_name", choices={group.name: group.id for group in preloaded.groups},
+			name="class_name",
+			choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
 		"""Get the links to add or view the calendar
@@ -43,10 +44,14 @@ class CalendarCog(commands.Cog):
 			group_id: Calendar to show links for (eg. Lev 2023). Leave blank if you have only one class role.
 		"""
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
+		calendar = await Calendar.get_calendar(
+			interaction, await Group.get_groups(), group_id
+		)
 		# fetch links for calendar
 		links = self.service.get_links(calendar)
-		embed = self.embedder.embed_links(f"🔗 Calendar Links for {calendar.name}", links)
+		embed = self.embedder.embed_links(
+			f"🔗 Calendar Links for {calendar.name}", links
+		)
 		await interaction.send(embed=embed)
 
 	@calendar.subcommand(name="events")
@@ -56,7 +61,8 @@ class CalendarCog(commands.Cog):
 		query: str = "",
 		results_per_page: int = 5,
 		group_id: Optional[int] = nextcord.SlashOption(
-			name="class_name", choices={group.name: group.id for group in preloaded.groups},
+			name="class_name",
+			choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
 		"""Display upcoming events from the Google Calendar
@@ -70,7 +76,9 @@ class CalendarCog(commands.Cog):
 		"""
 		await interaction.response.defer()
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
+		calendar = await Calendar.get_calendar(
+			interaction, await Group.get_groups(), group_id
+		)
 		# convert channel mentions to full names
 		full_query = await course_mentions.replace_channel_mentions(query)
 		# fetch upcoming events
@@ -90,7 +98,8 @@ class CalendarCog(commands.Cog):
 		description: str = "",
 		location: str = "",
 		group_id: Optional[int] = nextcord.SlashOption(
-			name="class_name", choices={group.name: group.id for group in preloaded.groups},
+			name="class_name",
+			choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
 		"""Add an event to the Google Calendar
@@ -109,9 +118,13 @@ class CalendarCog(commands.Cog):
 		description = await course_mentions.replace_channel_mentions(description)
 		location = await course_mentions.replace_channel_mentions(location)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
+		calendar = await Calendar.get_calendar(
+			interaction, await Group.get_groups(), group_id
+		)
 		try:
-			event = self.service.add_event(calendar.id, title, start, end, description, location)
+			event = self.service.add_event(
+				calendar.id, title, start, end, description, location
+			)
 		except ValueError as error:
 			raise FriendlyError(str(error), interaction, interaction.user, error)
 		embed = self.embedder.embed_event(
@@ -132,7 +145,8 @@ class CalendarCog(commands.Cog):
 		description: Optional[str] = None,
 		location: Optional[str] = None,
 		group_id: Optional[int] = nextcord.SlashOption(
-			name="class_name", choices={group.name: group.id for group in preloaded.groups},
+			name="class_name",
+			choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
 		"""Update an event in the Google Calendar
@@ -151,7 +165,9 @@ class CalendarCog(commands.Cog):
 		# replace channel mentions with course names
 		query = await course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
+		calendar = await Calendar.get_calendar(
+			interaction, await Group.get_groups(), group_id
+		)
 		# get a list of upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to update
@@ -170,9 +186,9 @@ class CalendarCog(commands.Cog):
 				.replace("\\n", "\n")
 			)
 		if location:
-			location = (await course_mentions.replace_channel_mentions(location)).replace(
-				"${location}", event_to_update.location or ""
-			)
+			location = (
+				await course_mentions.replace_channel_mentions(location)
+			).replace("${location}", event_to_update.location or "")
 		try:
 			event = self.service.update_event(
 				calendar.id, event_to_update, title, start, end, description, location,
@@ -191,7 +207,8 @@ class CalendarCog(commands.Cog):
 		interaction: nextcord.Interaction[commands.Bot],
 		query: str,
 		group_id: Optional[int] = nextcord.SlashOption(
-			name="class_name", choices={group.name: group.id for group in preloaded.groups},
+			name="class_name",
+			choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
 		"""Delete an event from the Google Calendar
@@ -204,7 +221,9 @@ class CalendarCog(commands.Cog):
 		# replace channel mentions with course names
 		query = await course_mentions.replace_channel_mentions(query)
 		# get calendar from selected class_role or author
-		calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
+		calendar = await Calendar.get_calendar(
+			interaction, await Group.get_groups(), group_id
+		)
 		# fetch upcoming events
 		events = self.service.fetch_upcoming(calendar.id, query)
 		# get event to delete
@@ -216,7 +235,9 @@ class CalendarCog(commands.Cog):
 			self.service.delete_event(calendar.id, event_to_delete)
 		except ConnectionError as error:
 			raise FriendlyError(error.args[0], interaction, interaction.user, error)
-		embed = self.embedder.embed_event("🗑 Event deleted successfully", event_to_delete, calendar)
+		embed = self.embedder.embed_event(
+			"🗑 Event deleted successfully", event_to_delete, calendar
+		)
 		# edit message if sent already, otherwise send
 		await interaction.edit_original_message(embed=embed)
 
@@ -226,7 +247,8 @@ class CalendarCog(commands.Cog):
 		interaction: nextcord.Interaction[commands.Bot],
 		email: str,
 		group_id: Optional[int] = nextcord.SlashOption(
-			name="class_name", choices={group.name: group.id for group in preloaded.groups},
+			name="class_name",
+			choices={group.name: group.id for group in preloaded.groups},
 		),
 	):
 		"""Add a Google account as a manager of your class's calendar
@@ -247,7 +269,9 @@ class CalendarCog(commands.Cog):
 			)
 		# add manager to calendar
 		if self.service.add_manager(calendar.id, email):
-			embed = embed_success(f":office_worker: Successfully added manager to {calendar.name}.")
+			embed = embed_success(
+				f":office_worker: Successfully added manager to {calendar.name}."
+			)
 			await interaction.send(embed=embed, ephemeral=True)
 			return
 		raise FriendlyError(

@@ -16,7 +16,9 @@ class FormattingCog(commands.Cog):
 		self,
 		interaction: nextcord.Interaction[commands.Bot],
 		format: Optional[str] = nextcord.SlashOption(
-			choices={tip_formatter.formats[key].name: key for key in tip_formatter.formats}
+			choices={
+				tip_formatter.formats[key].name: key for key in tip_formatter.formats
+			}
 		),
 	):
 		"""Command to display markdown tips for Discord messages.

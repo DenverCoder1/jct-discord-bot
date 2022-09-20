@@ -59,7 +59,8 @@ class ErrorHandler:
 		if isinstance(error, application_checks.ApplicationMissingPermissions):
 			return (
 				"You are missing the following permissions required to run the"
-				f' command: {", ".join(str(perm) for perm in error.missing_permissions)}.',
+				" command:"
+				f' {", ".join(str(perm) for perm in error.missing_permissions)}.',
 				False,
 			)
 		elif isinstance(error, application_checks.ApplicationMissingRole):

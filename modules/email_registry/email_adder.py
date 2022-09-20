@@ -18,12 +18,16 @@ async def add_email(person: Person, email: str, sender: nextcord.Interaction) ->
 	"""
 	try:
 		await sql.insert(
-			"emails", on_conflict="(person, email) DO NOTHING", person=person.id, email=email,
+			"emails",
+			on_conflict="(person, email) DO NOTHING",
+			person=person.id,
+			email=email,
 		)
 		return await Person.get_person(person.id)
 	except UniqueViolationError as e:
 		raise FriendlyError(
-			f"Ignoring request to add {email} to {person.name}; it is already in the system.",
+			f"Ignoring request to add {email} to {person.name}; it is already in the"
+			" system.",
 			sender=sender,
 			inner=e,
 		)

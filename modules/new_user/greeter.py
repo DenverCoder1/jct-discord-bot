@@ -30,7 +30,9 @@ class Greeter:
 		await utils.delayed_send(
 			channel, 8, "If you have any trouble tag @Admin and tell them your problem"
 		)
-		await utils.delayed_send(channel, 6, "But just so you dont have to, here's a GIF!")
+		await utils.delayed_send(
+			channel, 6, "But just so you dont have to, here's a GIF!"
+		)
 		await utils.delayed_send(channel, 5, "https://i.imgur.com/5So77B6.gif")
 
 	async def private_greet(self, member: nextcord.Member):
