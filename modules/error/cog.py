@@ -35,5 +35,9 @@ class ErrorLogCog(commands.Cog):
 
 # setup functions for bot
 def setup(bot: commands.Bot):
+	# We need to pass the bot to the cog
+	# so that we can set up the listeners
+	# within the cog. This enables us to
+	# use the cog's methods in the listeners
 	cog = ErrorLogCog(bot)
 	bot.add_cog(cog)
