@@ -9,8 +9,10 @@ class XKCDFetcher:
 		response = requests.get(f"https://xkcd.com/{comic_id}/info.0.json")
 		if response.status_code != 200:
 			# xkcd API did not return a 200 response code
+			if response.status_code == 404:
+				raise ConnectionError("That comic does not exist... yet.")
 			raise ConnectionError(
-				"Could not find a comic with an id of " + str(comic_id)
+				f"An unknown error occurred: HTTP {response.status_code}"
 			)
 		# load json from response
 		comic = response.json()
@@ -21,7 +23,9 @@ class XKCDFetcher:
 		response = requests.get("https://xkcd.com/info.0.json")
 		if response.status_code != 200:
 			# xkcd API did not return a 200 response code
-			raise ConnectionError("Failed to fetch the latest comic.")
+			raise ConnectionError(
+				f"Failed to fetch the latest comic: HTTP {response.status_code}"
+			)
 		# load json from response
 		comic = response.json()
 		return Comic(comic["num"], comic["safe_title"], comic["alt"], comic["img"])
