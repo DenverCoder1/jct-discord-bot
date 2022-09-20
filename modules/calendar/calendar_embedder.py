@@ -45,7 +45,7 @@ class CalendarEmbedder:
 		# set start index
 		page_num = 1
 		# message reference for editing
-		message: Optional[nextcord.Message] = None
+		message: Optional[nextcord.InteractionMessage] = None
 		while True:
 			try:
 				# create embed
@@ -57,10 +57,7 @@ class CalendarEmbedder:
 					page_num=page_num,
 					max_results=results_per_page,
 				)
-				sender = (
-					interaction.followup.send if not message else interaction.edit_original_message
-				)
-				message = await sender(embed=embed)
+				message = await interaction.edit_original_message(embed=embed)
 				# set emoji and page based on whether there are more events
 				if events:
 					next_emoji = "⏬"
@@ -77,7 +74,7 @@ class CalendarEmbedder:
 				# wait for author to respond to go to next page
 				await wait_for_reaction(
 					bot=self.bot,
-					message=message,  # type: ignore
+					message=message,
 					emoji_list=[next_emoji],
 					allowed_users=[interaction.user] if interaction.user else None,  # type: ignore
 				)

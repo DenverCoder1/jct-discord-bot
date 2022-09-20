@@ -183,12 +183,7 @@ class CalendarCog(commands.Cog):
 			":white_check_mark: Event updated successfully", event, calendar
 		)
 		# edit message if sent already, otherwise send
-		sender = (
-			interaction.send
-			if not interaction.response.is_done()
-			else interaction.edit_original_message
-		)
-		await sender(embed=embed)
+		await interaction.edit_original_message(embed=embed)
 
 	@calendar.subcommand(name="delete")
 	async def event_delete(
@@ -223,12 +218,7 @@ class CalendarCog(commands.Cog):
 			raise FriendlyError(error.args[0], interaction, interaction.user, error)
 		embed = self.embedder.embed_event("🗑 Event deleted successfully", event_to_delete, calendar)
 		# edit message if sent already, otherwise send
-		sender = (
-			interaction.send
-			if not interaction.response.is_done()
-			else interaction.edit_original_message
-		)
-		await sender(embed=embed)
+		await interaction.edit_original_message(embed=embed)
 
 	@calendar.subcommand(name="grant")
 	async def calendar_grant(
