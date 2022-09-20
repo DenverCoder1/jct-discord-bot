@@ -48,7 +48,10 @@ class FriendlyError(Exception):
 		return f"Sorry {self.member.display_name}, " if self.member else ""
 
 	async def reply(self):
-		if isinstance(self.sender, nextcord.Interaction) and self.sender.message is not None:
+		if (
+			isinstance(self.sender, nextcord.Interaction)
+			and self.sender.message is not None
+		):
 			sender = self.sender.channel  # slash command has already been answered
 		else:
 			sender = self.sender
@@ -56,5 +59,4 @@ class FriendlyError(Exception):
 			embed=utils.embedder.embed_error(
 				str(self), description=self.description, image=self.image
 			),
-			hidden=self.hidden,
 		)
