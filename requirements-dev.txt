@@ -1,3 +1,5 @@
 black-with-tabs
 mypy
 types-Markdown
+pre-commit
+taskipy
