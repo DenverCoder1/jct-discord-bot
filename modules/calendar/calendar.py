@@ -61,13 +61,13 @@ class Calendar:
         """Returns Calendar given a Discord member or a specified group id
 
         Args:
-                interaction (nextcord.Interaction): The interaction object to use to report errors.
-                groups (Optional[Iterable[Group]], optional): The groups who might own the calendar. Defaults to all of them.
-                group_id (Optional[int], optional): The group id which owns the calendar we seek. Defaults to the user's group, if he has only one.
-                ephemeral: Whether to use ephemeral messages when sending errors. Defaults to False.
+            interaction (nextcord.Interaction): The interaction object to use to report errors.
+            groups (Optional[Iterable[Group]], optional): The groups who might own the calendar. Defaults to all of them.
+            group_id (Optional[int], optional): The group id which owns the calendar we seek. Defaults to the user's group, if he has only one.
+            ephemeral: Whether to use ephemeral messages when sending errors. Defaults to False.
 
         Returns:
-                The calendar object.
+            The calendar object.
         """
         groups = groups or await Group.get_groups()
         if group_id:

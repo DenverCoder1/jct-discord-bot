@@ -29,7 +29,7 @@ async def sort_single_course(channel: nextcord.TextChannel) -> None:
     """Reposition a single course within its category. This function assumes that the rest of the categories are in sorted order; if thry aren't, use the alternative function `sort_courses`
 
     Args:
-            channel (nextcord.TextChannel): The channel to sort within its category.
+        channel (nextcord.TextChannel): The channel to sort within its category.
     """
     assert channel.category is not None
     for other_channel in channel.category.text_channels:

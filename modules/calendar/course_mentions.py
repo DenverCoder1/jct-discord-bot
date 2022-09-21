@@ -7,10 +7,10 @@ async def get_channel_full_name(channel_id: int) -> str:
     """Searches the database for the course name given the channel id
 
     Args:
-            channel_id (int): The ID of the channel to search for.
+        channel_id (int): The ID of the channel to search for.
 
     Returns:
-            str: The name of the course linked to the channel, or the name of the channel if it doesn't belong to a course.
+        str: The name of the course linked to the channel, or the name of the channel if it doesn't belong to a course.
     """
     name = await sql.select.value("categories", "name", channel=channel_id)
     if name:

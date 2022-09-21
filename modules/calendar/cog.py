@@ -44,7 +44,7 @@ class CalendarCog(commands.Cog):
         """Get the links to add or view the calendar
 
         Args:
-                group_id: Calendar to show links for (eg. Lev 2023). Leave blank if you have only one class role.
+            group_id: Calendar to show links for (eg. Lev 2023). Leave blank if you have only one class role.
         """
         # get calendar from selected class_role or author
         calendar = await Calendar.get_calendar(interaction, await Group.get_groups(), group_id)
@@ -67,11 +67,11 @@ class CalendarCog(commands.Cog):
         """Display upcoming events from the Google Calendar
 
         Args:
-                query: Query or channel mention to search for within event titles (if not specified,
-                        shows all events)
-                results_per_page: Number of events to display per page. (Default: 5)
-                group_id: Calendar to show events for (eg. Lev 2023). Leave blank if you have only one
-                        class role.
+            query: Query or channel mention to search for within event titles (if not specified,
+                shows all events)
+            results_per_page: Number of events to display per page. (Default: 5)
+            group_id: Calendar to show events for (eg. Lev 2023). Leave blank if you have only one
+                class role.
         """
         await interaction.response.defer()
         # get calendar from selected class_role or author
@@ -102,12 +102,12 @@ class CalendarCog(commands.Cog):
         """Add an event to the Google Calendar
 
         Args:
-                title: Title of the event (eg. "HW 1 #statistics")
-                start: The start date of the event in Israel Time (eg. "April 15, 2pm")
-                end: The end date of the event in Israel Time (eg. "3pm")
-                description: The description of the event (eg. "Submission box: https://moodle.jct.ac.il/123")
-                location: The location of the event (eg. "Brause 305")
-                group_id: Calendar to add event to (eg. Lev 2023). Leave blank if you have only one class role.
+            title: Title of the event (eg. "HW 1 #statistics")
+            start: The start date of the event in Israel Time (eg. "April 15, 2pm")
+            end: The end date of the event in Israel Time (eg. "3pm")
+            description: The description of the event (eg. "Submission box: https://moodle.jct.ac.il/123")
+            location: The location of the event (eg. "Brause 305")
+            group_id: Calendar to add event to (eg. Lev 2023). Leave blank if you have only one class role.
         """
         await interaction.response.defer()
         # replace channel mentions with course names
@@ -145,14 +145,14 @@ class CalendarCog(commands.Cog):
         """Update an event in the Google Calendar
 
         Args:
-                query: Query or channel mention to search for within event titles
-                title: New title of the event (eg. "HW 1 #statistics"). ${title} refers to old title.
-                start: New start date of the event in Israel Time (eg. "April 15, 2pm")
-                end: New end date of the event in Israel Time (eg. "3pm")
-                description: eg. "[Submission](https://...)". ${description} refers to old description. Use
-                        \\n for newlines.")
-                location: New location of the event (eg. "Brause 305"). ${location} refers to old location.
-                group_id: Calendar to update event in (eg. Lev 2023). Leave blank if you have only one class role.
+            query: Query or channel mention to search for within event titles
+            title: New title of the event (eg. "HW 1 #statistics"). ${title} refers to old title.
+            start: New start date of the event in Israel Time (eg. "April 15, 2pm")
+            end: New end date of the event in Israel Time (eg. "3pm")
+            description: eg. "[Submission](https://...)". ${description} refers to old description. Use
+                \\n for newlines.")
+            location: New location of the event (eg. "Brause 305"). ${location} refers to old location.
+            group_id: Calendar to update event in (eg. Lev 2023). Leave blank if you have only one class role.
         """
         await interaction.response.defer()
         # replace channel mentions with course names
@@ -211,8 +211,8 @@ class CalendarCog(commands.Cog):
         """Delete an event from the Google Calendar
 
         Args:
-                query: Query or channel mention to search for within event titles
-                group_id: Calendar to delete event from (eg. Lev 2023). Leave blank if you have only one class role.
+            query: Query or channel mention to search for within event titles
+            group_id: Calendar to delete event from (eg. Lev 2023). Leave blank if you have only one class role.
         """
         await interaction.response.defer()
         # replace channel mentions with course names
@@ -247,8 +247,8 @@ class CalendarCog(commands.Cog):
         """Add a Google account as a manager of your class's calendar
 
         Args:
-                email: The email address of the Google account to add
-                group_id: Calendar to get access to (eg. Lev 2023). Leave blank if you have only one class role.
+            email: The email address of the Google account to add
+            group_id: Calendar to get access to (eg. Lev 2023). Leave blank if you have only one class role.
         """
         await interaction.response.defer(ephemeral=True)
         # get calendar from selected class_role or author

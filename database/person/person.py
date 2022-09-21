@@ -63,10 +63,10 @@ class Person:
         """Searches the database for all people whose name or surname reasonably match the input and returns a sequence of (person, similarity) pairs sorted by decreasing similarity.
 
         Args:
-                name (str): The name of the person to search for.
+            name (str): The name of the person to search for.
 
         Returns:
-                Sequence[Tuple[Person, float]]: A sequence of results where each result is a tuple of the person that matched as well as a similarity score between 0 and 1.
+            Sequence[Tuple[Person, float]]: A sequence of results where each result is a tuple of the person that matched as well as a similarity score between 0 and 1.
         """
         query = sql_fetcher.fetch("database", "person", "queries", "search_people.sql")
         return [(cls(*record[:-1]), record[-1]) for record in await config.conn.fetch(query, name)]
@@ -99,11 +99,11 @@ class Person:
         """Searches the database using a given a table and some kwarg conditions and returns a list of people found.
 
         Args:
-                table (str): The name of the table to search in.
-                **conditions: The column names and values that the found records should have.
+            table (str): The name of the table to search in.
+            **conditions: The column names and values that the found records should have.
 
         Returns:
-                Iterable[Person]: An iterable of the people found.
+            Iterable[Person]: An iterable of the people found.
         """
         records = await sql.select.many(table, ("person",), **conditions)
         return {await Person.get_person(record["person"]) for record in records}

@@ -34,7 +34,7 @@ class ErrorLogCog(commands.Cog):
         """Show recent logs from err.log.
 
         Args:
-                num_lines: The number of lines to show (default is 50).
+            num_lines: The number of lines to show (default is 50).
         """
         await interaction.send(self.logger.read_logs(num_lines))
 

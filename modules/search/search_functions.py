@@ -8,7 +8,7 @@ from utils.utils import remove_tabs
 
 
 def remove_citations(wiki_paragraph):
-    """removes citations from a string from a wiki"""
+    """Removes citations from a string from a wiki"""
     while True:
         start_of_brackets = wiki_paragraph.find("[")
         end_of_brackets = wiki_paragraph.find("]")
@@ -33,7 +33,7 @@ def get_wiki(url: str) -> ResultSet:
 
 
 def get_wiki_intro(wiki_link: str) -> str:
-    """finds the into to the wiki from the text of the wiki"""
+    """Finds the into to the wiki from the text of the wiki"""
     wiki = get_wiki(wiki_link)
 
     # iterate through the paragraphs of the wiki
@@ -50,7 +50,5 @@ def get_wiki_intro(wiki_link: str) -> str:
 
 
 def format_message(query: str, url: str, wiki_string: Optional[str] = None) -> str:
-    """formats the message"""
-    return remove_tabs(
-        f"Search results for: {query}" + (f"\n{wiki_string}" if wiki_string else "") + f"\n{url}"
-    )
+    """Formats the message"""
+    return remove_tabs(f"Search results for: {query}\n{wiki_string or ''}\n{url}")

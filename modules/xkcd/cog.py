@@ -60,7 +60,7 @@ class XKCDCog(commands.Cog):
         """Gets a specific xkcd comic
 
         Args:
-                number: The ID of the comic to display
+            number: The ID of the comic to display
         """
         await interaction.response.defer()
         try:
@@ -80,7 +80,7 @@ class XKCDCog(commands.Cog):
         """Searches for a relevant xkcd comic
 
         Args:
-                query: The query to search for
+            query: The query to search for
         """
         await interaction.response.defer()
         try:

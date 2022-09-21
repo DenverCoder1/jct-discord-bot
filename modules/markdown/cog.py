@@ -24,7 +24,7 @@ class FormattingCog(commands.Cog):
         """Command to display markdown tips for Discord messages.
 
         Args:
-                format (str): The format to display information about (default is all).
+            format (str): The format to display information about (default is all).
         """
         if not format:
             message = tip_formatter.all_markdown_tips()

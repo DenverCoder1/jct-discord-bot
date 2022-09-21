@@ -31,9 +31,9 @@ class CourseManagerCog(commands.Cog):
         """Add a new course to the database and create a channel for it.
 
         Args:
-                course_name: The full name of the course. (eg. "Advanced Object Oriented Programming and Design")
-                channel_name: The name of the channel. (eg. object-oriented-programming) (default is course name)
-                professors: A comma separated string of names of professors who teach the course. (eg. "shahar golan, eitan")
+            course_name: The full name of the course. (eg. "Advanced Object Oriented Programming and Design")
+            channel_name: The name of the channel. (eg. object-oriented-programming) (default is course name)
+            professors: A comma separated string of names of professors who teach the course. (eg. "shahar golan, eitan")
         """
         await interaction.response.defer()
         professors_split = [professor.strip() for professor in professors.split(",")]
@@ -54,7 +54,7 @@ class CourseManagerCog(commands.Cog):
         """Delete course from the database and delete its channel. (For discontinued courses).
 
         Args:
-                channel: The channel corresponding to the course you want to delete.
+            channel: The channel corresponding to the course you want to delete.
         """
         await interaction.response.defer()
         await course_deleter.delete_course(interaction, channel)
@@ -73,7 +73,7 @@ class CourseManagerCog(commands.Cog):
         """Move an inactive course channel to the active courses list.
 
         Args:
-                course: The channel corresponding to the course you want to activate.
+            course: The channel corresponding to the course you want to activate.
         """
         await interaction.response.defer()
         await course_activator.activate_course(interaction, course)
@@ -87,7 +87,7 @@ class CourseManagerCog(commands.Cog):
         """Move an active course channel to the inactive courses list.
 
         Args:
-                course: The channel corresponding to the course you want to deactivate.
+            course: The channel corresponding to the course you want to deactivate.
         """
         await interaction.response.defer()
         await course_activator.deactivate_course(interaction, course)
@@ -109,7 +109,7 @@ class CourseManagerCog(commands.Cog):
         await util.sort_courses()
         await interaction.send(
             embed=embed_success(
-                "I'm pretty bad at sorting asynchronously, but I think I did it" " right..."
+                "I'm pretty bad at sorting asynchronously, but I think I did it right..."
             )
         )
 

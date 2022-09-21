@@ -13,12 +13,12 @@ async def many(table: str, columns: Iterable[str] = ("*",), **conditions) -> Lis
     For security reasons it is important that the only user input passed into this function is via the values of `**conditions`.
 
     Args:
-            table (str): The name of the table to select from.
-            columns (Iterable[str], optional): The names of columns to select. Defaults to all columns.
-            **conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
+        table (str): The name of the table to select from.
+        columns (Iterable[str], optional): The names of columns to select. Defaults to all columns.
+        **conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
 
     Returns:
-            List[asyncpg.Record]: A list of the records in the table.
+        List[asyncpg.Record]: A list of the records in the table.
     """
     return await __select(table, columns, config.conn.fetch, **conditions)
 
@@ -31,12 +31,12 @@ async def one(
     For security reasons it is important that the only user input passed into this function is via the values of `**conditions`.
 
     Args:
-            table (str): The name of the table to select from.
-            columns (Iterable[str], optional): The names of the columns to select. Defaults to all columns.
-            **conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
+        table (str): The name of the table to select from.
+        columns (Iterable[str], optional): The names of the columns to select. Defaults to all columns.
+        **conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
 
     Returns:
-            Optional[asyncpg.Record]: The selected row if one was found, or None otherwise.
+        Optional[asyncpg.Record]: The selected row if one was found, or None otherwise.
     """
     return await __select(table, columns, config.conn.fetchrow, **conditions)
 
@@ -47,12 +47,12 @@ async def value(table: str, column: str = "*", **conditions) -> Any:
     For security reasons it is important that the only user input passed into this function is via the values of `**conditions`.
 
     Args:
-            table (str): The name of the table to select from.
-            column (str, optional): The names of the columns to select. Defaults to the first column.
-            **conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
+        table (str): The name of the table to select from.
+        column (str, optional): The names of the columns to select. Defaults to the first column.
+        **conditions: Keyword arguments specifying constraints on the select statement. For a kwarg A=B, the select statement will only match rows where the column named A has the value B.
 
     Returns:
-            Optional[Any]: The value of the selected cell if one was found, or None otherwise.
+        Optional[Any]: The value of the selected cell if one was found, or None otherwise.
     """
     return await __select(table, (column,), config.conn.fetchval, **conditions)
 

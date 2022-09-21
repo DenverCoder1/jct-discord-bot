@@ -21,7 +21,7 @@ class PingCog(commands.Cog):
     async def ping(self, interaction: nextcord.Interaction[commands.Bot]):
         """Responds with a random acknowledgement"""
         await interaction.send(
-            f"**{getpass.getuser()} @ {socket.gethostname()} $**" f" {random.choice(self.lines)}"
+            f"**{getpass.getuser()} @ {socket.gethostname()} $** {random.choice(self.lines)}"
         )
 
 

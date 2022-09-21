@@ -36,10 +36,10 @@ async def assign(member: nextcord.Member, name: str, campus_id: int, year: int):
     Sets the user's nickname to their full name, adds the role for the class they're in, and replaces the unassigned role with the assigned role. Following this, it welcomes the user in #off-topic.
 
     Args:
-            member (nextcord.Member): The member to assign.
-            name (str): The member's full name.
-            campus_id (int): The ID of the campus they study in.
-            year (int): The index of the year they're in. This should be a number from 1 to 4.
+        member (nextcord.Member): The member to assign.
+        name (str): The member's full name.
+        campus_id (int): The ID of the campus they study in.
+        year (int): The index of the year they're in. This should be a number from 1 to 4.
     """
     if __unassigned_role() in member.roles:
         await member.edit(nick=name)

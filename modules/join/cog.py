@@ -30,10 +30,10 @@ class JoinCog(commands.Cog):
         """Join command to get new users' information and place them in the right roles.
 
         Args:
-                first_name: Your first name.
-                last_name: Your last name.
-                campus: Your campus (Lev or Tal).
-                year: Your year.
+            first_name: Your first name.
+            last_name: Your last name.
+            campus: Your campus (Lev or Tal).
+            year: Your year.
         """
         assert isinstance(
             interaction.user, nextcord.Member

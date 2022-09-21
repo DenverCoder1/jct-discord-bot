@@ -14,10 +14,10 @@ class CalendarCreator:
         """Create a calendar for each campus.
 
         Args:
-                year (int): The year to create the calendars for.
+            year (int): The year to create the calendars for.
 
         Returns:
-                Dict[int, Calendar]: A dict mapping from campus ID to the newly created calendar objects.
+            Dict[int, Calendar]: A dict mapping from campus ID to the newly created calendar objects.
         """
         return {
             campus: self.__service.create_calendar(f"JCT CompSci {campus.name} {year}")
