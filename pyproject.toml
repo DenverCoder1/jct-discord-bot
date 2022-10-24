@@ -1,0 +1,55 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "jct-discord-bot"
+
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+
+[tool.isort]
+profile = "black"
+py_version = 310
+line_length = 100
+combine_as_imports = true
+filter_files = true
+
+
+[tool.mypy]
+python_version = "3.10"
+namespace_packages = true
+
+
+[[tool.mypy.overrides]]
+module = [
+    "asyncpg",
+    "asyncpg.exceptions",
+    "bs4",
+    "bs4.element",
+    "google.oauth2",
+    "googleapiclient.discovery",
+    "googlesearch",
+    "lxml",
+    "lxml.html",
+    "markdownify",
+    "pyluach",
+    "pyluach.dates",
+    "thefuzz",
+]
+ignore_missing_imports = true
+
+
+[tool.taskipy.tasks]
+black = { cmd = "task lint black", help = "Run black" }
+isort = { cmd = "task lint isort", help = "Run isort" }
+lint = { cmd = "pre-commit run --all-files", help = "Check all files for linting errors" }
+precommit = { cmd = "pre-commit install --install-hooks", help = "Install the precommit hook" }
+mypy = { cmd = "mypy .", help = "Run mypy" }

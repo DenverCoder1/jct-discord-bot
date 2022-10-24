@@ -1,3 +1,7 @@
-black-with-tabs
+black
 mypy
+pre-commit
+taskipy
 types-Markdown
+types-dateparser
+types-requests
