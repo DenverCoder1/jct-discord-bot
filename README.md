@@ -62,6 +62,12 @@ This bot was created by the contribution of the following members. If you would 
 </table>
 <!-- readme: contributors -end -->
 
+
 ## Issues and Feature Requests
 
 If you'd like a new feature added to the bot, or you have discovered some misbehavior by it, please feel free to open an issue detailing it in the [GitHub issues tab](https://github.com/DenverCoder1/jct-discord-bot/issues).
+
+
+## How to use the bot
+
+[Tutorials Playlist](https://www.youtube.com/playlist?list=PL9DdgseuDZgKrT52rm5VApmGa6q02sqKV)
