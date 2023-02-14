@@ -1,7 +1,6 @@
 import os
 from typing import Optional
 
-import asyncpg
 import nextcord
 from dotenv.main import load_dotenv
 
@@ -18,9 +17,6 @@ def guild() -> nextcord.Guild:
     assert _guild is not None
     return _guild
 
-
-# Connect to database
-conn: asyncpg.Connection = None
 
 # Google client configuration
 google_config = {

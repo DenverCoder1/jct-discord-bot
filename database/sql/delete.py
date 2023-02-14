@@ -1,4 +1,4 @@
-import config
+from database import config as db_config
 
 from . import util
 
@@ -16,5 +16,6 @@ async def delete(table: str, **conditions):
     """
     columns, values, placeholders = util.prepare_kwargs(conditions)
     query = f"DELETE FROM {table}{util.where(columns, placeholders)}"
-    async with config.conn.transaction():
-        await config.conn.execute(query, *values)
+    conn = await db_config.get_connection()
+    async with conn.transaction():
+        await conn.execute(query, *values)

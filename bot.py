@@ -1,7 +1,6 @@
 import asyncio
 import os
 
-import asyncpg
 import nextcord
 from nextcord.ext import commands
 
@@ -11,8 +10,6 @@ from utils.scheduler import Scheduler
 
 
 async def main():
-    # Connect to the database
-    config.conn = await asyncpg.connect(os.getenv("DATABASE_URL", ""), ssl="require")
     # Preload necessary data from the database
     await database.preloaded.load()
 
