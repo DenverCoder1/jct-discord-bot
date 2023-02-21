@@ -3,7 +3,8 @@ from typing import Iterable
 import nextcord
 from nextcord.ext import commands
 
-from database import config as db_config, sql_fetcher
+import config
+from database import sql_fetcher
 from database.person import Person
 from utils.mention import decode_channel_mention
 
@@ -38,7 +39,7 @@ async def __add_remove_categories(
     person_id: int,
     channel_mentions: Iterable[str],
 ) -> Person:
-    conn = await db_config.get_connection()
+    conn = await config.get_connection()
     query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
     async with conn.transaction():
         for channel in channel_mentions:

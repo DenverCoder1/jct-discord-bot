@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from database import config as db_config
+import config
 
 from . import util
 
@@ -30,6 +30,6 @@ async def insert(
         f" {'ON CONFLICT ' + on_conflict if on_conflict else ''}"
         f" {('RETURNING ' + returning) if returning else ''}"
     )
-    conn = await db_config.get_connection()
+    conn = await config.get_connection()
     async with conn.transaction():
         return await conn.fetchval(query, *values)

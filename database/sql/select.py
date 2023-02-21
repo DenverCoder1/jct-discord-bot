@@ -2,7 +2,7 @@ from typing import Any, Coroutine, Iterable, List, Optional, Protocol, TypeVar
 
 import asyncpg
 
-from database import config as db_config
+import config
 
 from . import util
 
@@ -20,7 +20,7 @@ async def many(table: str, columns: Iterable[str] = ("*",), **conditions) -> Lis
     Returns:
         List[asyncpg.Record]: A list of the records in the table.
     """
-    conn = await db_config.get_connection()
+    conn = await config.get_connection()
     return await __select(table, columns, conn.fetch, **conditions)
 
 
@@ -39,7 +39,7 @@ async def one(
     Returns:
         Optional[asyncpg.Record]: The selected row if one was found, or None otherwise.
     """
-    conn = await db_config.get_connection()
+    conn = await config.get_connection()
     return await __select(table, columns, conn.fetchrow, **conditions)
 
 
@@ -56,7 +56,7 @@ async def value(table: str, column: str = "*", **conditions) -> Any:
     Returns:
         Optional[Any]: The value of the selected cell if one was found, or None otherwise.
     """
-    conn = await db_config.get_connection()
+    conn = await config.get_connection()
     return await __select(table, (column,), conn.fetchval, **conditions)
 
 
