@@ -39,8 +39,9 @@ async def __add_remove_categories(
     person_id: int,
     channel_mentions: Iterable[str],
 ) -> Person:
+    conn = await config.get_connection()
     query = sql_fetcher.fetch("modules", "email_registry", "queries", sql_file)
-    async with config.conn.transaction():
+    async with conn.transaction():
         for channel in channel_mentions:
             channel_id = decode_channel_mention(channel)
             if channel_id is None:
@@ -49,5 +50,5 @@ async def __add_remove_categories(
                     interaction,
                     interaction.user,
                 )
-            await config.conn.execute(query, person_id, channel_id)
+            await conn.execute(query, person_id, channel_id)
     return await Person.get_person(person_id)

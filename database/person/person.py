@@ -68,8 +68,9 @@ class Person:
         Returns:
             Sequence[Tuple[Person, float]]: A sequence of results where each result is a tuple of the person that matched as well as a similarity score between 0 and 1.
         """
+        conn = await config.get_connection()
         query = sql_fetcher.fetch("database", "person", "queries", "search_people.sql")
-        return [(cls(*record[:-1]), record[-1]) for record in await config.conn.fetch(query, name)]
+        return [(cls(*record[:-1]), record[-1]) for record in await conn.fetch(query, name)]
 
     @classmethod
     async def search_by_channel(cls, channel_id: int) -> Iterable["Person"]:

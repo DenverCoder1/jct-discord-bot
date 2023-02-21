@@ -20,7 +20,8 @@ async def many(table: str, columns: Iterable[str] = ("*",), **conditions) -> Lis
     Returns:
         List[asyncpg.Record]: A list of the records in the table.
     """
-    return await __select(table, columns, config.conn.fetch, **conditions)
+    conn = await config.get_connection()
+    return await __select(table, columns, conn.fetch, **conditions)
 
 
 async def one(
@@ -38,7 +39,8 @@ async def one(
     Returns:
         Optional[asyncpg.Record]: The selected row if one was found, or None otherwise.
     """
-    return await __select(table, columns, config.conn.fetchrow, **conditions)
+    conn = await config.get_connection()
+    return await __select(table, columns, conn.fetchrow, **conditions)
 
 
 async def value(table: str, column: str = "*", **conditions) -> Any:
@@ -54,7 +56,8 @@ async def value(table: str, column: str = "*", **conditions) -> Any:
     Returns:
         Optional[Any]: The value of the selected cell if one was found, or None otherwise.
     """
-    return await __select(table, (column,), config.conn.fetchval, **conditions)
+    conn = await config.get_connection()
+    return await __select(table, (column,), conn.fetchval, **conditions)
 
 
 T = TypeVar("T", covariant=True)

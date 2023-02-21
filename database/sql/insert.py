@@ -30,5 +30,6 @@ async def insert(
         f" {'ON CONFLICT ' + on_conflict if on_conflict else ''}"
         f" {('RETURNING ' + returning) if returning else ''}"
     )
-    async with config.conn.transaction():
-        return await config.conn.fetchval(query, *values)
+    conn = await config.get_connection()
+    async with conn.transaction():
+        return await conn.fetchval(query, *values)
