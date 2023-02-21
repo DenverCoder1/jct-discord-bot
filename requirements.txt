@@ -2,7 +2,7 @@ nextcord==2.4.0
 python-dotenv==0.21.1
 googlesearch-python==1.1.0
 beautifulsoup4==4.9.3
-google-api-python-client==2.52.0
+google-api-python-client==2.79.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.5.3
 dateparser==1.1.7
