@@ -1,5 +1,5 @@
 nextcord==2.2.0
-python-dotenv>=0.21.1,<1
+python-dotenv>=0.21.1,<2
 googlesearch-python>=1.1.0,<2
 beautifulsoup4>=4.9.3,<5
 google-api-python-client>=2.52.0,<3
