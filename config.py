@@ -52,3 +52,7 @@ google_config = {
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": os.getenv("GOOGLE_CLIENT_X509_CERT_URL"),
 }
+
+# Google Drive folder IDs
+drive_folder_id = os.getenv("DRIVE_FOLDER_ID", "")
+drive_guidelines_url = os.getenv("DRIVE_GUIDLELINES_URL", "")
