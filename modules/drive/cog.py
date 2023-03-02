@@ -53,29 +53,31 @@ class DriveCog(commands.Cog):
                 ephemeral=True,
             )
         # add manager to Drive
-        if self.service.add_manager(email):
-            embed = embed_success(
-                title=f":office_worker: Successfully added {email} as an editor to the ESP Google Drive.",
-                description=(
-                    f"Thanks for helping keep the Drive up to date! :heart:\n\n"
-                    f"You now have access to upload any tests, assignments, or other documents that may be useful to other students.\n\n"
-                    f"Please read through the [Drive Guidelines]({config.drive_guidelines_url}) for more information on keeping the Drive organized."
-                ),
+        try:
+            self.service.add_manager(email)
+        except Exception as e:
+            raise FriendlyError(
+                "An error occurred while applying changes.",
+                interaction,
+                interaction.user,
+                ephemeral=True,
             )
-            if email.endswith("@g.jct.ac.il"):
-                embed.description = (
-                    f"{embed.description}\n\n"
-                    ":warning: Note: This is a JCT email address, since it is unclear whether this email address is permanent, "
-                    "we recommend that you use a personal email address instead to avoid files potentially being lost in the future."
-                )
-            await interaction.send(embed=embed, ephemeral=True)
-            return
-        raise FriendlyError(
-            "An error occurred while applying changes.",
-            interaction,
-            interaction.user,
-            ephemeral=True,
+        # send success message
+        embed = embed_success(
+            title=f":office_worker: Successfully added {email} as an editor to the ESP Google Drive.",
+            description=(
+                f"Thanks for helping keep the Drive up to date! :heart:\n\n"
+                f"You now have access to upload any tests, assignments, or other documents that may be useful to other students.\n\n"
+                f"Please read through the [Drive Guidelines]({config.drive_guidelines_url}) for more information on keeping the Drive organized."
+            ),
         )
+        if email.endswith("@g.jct.ac.il"):
+            embed.description = (
+                f"{embed.description}\n\n"
+                ":warning: Note: This is a JCT email address, since it is unclear whether this email address is permanent, "
+                "we recommend that you use a personal email address instead to avoid files potentially being lost in the future."
+            )
+        await interaction.send(embed=embed, ephemeral=True)
 
 
 # setup functions for bot

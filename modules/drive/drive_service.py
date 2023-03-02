@@ -13,8 +13,16 @@ class DriveService:
         self.service = build("drive", "v3", credentials=self.creds)
         self.folder_id = folder_id
 
-    def add_manager(self, email: str) -> bool:
-        """Gives write access to the Google Drive folder given an email address"""
+    def add_manager(self, email: str) -> None:
+        """Gives write access to the Google Drive folder given an email address
+
+        Args:
+            email: The email address of the Google account to add
+
+        Raises:
+            errors.HttpError: If an error occurs while creating the permission
+            AssertionError: If the created permission does not match the email address
+        """
         rule = {
             "role": "writer",
             "type": "user",
@@ -22,7 +30,7 @@ class DriveService:
         }
         created_permission = (
             self.service.permissions()
-            .create(fileId=self.folder_id, body=rule, fields="id")
+            .create(fileId=self.folder_id, body=rule, fields="emailAddress")
             .execute()
         )
-        return "id" in created_permission
+        assert created_permission["emailAddress"] == email
