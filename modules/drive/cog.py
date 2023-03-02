@@ -10,7 +10,7 @@ from ..error.friendly_error import FriendlyError
 
 
 class DriveCog(commands.Cog):
-    """Display and update Google Drive events"""
+    """Manage the ESP Google Drive"""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -18,7 +18,7 @@ class DriveCog(commands.Cog):
 
     @nextcord.slash_command(guild_ids=[config.guild_id])
     async def drive(self, interaction: nextcord.Interaction[commands.Bot]):
-        """This is a base command for all Drive commands and is not invoked"""
+        """This is a base command for all Google Drive commands and is not invoked"""
         pass
 
     @drive.subcommand(name="link")
