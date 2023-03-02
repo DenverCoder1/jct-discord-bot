@@ -52,9 +52,21 @@ class DriveCog(commands.Cog):
                 interaction.user,
                 ephemeral=True,
             )
+        # create message
+        info_message = (
+            f"Thanks for helping keep the Drive up to date! ❤️\n\n"
+            f"You now have access to upload any tests, assignments, or other documents that may be useful to other students.\n\n"
+            f"Please read through the [Drive Guidelines]({config.drive_guidelines_url}) for more information on keeping the Drive organized."
+        )
+        if email.endswith("@g.jct.ac.il"):
+            info_message += (
+                "\n\n⚠️ Note: You are using a JCT email address, since it is unclear whether this email address is permanent, "
+                "we recommend that you use a personal email address instead to avoid files potentially being lost in the future."
+            )
+        email_message = info_message.replace("[Drive Guidelines]", "Drive Guidelines ")
         # add manager to Drive
         try:
-            self.service.add_manager(email)
+            self.service.add_manager(email=email, email_message=email_message)
         except Exception as e:
             raise FriendlyError(
                 "An error occurred while applying changes.",
@@ -65,18 +77,8 @@ class DriveCog(commands.Cog):
         # send success message
         embed = embed_success(
             title=f":office_worker: Successfully added {email} as an editor to the ESP Google Drive.",
-            description=(
-                f"Thanks for helping keep the Drive up to date! :heart:\n\n"
-                f"You now have access to upload any tests, assignments, or other documents that may be useful to other students.\n\n"
-                f"Please read through the [Drive Guidelines]({config.drive_guidelines_url}) for more information on keeping the Drive organized."
-            ),
+            description=info_message,
         )
-        if email.endswith("@g.jct.ac.il"):
-            embed.description = (
-                f"{embed.description}\n\n"
-                ":warning: Note: This is a JCT email address, since it is unclear whether this email address is permanent, "
-                "we recommend that you use a personal email address instead to avoid files potentially being lost in the future."
-            )
         await interaction.send(embed=embed, ephemeral=True)
 
 
