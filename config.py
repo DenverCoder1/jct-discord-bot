@@ -32,7 +32,7 @@ async def get_connection() -> asyncpg.Connection:
     """
     global _conn
     if _conn is None or _conn.is_closed():
-        _conn = await asyncpg.connect(os.getenv("DATABASE_URL", ""), ssl="require")  # type: ignore
+        _conn = await asyncpg.connect(os.getenv("DATABASE_URL"))  # type: ignore
     assert isinstance(
         _conn, asyncpg.Connection
     ), "A connection to the database could not be established."

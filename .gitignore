@@ -138,3 +138,6 @@ jct-compsci-esp-*.json
 
 # SQL stuff
 *.session.sql
+
+# Fly.io
+abbot-engelborg-db
