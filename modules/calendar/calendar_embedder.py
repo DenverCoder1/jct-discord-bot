@@ -80,9 +80,11 @@ class CalendarEmbedder:
                     bot=self.bot,
                     message=message,
                     emoji_list=[next_emoji],
-                    allowed_users=[interaction.user]
-                    if isinstance(interaction.user, nextcord.Member)
-                    else None,
+                    allowed_users=(
+                        [interaction.user]
+                        if isinstance(interaction.user, nextcord.Member)
+                        else None
+                    ),
                 )
             # time window exceeded
             except FriendlyError:
@@ -133,9 +135,9 @@ class CalendarEmbedder:
             bot=self.bot,
             message=message,
             emoji_list=self.number_emoji[:num_events],
-            allowed_users=[interaction.user]
-            if isinstance(interaction.user, nextcord.Member)
-            else None,
+            allowed_users=(
+                [interaction.user] if isinstance(interaction.user, nextcord.Member) else None
+            ),
         )
         # get the event selected by the user
         return events_list[selection_index]
