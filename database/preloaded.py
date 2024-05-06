@@ -10,7 +10,6 @@ Just make sure you call await load() sometime before you use any of the data in
 this module.
 """
 
-
 from typing import Collection
 
 from database.campus import Campus

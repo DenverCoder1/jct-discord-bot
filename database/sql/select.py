@@ -64,8 +64,7 @@ T = TypeVar("T", covariant=True)
 
 
 class Fetcher(Protocol[T]):
-    def __call__(self, query: str, *values: Any) -> Coroutine[Any, Any, T]:
-        ...
+    def __call__(self, query: str, *values: Any) -> Coroutine[Any, Any, T]: ...
 
 
 async def __select(table: str, columns: Iterable[str], fetcher: Fetcher[T], **conditions) -> T:
