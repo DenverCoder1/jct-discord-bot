@@ -36,12 +36,8 @@ class Greeter:
         """privately messages the user who joined"""
         channel = self.__intro_channel()
         assert isinstance(channel, nextcord.TextChannel)
-        await member.send(
-            utils.remove_tabs(
-                f"""
+        await member.send(utils.remove_tabs(f"""
 				Hey, {member.mention}! Welcome!
 
 				Please type head over to the {channel.mention} channel and follow instructions there.
-				"""
-            )
-        )
+				"""))
